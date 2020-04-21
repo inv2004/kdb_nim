@@ -41,13 +41,16 @@ proc kK*(x: K): K {.
 proc khp*(x: cstring, p: int): FileHandle {.
   importc: "khp", header: "\"k.h\"".}
 
-proc k*(h: cint, x: cstring, arg1: K): K {.
+proc k*(h: cint, x: cstring, a: K): K {.
   importc: "k", header: "\"k.h\"".}
 
-proc k*(h: cint, x: cstring, arg1, arg2: K): K {.
+proc k*(h: cint, x: cstring, a, b: K): K {.
   importc: "k", header: "\"k.h\"".}
 
-proc k*(h: cint, x: cstring, arg1, arg2, arg3: K): K {.
+proc k*(h: cint, x: cstring, a, b, c: K): K {.
+  importc: "k", header: "\"k.h\"".}
+
+proc k*(h: cint, x: cstring, a, b, c, d: K): K {.
   importc: "k", header: "\"k.h\"".}
 
 proc checkCStructOffset*() {.
