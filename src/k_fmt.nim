@@ -39,6 +39,8 @@ proc `$`*(x: K): string =
     result.add fmtKDict(x)
   of kInt:
     result.add $x.ii
+  of kLong:
+    result.add $x.jj
   of kString:
     result.add '"' & $x.ss & '\"'
   else:

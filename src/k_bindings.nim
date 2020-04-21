@@ -38,6 +38,18 @@ proc xT*(x: K): K {.
 proc kK*(x: K): K {.
   importc: "kK", header: "\"k.h\"".}
 
+proc khp*(x: cstring, p: int): FileHandle {.
+  importc: "khp", header: "\"k.h\"".}
+
+proc k*(h: cint, x: cstring, arg1: K): K {.
+  importc: "k", header: "\"k.h\"".}
+
+proc k*(h: cint, x: cstring, arg1, arg2: K): K {.
+  importc: "k", header: "\"k.h\"".}
+
+proc k*(h: cint, x: cstring, arg1, arg2, arg3: K): K {.
+  importc: "k", header: "\"k.h\"".}
+
 proc checkCStructOffset*() {.
   importc: "check_c_struct_offset".}
 

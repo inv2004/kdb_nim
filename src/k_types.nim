@@ -9,6 +9,7 @@ type
     kTable = 98,
     kDict = 99,
     kString = 256-11
+    kLong = 256-7,
     kInt = 256-6,
 
   K* = ptr object {.packed.}
@@ -44,6 +45,10 @@ type
       iu*: cchar
       ir*: cint
       ii*: cint
+    of kLong:
+      ju*: cchar
+      jr*: cint
+      jj*: clonglong
     of kString:
       su*: cchar
       sr*: cint
