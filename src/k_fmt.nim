@@ -23,22 +23,6 @@ proc fmtKTable(x: K): string =
   result = t.render()
   result.removeSuffix()
 
-proc fmtKTable_old(x: K): string =
-  # result.add ($x.dict.keys.len) & "x" & ($x.dict.values.kArr[0].len) & "\n"
-  result.add "|"
-  var i = 0
-  for c in x.dict.keys.iterString():
-    if i > 0:
-      result.add " "
-    result.add c
-    inc(i)
-  result.add "|\n"
-  for i in 0..<x.dict.values.kArr[0].len:
-    for c in x.dict.values.iterK():
-      # result.add " " & $c.intArr[i]
-      result.add " " & $c[i]
-    result.add "\n"
-
 proc fmtKDict(x: K): string =
   result.add "{"
   for i in 0..<x.keys.len:
