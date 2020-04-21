@@ -141,5 +141,4 @@ proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
   of 1: result = k(h, s.cstring, args[0], nil)
   of 2: result = k(h, s.cstring, args[0], args[1], nil)
   of 3: result = k(h, s.cstring, args[0], args[1], args[2], nil)
-  else: raise newException(KError, "Cannot exec with more than 2 arguments")
 
