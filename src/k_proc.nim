@@ -1,6 +1,15 @@
 import k_bindings
 export k_bindings
 
+converter toK*(x: int): K =
+  ki(x.cint)
+
+converter toK*(x: string): K =
+  ks(x.cstring)
+
+converter toK*(x: cstring): K =
+  ks(x)
+
 proc len*(x: K): clonglong =
   case x.kind
   of kList: x.kLen
@@ -8,23 +17,24 @@ proc len*(x: K): clonglong =
   of kVecSym: x.stringLen
   else: raise newException(KError, "Not List")
 
-iterator iterK*(x: K): var K =
-  var i = 0
-  while i < x.kLen:
-    yield x.kArr[i]
-    inc(i)
-
-iterator iterString*(x: K): cstring =
-  var i = 0
-  while i < x.stringLen:
-    yield x.stringArr[i]
-    inc(i)
-
-iterator iterInt*(x: K): cint =
-  var i = 0
-  while i < x.intLen:
-    yield x.intArr[i]
-    inc(i)
+iterator items*(x: K): K =
+  case x.kind
+  of kList:
+    var i = 0
+    while i < x.kLen:
+      yield x.kArr[i]
+      inc(i)
+  of kVecInt:
+    var i = 0
+    while i < x.intLen:
+      yield x.intArr[i].toK()
+      inc(i)
+  of kVecSym:
+    var i = 0
+    while i < x.stringLen:
+      yield x.stringArr[i].toK()
+      inc(i)
+  else: raise newException(KError, "items is not supported here")
 
 proc newKDict*(kt, vt: int): K =
   let header = ktn(kt, 0)
@@ -67,12 +77,6 @@ proc addColumn*(t: var K, name: cstring, x: int) =
 
 proc `%`(x: int): K =
   ki(x.cint)
-
-converter toK*(x: int): K =
-  ki(x.cint)
-
-converter toK*(x: string): K =
-  ks(x.cstring)
 
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.dict.values.len == vals.len

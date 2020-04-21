@@ -10,13 +10,13 @@ proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for c in x.dict.keys.iterString():
+  for c in x.dict.keys:
     header.add $c
   t.setHeaders(header)
 
   for i in 0..<x.dict.values.kArr[0].len:
     var row: seq[string] = @[]
-    for c in x.dict.values.iterK():
+    for c in x.dict.values:
       row.add $c[i]
     t.addRow(row)
 
