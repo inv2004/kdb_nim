@@ -3,6 +3,7 @@
 {.link: "c.o".}
 
 import k_types
+export k_types
 
 proc ks*(x: cstring): K {.
   importc: "ks", header: "\"k.h\"".}

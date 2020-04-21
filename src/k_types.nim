@@ -7,8 +7,10 @@ type
     kVecInt = 6,
     kVecSym = 11,
     kTable = 98,
-    kDict = 99
-    kInt = 256-6
+    kDict = 99,
+    kString = 256-11
+    kInt = 256-6,
+
   K* = ptr object {.packed.}
     m*: cchar
     a*: cchar
@@ -42,3 +44,8 @@ type
       iu*: cchar
       ir*: cint
       ii*: cint
+    of kString:
+      su*: cchar
+      sr*: cint
+      ss*: cstring
+
