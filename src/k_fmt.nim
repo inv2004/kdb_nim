@@ -9,6 +9,7 @@ const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
 const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
 const timespanFormat = "HH:mm:ss\'.\'fffffffff"
+const timeFormat = "HH:mm:ss\'.\'fff"
 
 proc `$`*(x: K): string
 
@@ -66,6 +67,9 @@ proc `$`*(x: K): string =
   of kTimespan:
     let d = initTime(0, 0) + initDuration(nanoseconds = x.tp)
     result.add d.format(timespanFormat, zone = utc())
+  of kTime:
+    let d = initTime(0, 0) + initDuration(milliseconds = x.tt)
+    result.add d.format(timeFormat, zone = utc())
   of kVecChar:
     result.add '"' & $cast[cstring](x.charArr) & '"'
   else:

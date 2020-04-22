@@ -28,6 +28,9 @@ converter toKTimestamp*(x: clonglong): K =
 converter toKTimespan*(x: clonglong): K =
   ktj(KKind.kTimespan.byte, x)
 
+converter toKTime*(x: cint): K =
+  kt(x)
+
 proc len*(x: K): clonglong =
   case x.kind
   of kList: x.kLen
@@ -136,6 +139,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecDate: x.dateArr[i].toKDate()
   of kVecDateTime: x.dtArr[i].toKDateTime()
   of kVecTimespan: x.tpArr[i].toKTimespan()
+  of kVecTime: x.ttArr[i].toKTime()
   of kList: x.kArr[i]
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 

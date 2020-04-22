@@ -23,6 +23,9 @@ proc kz*(x: cdouble): K {.
 proc ktj*(t: byte, x: clonglong): K {.
   importc: "ktj", header: "k.h".}
 
+proc kt*(x: cint): K {.
+  importc: "kt", header: "k.h".}
+
 proc knk*(i: int): K {.
   importc: "knk", header: "k.h".}
 
