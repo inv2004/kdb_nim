@@ -41,8 +41,10 @@ proc `$`*(x: K): string =
     result.add $x.ii
   of kLong:
     result.add $x.jj
-  of kString:
-    result.add '"' & $x.ss & '\"'
+  of kSym:
+    result.add '"' & $x.ss & '"'
+  of kVecChar:
+    result.add '"' & $cast[cstring](x.charArr) & '"'
   else:
     result.add $x.kind & ": "
     result.add "unknown"

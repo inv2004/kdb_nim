@@ -130,7 +130,7 @@ proc `[]=`*(x: var K, i: int, v: K) =
     x.keys.add(%i)
     x.values.add(v)
   of kVecSym:
-    assert v.kind == kString  # /-------\
+    assert v.kind == kSym  # /-------\
     x.stringArr[i] = v.ss     # TODO: fix
   else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.kind)
 

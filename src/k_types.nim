@@ -6,10 +6,11 @@ type
     kList = 0,
     kVecInt = 6,
     kVecLong = 7,
+    kVecChar = 10,
     kVecSym = 11,
     kTable = 98,
     kDict = 99,
-    kString = 256-11
+    kSym = 256-11
     kLong = 256-7,
     kInt = 256-6,
 
@@ -42,6 +43,11 @@ type
       vjr*: cint
       longLen*: clonglong
       longArr*: UncheckedArray[clonglong]
+    of kVecChar:
+      vcu*: cchar
+      vcr*: cint
+      charLen*: clonglong
+      charArr*: UncheckedArray[char]
     of kVecSym:
       vsu*: cchar
       vsr*: cint
@@ -55,7 +61,7 @@ type
       ju*: cchar
       jr*: cint
       jj*: clonglong
-    of kString:
+    of kSym:
       su*: cchar
       sr*: cint
       ss*: cstring
