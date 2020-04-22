@@ -11,6 +11,9 @@ proc ks*(x: cstring): K {.
 proc ki*(x: cint): K {.
   importc: "ki", header: "\"k.h\"".}
 
+proc kf*(x: cdouble): K {.
+  importc: "kf", header: "\"k.h\"".}
+
 proc knk*(i: int): K {.
   importc: "knk", header: "\"k.h\"".}
 

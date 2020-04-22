@@ -7,6 +7,9 @@ converter toK*(x: int): K =
 converter toK*(x: int64): K =
   ki(x.cint)
 
+converter toK*(x: float64): K =
+  kf(x.cdouble)
+
 converter toK*(x: string): K =
   ks(x.cstring)
 
@@ -113,6 +116,7 @@ proc `[]`*(x: K, i: int64): K =
   case x.kind
   of kVecInt: x.intArr[i].toK()
   of kVecLong: x.longArr[i].toK()
+  of kVecFloat: x.floatArr[i].toK()
   of kVecSym: x.stringArr[i].toK()
   of kList: x.kArr[i]
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)

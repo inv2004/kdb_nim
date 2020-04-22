@@ -6,11 +6,13 @@ type
     kList = 0,
     kVecInt = 6,
     kVecLong = 7,
+    kVecFloat = 9,
     kVecChar = 10,
     kVecSym = 11,
     kTable = 98,
     kDict = 99,
     kSym = 256-11
+    kFloat = 256-9,
     kLong = 256-7,
     kInt = 256-6,
 
@@ -43,6 +45,11 @@ type
       vjr*: cint
       longLen*: clonglong
       longArr*: UncheckedArray[clonglong]
+    of kVecFloat:
+      vfu*: cchar
+      vfr*: cint
+      floatLen*: clonglong
+      floatArr*: UncheckedArray[cdouble]
     of kVecChar:
       vcu*: cchar
       vcr*: cint
@@ -61,6 +68,10 @@ type
       ju*: cchar
       jr*: cint
       jj*: clonglong
+    of kFloat:
+      fu*: cchar
+      fr*: cint
+      ff*: cdouble
     of kSym:
       su*: cchar
       sr*: cint

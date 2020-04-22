@@ -41,6 +41,8 @@ proc `$`*(x: K): string =
     result.add $x.ii
   of kLong:
     result.add $x.jj
+  of kFloat:
+    result.add $x.ff
   of kSym:
     result.add x.ss
   of kVecChar:
