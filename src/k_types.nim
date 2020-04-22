@@ -12,8 +12,10 @@ type
     kVecTimestamp = 12
     kVecDate = 14
     kVecDateTime = 15
+    kVecTimespan = 16
     kTable = 98
     kDict = 99
+    kTimespan = 256-16
     kDateTIme = 256-15
     kDate = 256-14
     kTimestamp = 256-12
@@ -71,6 +73,11 @@ type
       vdtr*: cint
       dtLen*: clonglong
       dtArr*: UncheckedArray[cdouble]
+    of kVecTimespan:
+      vtpu*: cchar
+      vtpr*: cint
+      tpLen*: clonglong
+      tpArr*: UncheckedArray[clonglong]
     of kTable:
       tu*: cchar
       tr*: cint
@@ -81,6 +88,10 @@ type
       dn*: clonglong  # always 2
       keys*: K
       values*: K
+    of kTimespan:
+      tpu*: cchar
+      tpr*: cint
+      tp*: clonglong
     of kDateTime:
       dtu*: cchar
       dtr*: cint

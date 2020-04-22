@@ -8,6 +8,7 @@ import terminaltables
 const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
 const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
+const timespanFormat = "HH:mm:ss\'.\'fffffffff"
 
 proc `$`*(x: K): string
 
@@ -62,6 +63,9 @@ proc `$`*(x: K): string =
     let d = initDuration(seconds = int64(86400*(x.dt+10957)))
     let dt = initDateTime(1, mJan, 1970, 0, 0, 0, utc()) + d
     result.add dt.format(dateTimeFormat)
+  of kTimespan:
+    let d = initTime(0, 0) + initDuration(nanoseconds = x.tp)
+    result.add d.format(timespanFormat, zone = utc())
   of kVecChar:
     result.add '"' & $cast[cstring](x.charArr) & '"'
   else:
