@@ -1,9 +1,14 @@
+{.compile: "k.c".}
+{.passC: "-DKXVER=3".}
+{.link: "c.o".}
+
 type
   KError* = object of Exception
 
 type
-  KKind* = enum
+  KKind* {.size: 1.} = enum
     kList = 0
+    kVecBool = 1
     kVecInt = 6
     kVecLong = 7
     kVecFloat = 9
@@ -25,8 +30,9 @@ type
     kFloat = 256-9
     kLong = 256-7
     kInt = 256-6
+    kBool = 256-1
 
-  K* = ptr object {.packed.}
+  K0* = ptr object {.packed.}
     m*: cchar
     a*: cchar
     case kind*: KKind
@@ -34,7 +40,12 @@ type
       lu*: cchar
       lr*: cint
       kLen*: clonglong
-      kArr*: UncheckedArray[K]
+      kArr*: UncheckedArray[K0]
+    of kVecBool:
+      vbu*: cchar
+      vbr*: cint
+      boolInt*: clonglong
+      boolArr*: UncheckedArray[bool]
     of kVecInt:
       viu*: cchar
       vir*: cint
@@ -88,13 +99,13 @@ type
     of kTable:
       tu*: cchar
       tr*: cint
-      dict*: K
+      dict*: K0
     of kDict:
       du*: cchar
       dr*: cint
       dn*: clonglong  # always 2
-      keys*: K
-      values*: K
+      keys*: K0
+      values*: K0
     of kTime:
       ttu*: cchar
       ttr*: cint
@@ -131,4 +142,28 @@ type
       iu*: cchar
       ir*: cint
       ii*: cint
+    of kBool:
+      bu*: cchar
+      br*: cint
+      bb*: bool
+
+  K* = object
+    k*: K0
+
+
+proc r0*(x: K0) {.
+  importc: "r0", header: "k.h".}
+
+proc r1*(x: K0) {.
+  importc: "r1", header: "k.h".}
+
+proc `=`*(a: var K, b: K) =
+  r1(b.k)
+  a.k = b.k
+
+proc `=destroy`*(x: var K) =
+  echo "destroy K: ", if x.k == nil: "nil" else: "full"
+  if x.k != nil:
+    echo "destroy KK: rc = ", x.k.ir
+    r0(x.k)
 

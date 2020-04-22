@@ -25,5 +25,13 @@ proc main() =
   let r = h.exec("f")
   echo r
 
+proc main() =
+  var c = 0
+  while true:
+    # var i = toK(1122)
+    var i = %1122
+    r1(i.k)
+    # r0(i)
+
 when isMainModule:
-  main()
+  main2()

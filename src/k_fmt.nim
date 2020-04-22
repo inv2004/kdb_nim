@@ -17,14 +17,14 @@ proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for c in x.dict.keys:
-    header.add $c.ss  # to remove quoted names
+  for c in x.k.dict.keys:
+    header.add $c.k.ss  # to remove quoted names
   t.setHeaders(header)
 
-  for i in 0..<x.dict.values.kArr[0].len:
+  for i in 0..<x.k.dict.values.kArr[0].len:
     var row: seq[string] = @[]
-    for c in x.dict.values:
-      row.add $c[i]
+    for c in x.k.dict.values:
+      row.add $c.k[i]
     t.addRow(row)
 
   result = t.render()
@@ -32,46 +32,47 @@ proc fmtKTable(x: K): string =
 
 proc fmtKDict(x: K): string =
   result.add "{"
-  for i in 0..<x.keys.len:
+  for i in 0..<x.k.keys.len:
     if i > 0:
       result.add "; "
-    result.add $x.keys[i] & ": " & $x.values[i]
+    result.add $x.k.keys[i] & ": " & $x.k.values[i]
   result.add "}"
 
 proc `$`*(x: K): string =
-  case x.kind
+  case x.k.kind
   of kTable:
     result.add fmtKTable(x)
   of kDict:
     result.add fmtKDict(x)
   of kInt:
-    result.add $x.ii
+    result.add $x.k.ii
   of kLong:
-    result.add $x.jj
+    result.add $x.k.jj
   of kFloat:
-    result.add $x.ff
+    result.add $x.k.ff
   of kSym:
-    result.add x.ss
+    result.add x.k.ss
+  of kBool:
+    result.add $x.k.bb.bool
   of kTimestamp:
-    let d = initDuration(nanoseconds = x.ts)
+    let d = initDuration(nanoseconds = x.k.ts)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(timestampFormat)
   of kDate:
-    let d = initDuration(days = x.dd)
+    let d = initDuration(days = x.k.dd)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(dateFormat)
   of kDateTime:
-    let d = initDuration(seconds = int64(86400*(x.dt+10957)))
+    let d = initDuration(seconds = int64(86400*(x.k.dt+10957)))
     let dt = initDateTime(1, mJan, 1970, 0, 0, 0, utc()) + d
     result.add dt.format(dateTimeFormat)
   of kTimespan:
-    let d = initTime(0, 0) + initDuration(nanoseconds = x.tp)
+    let d = initTime(0, 0) + initDuration(nanoseconds = x.k.tp)
     result.add d.format(timespanFormat, zone = utc())
   of kTime:
-    let d = initTime(0, 0) + initDuration(milliseconds = x.tt)
+    let d = initTime(0, 0) + initDuration(milliseconds = x.k.tt)
     result.add d.format(timeFormat, zone = utc())
   of kVecChar:
-    result.add '"' & $cast[cstring](x.charArr) & '"'
+    result.add '"' & $cast[cstring](x.k.charArr) & '"'
   else:
-    result.add $x.kind & ": "
-    result.add "unknown"
+    result.add $x.k.kind & ": unknown"

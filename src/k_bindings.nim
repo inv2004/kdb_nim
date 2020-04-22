@@ -1,71 +1,70 @@
-{.compile: "k.c".}
-{.passC: "-DKXVER=3".}
-{.link: "c.o".}
-
 import k_types
 export k_types
 
-proc ks*(x: cstring): K {.
+proc kb*(x: bool): K0 {.
+  importc: "kb", header: "k.h".}
+
+proc ks*(x: cstring): K0 {.
   importc: "ks", header: "k.h".}
 
-proc ki*(x: cint): K {.
+proc ki*(x: cint): K0 {.
   importc: "ki", header: "k.h".}
 
-proc kf*(x: cdouble): K {.
+proc kf*(x: cdouble): K0 {.
   importc: "kf", header: "k.h".}
 
-proc kd*(x: cint): K {.
+proc kd*(x: cint): K0 {.
   importc: "kd", header: "k.h".}
 
-proc kz*(x: cdouble): K {.
+proc kz*(x: cdouble): K0 {.
   importc: "kz", header: "k.h".}
 
-proc ktj*(t: byte, x: clonglong): K {.
+proc ktj*(t: byte, x: clonglong): K0 {.
   importc: "ktj", header: "k.h".}
 
-proc kt*(x: cint): K {.
+proc kt*(x: cint): K0 {.
   importc: "kt", header: "k.h".}
 
-proc knk*(i: int): K {.
+proc knk*(i: int): K0 {.
   importc: "knk", header: "k.h".}
 
-proc jk*(l: ptr K, x: K) {.
+proc jk*(l: ptr K0, x: K0) {.
   importc: "jk", header: "k.h".}
 
-proc ktn*(t:int, i: int): K {.
+proc ktn*(t:int, i: int): K0 {.
   importc: "ktn", header: "k.h".}
 
-proc js*(l: ptr K, x: cstring) {.
+proc js*(l: ptr K0, x: cstring) {.
   importc: "js", header: "k.h".}
 
-proc ja*(l: ptr K, x: ptr cint) {.
+proc ja*(l: ptr K0, x: ptr cint) {.
   importc: "ja", header: "k.h".}
 
 proc ss*(x: cstring): cstring {.
   importc: "ss", header: "k.h".}
 
-proc xD*(k: K, v: K): K {.
+proc xD*(k: K0, v: K0): K0 {.
   importc: "xD", header: "k.h".}
 
-proc xT*(x: K): K {.
+proc xT*(x: K0): K0 {.
   importc: "xT", header: "k.h".}
 
-proc kK*(x: K): K {.
+proc kK*(x: K0): K0 {.
   importc: "kK", header: "k.h".}
 
 proc khp*(x: cstring, p: int): FileHandle {.
   importc: "khp", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a: K): K {.
+proc k*(h: cint, x: cstring, a: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b: K): K {.
+proc k*(h: cint, x: cstring, a, b: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b, c: K): K {.
+proc k*(h: cint, x: cstring, a, b, c: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b, c, d: K): K {.
+proc k*(h: cint, x: cstring, a, b, c, d: K0): K0 {.
   importc: "k", header: "k.h".}
 
 proc checkCStructOffset*() {.
@@ -73,12 +72,12 @@ proc checkCStructOffset*() {.
 
 proc checkNimStructOffset*() =
   echo "Nim-struct-offset:"
-  echo "  m: ", offsetof(K, m)
-  echo "  a: ", offsetof(K, a)
-  echo "  t: ", offsetof(K, kind)
-  echo "  u: ", offsetof(K, tu)
-  echo "  r: ", offsetof(K, tr)
-  echo "  k: ", offsetof(K, dict)
-  echo "  n: ", offsetof(K, kLen)
-  echo "  g: ", offsetof(K, kArr)
+  echo "  m: ", offsetof(K0, m)
+  echo "  a: ", offsetof(K0, a)
+  echo "  t: ", offsetof(K0, kind)
+  echo "  u: ", offsetof(K0, tu)
+  echo "  r: ", offsetof(K0, tr)
+  echo "  k: ", offsetof(K0, dict)
+  echo "  n: ", offsetof(K0, kLen)
+  echo "  g: ", offsetof(K0, kArr)
 

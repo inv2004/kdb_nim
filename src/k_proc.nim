@@ -1,37 +1,46 @@
 import k_bindings
 export k_bindings
 
-converter toK*(x: int): K =
-  ki(x.cint)
+converter toK*(x: int): K=
+  K(k: ki(x.cint))
 
 converter toK*(x: int64): K =
-  ki(x.cint)
+  K(k: ki(x.cint))
 
 converter toK*(x: float64): K =
-  kf(x.cdouble)
+  K(k: kf(x.cdouble))
 
 converter toK*(x: string): K =
-  ks(x.cstring)
+  K(k: ks(x.cstring))
 
 converter toK*(x: cstring): K =
-  ks(x)
+  K(k: ks(x))
 
 converter toKDate*(x: cint): K =
-  kd(x)
+  K(k: kd(x))
 
 converter toKDateTime*(x: cdouble): K =
-  kz(x)
+  K(k: kz(x))
 
 converter toKTimestamp*(x: clonglong): K =
-  ktj(KKind.kTimestamp.byte, x)
+  K(k: ktj(KKind.kTimestamp.byte, x))
 
 converter toKTimespan*(x: clonglong): K =
-  ktj(KKind.kTimespan.byte, x)
+  K(k: ktj(KKind.kTimespan.byte, x))
 
 converter toKTime*(x: cint): K =
-  kt(x)
+  K(k: kt(x))
 
-proc len*(x: K): clonglong =
+converter toK*(x: bool): K =
+  K(k: kb(x))
+
+converter toK*(x: K0): K =
+  K(k: x)
+
+proc `%`*(x: int): K =
+  toK(x)
+
+proc len*(x: K0): clonglong =
   case x.kind
   of kList: x.kLen
   of kVecInt: x.intLen
@@ -40,7 +49,7 @@ proc len*(x: K): clonglong =
   of kVecDate: x.dateLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
-iterator items*(x: K): K =
+iterator items*(x: K0): K =
   case x.kind
   of kList:
     var i = 0
@@ -59,7 +68,7 @@ iterator items*(x: K): K =
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.kind)
 
-iterator mitems*(x: K): var K =
+iterator mitems*(x: K0): var K0 =
   case x.kind
   of kList:
     var i = 0
@@ -81,56 +90,64 @@ iterator mitems*(x: K): var K =
 proc newKDict*(kt, vt: int): K =
   let header = ktn(kt, 0)
   let data = ktn(vt, 0)
-  xD(header, data)
+  K(k: xD(header, data))
 
-proc add*(x: var K, v: cstring) =
+proc add*(x: var K0, v: cstring) =
   js(x.addr, ss(v))
 
-proc add*(x: var K, v: cint) =
+proc add*(x: var K, v: cstring) =
+  add(x.k, v)
+
+proc add*(x: var K0, v: cint) =
   ja(x.addr, v.unsafeAddr)
 
-proc add*(x: var K, v: K) =
+proc add*(x: var K0, v: int) =
+  add(x, v.cint)
+
+proc add*(x: var K0, v: K0) =
   case x.kind
   of kList: jk(x.addr, v)
   of kVecInt: add(x, v.ii.cint)
   else: raise newException(KError, "add is not supported for " & $x.kind)
 
+proc add*(x: var K, v: K) =
+  add(x.k, v.k)
+
 proc newKVec*(x: int): K =
-  ktn(x.cint, 0)
+  K(k: ktn(x.cint, 0))
 
 proc newKVecSym*(): K =
   newKVec(11)
 
 proc newKList*(): K =
-  knk(0)
+  K(k: knk(0))
 
 proc addColumn*(t: var K, name: cstring, x: int) =
-  if t == nil:
+  if t.k == nil:
     var header = newKVecSym()
     header.add(name)
     var data = newKList()
-    var c1 = ktn(x, 0)
-    data.add(c1)
-    t = xT(xD(header, data))
-  else:
-    t.dict.keys.add(name)
     var c1 = newKVec(x)
-    t.dict.values.add(c1)
+    data.add(c1)
+    t.k = xT(xD(header.k, data.k))
+  else:
+    t.k.dict.keys.add(name)
+    var c1 = newKVec(x)
+    t.k.dict.values.add(c1.k)
 
-proc `%`(x: int): K =
-  ki(x.cint)
 
 proc addRow*(t: var K, vals: varargs[K]) =
-  assert t.dict.values.len == vals.len
-  for i in 0..<t.dict.values.len:
-    t.dict.values.kArr[i].add(vals[i])
+  assert t.k.dict.values.len == vals.len
+  for i in 0..<t.k.dict.values.len:
+    t.k.dict.values.kArr[i].add(vals[i].k)
 
 proc newKTable*(fromDict = newKDict(10, 0)): K =
 #  xT(fromDict)
-  nil # empty table is nil
+  K(k: nil) # empty table is nil
 
-proc `[]`*(x: K, i: int64): K =
+proc `[]`*(x: K0, i: int64): K =
   case x.kind
+  of kVecBool: x.boolArr[i].toK()
   of kVecInt: x.intArr[i].toK()
   of kVecLong: x.longArr[i].toK()
   of kVecFloat: x.floatArr[i].toK()
@@ -144,21 +161,22 @@ proc `[]`*(x: K, i: int64): K =
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 
 proc `[]=`*(x: var K, k: K, v: K) =
+  var x = x.k
   case x.kind
   of kDict:
-    x.keys.add(k)
-    x.values.add(v)
+    x.keys.add(k.k)
+    x.values.add(v.k)
   else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
 
 proc `[]=`*(x: var K, i: int, v: K) =
-  case x.kind
+  case x.k.kind
   of kDict:
-    x.keys.add(%i)
-    x.values.add(v)
+    x.k.keys.add(i)
+    x.k.values.add(v.k)
   of kVecSym:
-    assert v.kind == kSym  # /-------\
-    x.stringArr[i] = v.ss     # TODO: fix
-  else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.kind)
+    assert v.k.kind == kSym     # /-------\
+    x.k.stringArr[i] = v.k.ss   # TODO: fix
+  else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
 
 proc connect*(hostname: string, port: int): FileHandle =
   result = khp(hostname, port)
@@ -167,9 +185,9 @@ proc connect*(hostname: string, port: int): FileHandle =
 
 proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
   case args.len
-  of 0: result = k(h, s.cstring, nil)
-  of 1: result = k(h, s.cstring, args[0], nil)
-  of 2: result = k(h, s.cstring, args[0], args[1], nil)
-  of 3: result = k(h, s.cstring, args[0], args[1], args[2], nil)
+  of 0: result = K(k: k(h, s.cstring, nil))
+  of 1: result = K(k: k(h, s.cstring, args[0].k, nil))
+  of 2: result = K(k: k(h, s.cstring, args[0].k, args[1].k, nil))
+  of 3: result = K(k: k(h, s.cstring, args[0].k, args[1].k, args[2].k, nil))
   else: raise newException(KError, "Cannot exec with more than 3 arguments")
 
