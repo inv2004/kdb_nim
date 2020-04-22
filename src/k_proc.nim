@@ -4,6 +4,9 @@ export k_bindings
 converter toK*(x: int): K =
   ki(x.cint)
 
+converter toK*(x: int64): K =
+  ki(x.cint)
+
 converter toK*(x: string): K =
   ks(x.cstring)
 
@@ -109,6 +112,7 @@ proc newKTable*(fromDict = newKDict(10, 0)): K =
 proc `[]`*(x: K, i: int64): K =
   case x.kind
   of kVecInt: x.intArr[i].toK()
+  of kVecLong: x.longArr[i].toK()
   of kVecSym: x.stringArr[i].toK()
   of kList: x.kArr[i]
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)

@@ -26,4 +26,4 @@ proc main() =
   echo r
 
 when isMainModule:
-  main()
+  main2()

@@ -5,6 +5,7 @@ type
   KKind* = enum
     kList = 0,
     kVecInt = 6,
+    kVecLong = 7,
     kVecSym = 11,
     kTable = 98,
     kDict = 99,
@@ -36,6 +37,11 @@ type
       vir*: cint
       intLen*: clonglong
       intArr*: UncheckedArray[cint]
+    of kVecLong:
+      vju*: cchar
+      vjr*: cint
+      longLen*: clonglong
+      longArr*: UncheckedArray[clonglong]
     of kVecSym:
       vsu*: cchar
       vsr*: cint

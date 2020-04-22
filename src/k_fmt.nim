@@ -11,7 +11,7 @@ proc fmtKTable(x: K): string =
   t.separateRows = false
   var header: seq[string] = @[]
   for c in x.dict.keys:
-    header.add $c
+    header.add $c.ss  # to remove quoted names
   t.setHeaders(header)
 
   for i in 0..<x.dict.values.kArr[0].len:
