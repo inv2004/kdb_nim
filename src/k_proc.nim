@@ -17,8 +17,10 @@ converter toK*(x: cstring): K =
   ks(x)
 
 converter toKDate*(x: cint): K =
-  kd(x.cint)
+  kd(x)
 
+converter toKDateTime*(x: cdouble): K =
+  kz(x)
 
 proc len*(x: K): clonglong =
   case x.kind
@@ -125,6 +127,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecFloat: x.floatArr[i].toK()
   of kVecSym: x.stringArr[i].toK()
   of kVecDate: x.dateArr[i].toKDate()
+  of kVecDateTime: x.dtArr[i].toKDateTime()
   of kList: x.kArr[i]
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 

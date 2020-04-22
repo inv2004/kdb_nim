@@ -10,8 +10,10 @@ type
     kVecChar = 10
     kVecSym = 11
     kVecDate = 14
+    kVecDateTime = 15
     kTable = 98
     kDict = 99
+    kDateTIme = 256-15
     kDate = 256-14
     kSym = 256-11
     kFloat = 256-9
@@ -57,6 +59,11 @@ type
       vdr*: cint
       dateLen*: clonglong
       dateArr*: UncheckedArray[cint]
+    of kVecDateTime:
+      vdtu*: cchar
+      vdtr*: cint
+      dtLen*: clonglong
+      dtArr*: UncheckedArray[cdouble]
     of kTable:
       tu*: cchar
       tr*: cint
@@ -64,9 +71,13 @@ type
     of kDict:
       du*: cchar
       dr*: cint
-      dn*: clonglong     # always 2
+      dn*: clonglong  # always 2
       keys*: K
       values*: K
+    of kDateTime:
+      dtu*: cchar
+      dtr*: cint
+      dt*: cdouble
     of kDate:
       eu*: cchar
       er*: cint

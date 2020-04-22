@@ -6,6 +6,7 @@ import times
 import terminaltables
 
 const dateFormat = initTimeFormat("yyyy-MM-dd")
+const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
 
 proc `$`*(x: K): string
 
@@ -49,8 +50,13 @@ proc `$`*(x: K): string =
   of kSym:
     result.add x.ss
   of kDate:
-    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + initDuration(days = x.dd)
+    let d = initDuration(days = x.dd)
+    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(dateFormat)
+  of kDateTime:
+    let d = initDuration(seconds = int64(86400*(x.dt+10957)))
+    let dt = initDateTime(1, mJan, 1970, 0, 0, 0, utc()) + d
+    result.add dt.format(dateTimeFormat)
   of kVecChar:
     result.add '"' & $cast[cstring](x.charArr) & '"'
   else:
