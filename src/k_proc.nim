@@ -22,6 +22,9 @@ converter toKDate*(x: cint): K =
 converter toKDateTime*(x: cdouble): K =
   kz(x)
 
+converter toKTimestamp*(x: clonglong): K =
+  ktj(KKind.kTimestamp.byte, x)
+
 proc len*(x: K): clonglong =
   case x.kind
   of kList: x.kLen
@@ -126,6 +129,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecLong: x.longArr[i].toK()
   of kVecFloat: x.floatArr[i].toK()
   of kVecSym: x.stringArr[i].toK()
+  of kVecTimestamp: x.tsArr[i].toKTimestamp()
   of kVecDate: x.dateArr[i].toKDate()
   of kVecDateTime: x.dtArr[i].toKDateTime()
   of kList: x.kArr[i]

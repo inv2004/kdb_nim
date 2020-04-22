@@ -9,12 +9,14 @@ type
     kVecFloat = 9
     kVecChar = 10
     kVecSym = 11
+    kVecTimestamp = 12
     kVecDate = 14
     kVecDateTime = 15
     kTable = 98
     kDict = 99
     kDateTIme = 256-15
     kDate = 256-14
+    kTimestamp = 256-12
     kSym = 256-11
     kFloat = 256-9
     kLong = 256-7
@@ -54,6 +56,11 @@ type
       vsr*: cint
       stringLen*: clonglong
       stringArr*: UncheckedArray[cstring]
+    of kVecTimestamp:
+      vtsu*: cchar
+      vtsr*: cint
+      tsLen*: clonglong
+      tsArr*: UncheckedArray[clonglong]
     of kVecDate:
       vdu*: cchar
       vdr*: cint
@@ -82,6 +89,10 @@ type
       eu*: cchar
       er*: cint
       dd*: cint
+    of kTimestamp:
+      tsu*: cchar
+      tsr*: cint
+      ts*: clonglong
     of kSym:
       su*: cchar
       sr*: cint

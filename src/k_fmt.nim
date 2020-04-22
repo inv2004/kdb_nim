@@ -7,6 +7,7 @@ import terminaltables
 
 const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
+const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
 
 proc `$`*(x: K): string
 
@@ -49,6 +50,10 @@ proc `$`*(x: K): string =
     result.add $x.ff
   of kSym:
     result.add x.ss
+  of kTimestamp:
+    let d = initDuration(nanoseconds = x.ts)
+    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
+    result.add dt.format(timestampFormat)
   of kDate:
     let d = initDuration(days = x.dd)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
