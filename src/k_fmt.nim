@@ -42,7 +42,7 @@ proc `$`*(x: K): string =
   of kLong:
     result.add $x.jj
   of kSym:
-    result.add '"' & $x.ss & '"'
+    result.add x.ss
   of kVecChar:
     result.add '"' & $cast[cstring](x.charArr) & '"'
   else:
