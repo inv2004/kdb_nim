@@ -16,12 +16,18 @@ converter toK*(x: string): K =
 converter toK*(x: cstring): K =
   ks(x)
 
+converter toKDate*(x: cint): K =
+  kd(x.cint)
+
+
 proc len*(x: K): clonglong =
   case x.kind
   of kList: x.kLen
   of kVecInt: x.intLen
+  of kVecLong: x.longLen
   of kVecSym: x.stringLen
-  else: raise newException(KError, "Not List")
+  of kVecDate: x.dateLen
+  else: raise newException(KError, "Not List: " & $x.kind)
 
 iterator items*(x: K): K =
   case x.kind
@@ -118,6 +124,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecLong: x.longArr[i].toK()
   of kVecFloat: x.floatArr[i].toK()
   of kVecSym: x.stringArr[i].toK()
+  of kVecDate: x.dateArr[i].toKDate()
   of kList: x.kArr[i]
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 

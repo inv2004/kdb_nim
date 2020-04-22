@@ -2,7 +2,10 @@ import k_proc
 export k_proc
 
 import strutils
+import times
 import terminaltables
+
+const dateFormat = initTimeFormat("yyyy-MM-dd")
 
 proc `$`*(x: K): string
 
@@ -45,6 +48,9 @@ proc `$`*(x: K): string =
     result.add $x.ff
   of kSym:
     result.add x.ss
+  of kDate:
+    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + initDuration(days = x.dd)
+    result.add dt.format(dateFormat)
   of kVecChar:
     result.add '"' & $cast[cstring](x.charArr) & '"'
   else:

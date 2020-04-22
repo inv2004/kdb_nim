@@ -3,33 +3,25 @@ type
 
 type
   KKind* = enum
-    kList = 0,
-    kVecInt = 6,
-    kVecLong = 7,
-    kVecFloat = 9,
-    kVecChar = 10,
-    kVecSym = 11,
-    kTable = 98,
-    kDict = 99,
+    kList = 0
+    kVecInt = 6
+    kVecLong = 7
+    kVecFloat = 9
+    kVecChar = 10
+    kVecSym = 11
+    kVecDate = 14
+    kTable = 98
+    kDict = 99
+    kDate = 256-14
     kSym = 256-11
-    kFloat = 256-9,
-    kLong = 256-7,
-    kInt = 256-6,
+    kFloat = 256-9
+    kLong = 256-7
+    kInt = 256-6
 
   K* = ptr object {.packed.}
     m*: cchar
     a*: cchar
     case kind*: KKind
-    of kTable:
-      tu*: cchar
-      tr*: cint
-      dict*: K
-    of kDict:
-      du*: cchar
-      dr*: cint
-      dn*: clonglong     # always 2
-      keys*: K
-      values*: K
     of kList:
       lu*: cchar
       lr*: cint
@@ -60,20 +52,39 @@ type
       vsr*: cint
       stringLen*: clonglong
       stringArr*: UncheckedArray[cstring]
-    of kInt:
-      iu*: cchar
-      ir*: cint
-      ii*: cint
-    of kLong:
-      ju*: cchar
-      jr*: cint
-      jj*: clonglong
-    of kFloat:
-      fu*: cchar
-      fr*: cint
-      ff*: cdouble
+    of kVecDate:
+      vdu*: cchar
+      vdr*: cint
+      dateLen*: clonglong
+      dateArr*: UncheckedArray[cint]
+    of kTable:
+      tu*: cchar
+      tr*: cint
+      dict*: K
+    of kDict:
+      du*: cchar
+      dr*: cint
+      dn*: clonglong     # always 2
+      keys*: K
+      values*: K
+    of kDate:
+      eu*: cchar
+      er*: cint
+      dd*: cint
     of kSym:
       su*: cchar
       sr*: cint
       ss*: cstring
+    of kFloat:
+      fu*: cchar
+      fr*: cint
+      ff*: cdouble
+    of kLong:
+      ju*: cchar
+      jr*: cint
+      jj*: clonglong
+    of kInt:
+      iu*: cchar
+      ir*: cint
+      ii*: cint
 

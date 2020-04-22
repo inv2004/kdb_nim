@@ -6,55 +6,58 @@ import k_types
 export k_types
 
 proc ks*(x: cstring): K {.
-  importc: "ks", header: "\"k.h\"".}
+  importc: "ks", header: "k.h".}
 
 proc ki*(x: cint): K {.
-  importc: "ki", header: "\"k.h\"".}
+  importc: "ki", header: "k.h".}
 
 proc kf*(x: cdouble): K {.
-  importc: "kf", header: "\"k.h\"".}
+  importc: "kf", header: "k.h".}
+
+proc kd*(x: cint): K {.
+  importc: "kd", header: "k.h".}
 
 proc knk*(i: int): K {.
-  importc: "knk", header: "\"k.h\"".}
+  importc: "knk", header: "k.h".}
 
 proc jk*(l: ptr K, x: K) {.
-  importc: "jk", header: "\"k.h\"".}
+  importc: "jk", header: "k.h".}
 
 proc ktn*(t:int, i: int): K {.
-  importc: "ktn", header: "\"k.h\"".}
+  importc: "ktn", header: "k.h".}
 
 proc js*(l: ptr K, x: cstring) {.
-  importc: "js", header: "\"k.h\"".}
+  importc: "js", header: "k.h".}
 
 proc ja*(l: ptr K, x: ptr cint) {.
-  importc: "ja", header: "\"k.h\"".}
+  importc: "ja", header: "k.h".}
 
 proc ss*(x: cstring): cstring {.
-  importc: "ss", header: "\"k.h\"".}
+  importc: "ss", header: "k.h".}
 
 proc xD*(k: K, v: K): K {.
-  importc: "xD", header: "\"k.h\"".}
+  importc: "xD", header: "k.h".}
 
 proc xT*(x: K): K {.
-  importc: "xT", header: "\"k.h\"".}
+  importc: "xT", header: "k.h".}
 
 proc kK*(x: K): K {.
-  importc: "kK", header: "\"k.h\"".}
+  importc: "kK", header: "k.h".}
 
 proc khp*(x: cstring, p: int): FileHandle {.
-  importc: "khp", header: "\"k.h\"".}
+  importc: "khp", header: "k.h".}
 
 proc k*(h: cint, x: cstring, a: K): K {.
-  importc: "k", header: "\"k.h\"".}
+  importc: "k", header: "k.h".}
 
 proc k*(h: cint, x: cstring, a, b: K): K {.
-  importc: "k", header: "\"k.h\"".}
+  importc: "k", header: "k.h".}
 
 proc k*(h: cint, x: cstring, a, b, c: K): K {.
-  importc: "k", header: "\"k.h\"".}
+  importc: "k", header: "k.h".}
 
 proc k*(h: cint, x: cstring, a, b, c, d: K): K {.
-  importc: "k", header: "\"k.h\"".}
+  importc: "k", header: "k.h".}
 
 proc checkCStructOffset*() {.
   importc: "check_c_struct_offset".}
