@@ -12,9 +12,11 @@ converter toK*(x: float64): K =
 
 converter toK*(x: string): K =
   result = K(k: ks(x.cstring))
+  r1(result.k)
 
 converter toK*(x: cstring): K =
   result = K(k: ks(x))
+  # r1(result.k)
 
 converter toKDate*(x: cint): K =
   K(k: kd(x))
@@ -92,9 +94,9 @@ proc newKDict*(kt, vt: int): K =
   let header = ktn(kt, 0)
   let data = ktn(vt, 0)
   result = K(k: xD(header, data))
-  r1(header)
-  r1(data)
-  r1(result.k)
+  # r1(header)
+  # r1(data)
+  # r1(result.k)
 
 proc add*(x: var K0, v: cstring) =
   js(x.addr, ss(v))
@@ -136,8 +138,8 @@ proc addColumn*(t: var K, name: cstring, x: int) =
     var c1 = newKVec(x)
     data.add(c1)
     t.k = xT(xD(header.k, data.k))
-    r1(header.k)
-    r1(data.k)
+    # r1(header.k)
+    # r1(data.k)
     # r1(c1.k)
     r1(t.k.dict)
     # r1(t.k)
