@@ -157,13 +157,17 @@ proc r0*(x: K0) {.
 proc r1*(x: K0) {.
   importc: "r1", header: "k.h".}
 
+proc `=destroy`*(x: var K) =
+  if x.k == nil:
+    echo "destroy K: nil"
+  if x.k != nil:
+    echo "destroy K: ", x.k.kind
+    # echo "destroy KK: rc = ", x.k.ir
+    r0(x.k)
+
 proc `=`*(a: var K, b: K) =
   r1(b.k)
   a.k = b.k
 
-proc `=destroy`*(x: var K) =
-  echo "destroy K: ", if x.k == nil: "nil" else: "full"
-  if x.k != nil:
-    echo "destroy KK: rc = ", x.k.ir
-    r0(x.k)
-
+proc `=sink`*(a: var K; b: K) =
+  a.k = b.k
