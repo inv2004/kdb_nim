@@ -157,20 +157,18 @@ proc r0*(x: K0) {.
 proc r1*(x: K0) {.
   importc: "r1", header: "k.h".}
 
-proc `=destroy`*(x: var K) =
-  if x.k == nil:
-    echo "destroy K: nil"
-  if x.k != nil:
-    let rc = cast[ptr UncheckedArray[cint]](x.k)[1]
-    echo "destroy K: ", x.k.kind, " rc = ", rc
-    # echo "destroy KK: rc = ", x.k.ir
-
-    r0(x.k)
-
 proc `=`*(a: var K, b: K) =
   echo "create K"
   r1(b.k)
   a.k = b.k
+
+proc `=destroy`*(x: var K) =
+  if x.k == nil:
+    echo "destroy K: nil"
+  else:
+    let rc = cast[ptr UncheckedArray[cint]](x.k)[1]
+    echo "destroy K: ", x.k.kind, " rc = ", rc
+    r0(x.k)
 
 proc `=sink`*(a: var K; b: K) =
   a.k = b.k

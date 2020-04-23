@@ -29,7 +29,9 @@ proc main() =
   var c = 0
   while true:
     var i = toK(1122)
-    # var d = newKDict(6, 6)
+    # var d = newKDict(6, 0)
+    # d[1] = "one"
+    # d[2] = "two"
     # r1(i.k)
     # r0(i.k)
 
