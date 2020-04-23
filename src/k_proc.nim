@@ -114,13 +114,15 @@ proc add*(x: var K, v: K) =
   add(x.k, v.k)
 
 proc newKVec*(x: int): K =
-  K(k: ktn(x.cint, 0))
+  result = K(k: ktn(x.cint, 0))
+  r1(result.k)
 
 proc newKVecSym*(): K =
   newKVec(11)
 
 proc newKList*(): K =
-  K(k: knk(0))
+  result = K(k: knk(0))
+  r1(result.k)
 
 proc addColumn*(t: var K, name: cstring, x: int) =
   if t.k == nil:
@@ -130,6 +132,9 @@ proc addColumn*(t: var K, name: cstring, x: int) =
     var c1 = newKVec(x)
     data.add(c1)
     t.k = xT(xD(header.k, data.k))
+    r1(header.k)
+    r1(data.k)
+    # r1(t.k)
   else:
     t.k.dict.keys.add(name)
     var c1 = newKVec(x)
