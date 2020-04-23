@@ -150,25 +150,23 @@ type
   K* = object
     k*: K0
 
-
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
 
 proc r1*(x: K0) {.
   importc: "r1", header: "k.h".}
 
-proc `=`*(a: var K, b: K) =
-  echo "create K"
-  r1(b.k)
-  a.k = b.k
-
 proc `=destroy`*(x: var K) =
-  if x.k == nil:
-    echo "destroy K: nil"
-  else:
+  if x.k != nil:
     let rc = cast[ptr UncheckedArray[cint]](x.k)[1]
     echo "destroy K: ", x.k.kind, " rc = ", rc
     r0(x.k)
 
+proc `=`*(a: var K, b: K) =
+  `=destroy`(a)
+  a.k = b.k
+  r1(b.k)
+
 proc `=sink`*(a: var K; b: K) =
+  `=destroy`(a)
   a.k = b.k

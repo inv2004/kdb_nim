@@ -2,19 +2,19 @@ import k_bindings
 export k_bindings
 
 converter toK*(x: int): K=
-  K(k: ki(x.cint))
+  result = K(k: ki(x.cint))
 
 converter toK*(x: int64): K =
-  K(k: ki(x.cint))
+  result = K(k: ki(x.cint))
 
 converter toK*(x: float64): K =
   K(k: kf(x.cdouble))
 
 converter toK*(x: string): K =
-  K(k: ks(x.cstring))
+  result = K(k: ks(x.cstring))
 
 converter toK*(x: cstring): K =
-  K(k: ks(x))
+  result = K(k: ks(x))
 
 converter toKDate*(x: cint): K =
   K(k: kd(x))
@@ -35,7 +35,8 @@ converter toK*(x: bool): K =
   K(k: kb(x))
 
 converter toK*(x: K0): K =
-  K(k: x)
+  result = K(k: x)
+  r1(result.k)
 
 proc `%`*(x: int): K =
   toK(x)
@@ -90,7 +91,10 @@ iterator mitems*(x: K0): var K0 =
 proc newKDict*(kt, vt: int): K =
   let header = ktn(kt, 0)
   let data = ktn(vt, 0)
-  K(k: xD(header, data))
+  result = K(k: xD(header, data))
+  r1(header)
+  r1(data)
+  r1(result.k)
 
 proc add*(x: var K0, v: cstring) =
   js(x.addr, ss(v))
@@ -134,12 +138,13 @@ proc addColumn*(t: var K, name: cstring, x: int) =
     t.k = xT(xD(header.k, data.k))
     r1(header.k)
     r1(data.k)
+    # r1(c1.k)
+    r1(t.k.dict)
     # r1(t.k)
   else:
     t.k.dict.keys.add(name)
     var c1 = newKVec(x)
     t.k.dict.values.add(c1.k)
-
 
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.k.dict.values.len == vals.len
