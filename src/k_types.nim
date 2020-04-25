@@ -164,8 +164,7 @@ proc `=destroy`*(x: var K) =
 
 proc `=`*(a: var K, b: K) =
   `=destroy`(a)
-  a.k = b.k
-  # r1(b.k)
+  a.k = r1(b.k)
 
 proc `=sink`*(a: var K; b: K) =
   `=destroy`(a)
