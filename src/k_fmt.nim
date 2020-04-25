@@ -17,14 +17,20 @@ proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for c in x.k.dict.keys:
-    header.add $c.k.ss  # to remove quoted names
+  for i in 0..<x.k.dict.keys.stringLen:
+    header.add $x.k.dict.keys.stringArr[i]  # to remove quoted names
   t.setHeaders(header)
 
   for i in 0..<x.k.dict.values.kArr[0].len:
     var row: seq[string] = @[]
-    for c in x.k.dict.values:
-      row.add $c.k[i]
+    for j in 0..<x.k.dict.values.kLen:
+      case x.k.dict.values.kArr[j].kind
+      of kVecInt: 
+        row.add $x.k.dict.values.kArr[j].intArr[i]
+      of kList: # TODO: temporary
+        row.add $x.k.dict.values.kArr[j].kArr[i].ss
+      else:
+        row.add "fail: " & $x.k.dict.values.kArr[j].kind
     t.addRow(row)
 
   result = t.render()
@@ -35,7 +41,20 @@ proc fmtKDict(x: K): string =
   for i in 0..<x.k.keys.len:
     if i > 0:
       result.add "; "
-    result.add $x.k.keys[i] & ": " & $x.k.values[i]
+    case x.k.keys.kind
+    of kVecInt: 
+      result.add $x.k.keys[i]
+    else:
+      result.add "fail: " & $x.k.keys.kind
+    # result.add $x.k.keys[i] & ": " & $x.k.values[i]
+    result.add ": "
+    case x.k.values.kind
+    of kVecInt: 
+      result.add $x.k.values[i]
+    of kList: 
+      result.add $x.k.values.kArr[i].ss
+    else:
+      result.add "fail: " & $x.k.values.kind
   result.add "}"
 
 proc `$`*(x: K): string =

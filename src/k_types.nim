@@ -153,7 +153,7 @@ type
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
 
-proc r1*(x: K0) {.
+proc r1*(x: K0): K0 {.
   importc: "r1", header: "k.h".}
 
 proc `=destroy`*(x: var K) =
@@ -165,7 +165,7 @@ proc `=destroy`*(x: var K) =
 proc `=`*(a: var K, b: K) =
   `=destroy`(a)
   a.k = b.k
-  r1(b.k)
+  # r1(b.k)
 
 proc `=sink`*(a: var K; b: K) =
   `=destroy`(a)

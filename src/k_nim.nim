@@ -24,6 +24,7 @@ proc main() =
   echo r
 
 proc main() =
+  discard khp("", -1)
   while true:
     var t = newKTable()
     t.addColumn("aaa", 6)
@@ -31,10 +32,13 @@ proc main() =
     t.addRow(3, "30")
     t.addRow(4, "40")
     t.addRow(5, "50")
+    echo t
     var i = toK(1122)
+    echo i
     var d = newKDict(6, 0)
     d[1] = "one"
     d[2] = "two"
+    echo d
     var dd = newKDict(6, 6)
     dd[1] = 11
     dd[2] = 22

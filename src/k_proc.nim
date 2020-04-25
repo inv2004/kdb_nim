@@ -12,11 +12,9 @@ converter toK*(x: float64): K =
 
 converter toK*(x: string): K =
   result = K(k: ks(x.cstring))
-  r1(result.k)
 
 converter toK*(x: cstring): K =
   result = K(k: ks(x))
-  # r1(result.k)
 
 converter toKDate*(x: cint): K =
   K(k: kd(x))
@@ -38,7 +36,6 @@ converter toK*(x: bool): K =
 
 converter toK*(x: K0): K =
   result = K(k: x)
-  r1(result.k)
 
 proc `%`*(x: int): K =
   toK(x)
@@ -96,7 +93,6 @@ proc newKDict*(kt, vt: int): K =
   result = K(k: xD(header, data))
   # r1(header)
   # r1(data)
-  # r1(result.k)
 
 proc add*(x: var K0, v: cstring) =
   js(x.addr, ss(v))
@@ -115,7 +111,7 @@ proc add*(x: var K0, v: int) =
 
 proc add*(x: var K0, v: K0) =
   case x.kind
-  of kList: jk(x.addr, v)
+  of kList: jk(x.addr, r1(v))
   of kVecInt: add(x, v.ii.cint)
   else: raise newException(KError, "add is not supported for " & $x.kind)
 
@@ -123,15 +119,14 @@ proc add*(x: var K, v: K) =
   add(x.k, v.k)
 
 proc newKVec*(x: int): K =
-  result = K(k: ktn(x.cint, 0))
-  # r1(result.k) // 0 after first add
+  let k0 = ktn(x.cint, 0)
+  result = K(k: k0)
 
 proc newKVecSym*(): K =
   newKVec(11)
 
 proc newKList*(): K =
   result = K(k: knk(0))
-  # r1(result.k) // 0 after first add
 
 proc addColumn*(t: var K, name: cstring, x: int) =
   if t.k == nil:
@@ -140,26 +135,22 @@ proc addColumn*(t: var K, name: cstring, x: int) =
     var data = newKList()
     var c1 = newKVec(x)
     data.add(c1)
-    t.k = xT(xD(header.k, data.k))
-    r1(header.k)
-    r1(c1.k)
-    r1(data.k)
-    # r1(t.k.dict)
-    # r1(t.k)
+    let d0 = xD(r1(header.k), r1(data.k))
+    t.k = xT(d0)
   else:
     t.k.dict.keys.add(name)
     var c1 = newKVec(x)
     t.k.dict.values.add(c1.k)
-    r1(c1.k)
 
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.k.dict.values.len == vals.len
   for i in 0..<t.k.dict.values.len:
     t.k.dict.values.kArr[i].add(vals[i].k)
 
-proc newKTable*(fromDict = newKDict(10, 0)): K =
-#  xT(fromDict)
+# proc newKTable*(fromDict = newKDict(10, 0)): K =
+proc newKTable*(): K =
   K(k: nil) # empty table is nil
+#  xT(fromDict)
 
 proc `[]`*(x: K0, i: int64): K =
   case x.kind
