@@ -104,6 +104,9 @@ proc add*(x: var K0, v: cstring) =
 proc add*(x: var K, v: cstring) =
   add(x.k, v)
 
+proc add*(x: var K, v: string) =
+  add(x.k, v.cstring)
+
 proc add*(x: var K0, v: cint) =
   ja(x.addr, v.unsafeAddr)
 
@@ -121,14 +124,14 @@ proc add*(x: var K, v: K) =
 
 proc newKVec*(x: int): K =
   result = K(k: ktn(x.cint, 0))
-  r1(result.k)
+  # r1(result.k) // 0 after first add
 
 proc newKVecSym*(): K =
   newKVec(11)
 
 proc newKList*(): K =
   result = K(k: knk(0))
-  r1(result.k)
+  # r1(result.k) // 0 after first add
 
 proc addColumn*(t: var K, name: cstring, x: int) =
   if t.k == nil:
@@ -138,15 +141,16 @@ proc addColumn*(t: var K, name: cstring, x: int) =
     var c1 = newKVec(x)
     data.add(c1)
     t.k = xT(xD(header.k, data.k))
-    # r1(header.k)
-    # r1(data.k)
-    # r1(c1.k)
-    r1(t.k.dict)
+    r1(header.k)
+    r1(c1.k)
+    r1(data.k)
+    # r1(t.k.dict)
     # r1(t.k)
   else:
     t.k.dict.keys.add(name)
     var c1 = newKVec(x)
     t.k.dict.values.add(c1.k)
+    r1(c1.k)
 
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.k.dict.values.len == vals.len
