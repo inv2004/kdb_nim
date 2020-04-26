@@ -32,7 +32,7 @@ proc main() =
     t.addRow(3, "30")
     t.addRow(4, "40")
     t.addRow(5, "50")
-    # echo t
+    echo t
     var i = toK(1122)
     var d = newKDict(6, 0)
     d[1] = "one"
@@ -41,8 +41,10 @@ proc main() =
     var dd = newKDict(6, 6)
     dd[1] = 11
     dd[2] = 22
+    echo dd
     var l = newKList()
     l.add("aa".cstring)
+    echo l
     var v1 = newKVec(6)
     v1.add(10)
     v1.add(20)
@@ -55,6 +57,7 @@ proc main() =
     for x in vv:
       for y in x:
         echo y
+    echo vv
 
 proc rc(x: K0): string =
   result.add $x.kind

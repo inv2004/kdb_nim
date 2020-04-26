@@ -17,22 +17,14 @@ proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for x in r1(x.k.dict.keys): # TODO: strange r1
+  for x in x.k.dict.keys: # TODO: strange r1
     header.add $x  # to remove quoted names
   t.setHeaders(header)
 
-  for i in 0..<x.k.dict.keys.len:
+  for i in 0..<x.k.dict.values.kArr[0].len:
     var row: seq[string] = @[]
-    # for c in r1(x.k.dict.values):
-      # echo "aaa"
-      # row.add $c[i]
-      # case c.k.kind
-      # of kVecInt: 
-        # row.add $c.k.intArr[i]
-      # of kList: # TODO: temporary
-        # row.add $c.k.kArr[i].ss
-      # else:
-        # row.add "fail: " & $c.k.kArr[i].kind
+    for c in x.k.dict.values:
+      row.add $c[i]
     t.addRow(row)
 
   result = t.render()
