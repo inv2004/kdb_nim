@@ -1,6 +1,12 @@
 import k_bindings
 export k_bindings
 
+proc init*() = 
+  echo "Init KDB Memory"
+  discard khp("", -1)
+
+init()
+
 proc toSym*(x: cstring): K =
   K(k: ks(x))
 

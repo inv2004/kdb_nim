@@ -24,7 +24,6 @@ proc main1() =
   echo r
 
 proc main() =
-  discard khp("", -1)
   while true:
     var t = newKTable()
     t.addColumn[:int]("aaa")
