@@ -51,6 +51,10 @@ proc main() =
     var v2 = newKVecSym()
     v2.add("100")
     v2.add("200")
+    var v3 = newKVec(0)
+    v3.add("100")
+    v3.add("200")
+    echo v3
     var vv = newKList()
     vv.add(v1)
     vv.add(v2)

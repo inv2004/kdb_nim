@@ -52,6 +52,25 @@ proc len*(x: K0): clonglong =
   of kVecDate: x.dateLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
+iterator pairs*(x: K0): (int, K0) =  # it is copy of items, better to merge somehow
+  case x.kind
+  of kList:
+    var i = 0
+    while i < x.kLen:
+      yield (i, x.kArr[i])
+      inc(i)
+  of kVecInt:
+    var i = 0
+    while i < x.intLen:
+      yield (i, x.intArr[i].toK().k)
+      inc(i)
+  of kVecSym:
+    var i = 0
+    while i < x.stringLen:
+      yield (i, x.stringArr[i].toSym().k)
+      inc(i)
+  else: raise newException(KError, "items is not supported for " & $x.kind)
+
 iterator items*(x: K0): K0 =
   case x.kind
   of kList:

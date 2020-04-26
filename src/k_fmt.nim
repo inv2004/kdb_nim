@@ -47,6 +47,14 @@ proc fmtKDict(x: K): string =
     result.add $x.k.keys[i] & ": " & $x.k.values[i]
   result.add "}"
 
+proc fmtKVec(x: K): string =
+  result.add "["
+  for i in 0..<x.k.len:
+    if i > 0:
+      result.add ", "
+    result.add $x.k[i]
+  result.add "]"
+
 proc `$`*(x: K): string =
   case x.k.kind
   of kList:
@@ -87,5 +95,7 @@ proc `$`*(x: K): string =
     var str = newString(x.k.charLen)
     copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
     result.add '"' & str & '"'
+  of kVecInt, kVecSym:
+    result.add fmtKVec(x)
   else:
     result.add $x.k.kind & ": unknown"
