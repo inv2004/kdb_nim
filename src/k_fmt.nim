@@ -84,8 +84,8 @@ proc `$`*(x: K): string =
     let d = initTime(0, 0) + initDuration(milliseconds = x.k.tt)
     result.add d.format(timeFormat, zone = utc())
   of kVecChar:
-    var str = newString(x.k.charLen)
-    copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
-    result.add '"' & str & '"'
+    # var str = newString(x.k.charLen)
+    # copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
+    result.add '"' & toOpenArray(x.k.charArr.addr, 0, x.k.charLen.int-1).join() & '"'
   else:
     result.add $x.k.kind & ": unknown"
