@@ -2,19 +2,19 @@ import k_bindings
 export k_bindings
 
 converter toK*(x: int): K=
-  result = K(k: ki(x.cint))
+  K(k: ki(x.cint))
 
 converter toK*(x: int64): K =
-  result = K(k: ki(x.cint))
+  K(k: ki(x.cint))
 
 converter toK*(x: float64): K =
   K(k: kf(x.cdouble))
 
 converter toK*(x: string): K =
-  result = K(k: ks(x.cstring))
+  K(k: ks(x.cstring))
 
 converter toK*(x: cstring): K =
-  result = K(k: ks(x))
+  K(k: ks(x))
 
 converter toKDate*(x: cint): K =
   K(k: kd(x))
@@ -35,7 +35,7 @@ converter toK*(x: bool): K =
   K(k: kb(x))
 
 converter toK*(x: K0): K =
-  result = K(k: x)
+  K(k: x)
 
 proc `%`*(x: int): K =
   toK(x)
@@ -49,32 +49,33 @@ proc len*(x: K0): clonglong =
   of kVecDate: x.dateLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
-iterator items*(x: K0): K =
-  case x.kind
+iterator items*(x: K): K =
+  case x.k.kind
   of kList:
     var i = 0
-    while i < x.kLen:
-      yield x.kArr[i]
+    while i < x.k.kLen:
+      let v = r1(x.k.kArr[i])
+      yield v
       inc(i)
   of kVecInt:
     var i = 0
-    while i < x.intLen:
-      yield x.intArr[i].toK()
+    while i < x.k.intLen:
+      yield x.k.intArr[i].toK()
       inc(i)
   of kVecSym:
     var i = 0
-    while i < x.stringLen:
-      yield x.stringArr[i].toK()
+    while i < x.k.stringLen:
+      yield x.k.stringArr[i].toK()
       inc(i)
-  else: raise newException(KError, "items is not supported for " & $x.kind)
+  else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
-iterator mitems*(x: K0): var K0 =
-  case x.kind
-  of kList:
-    var i = 0
-    while i < x.kLen:
-      yield x.kArr[i]
-      inc(i)
+# iterator mitems*(x: K0): var K0 =
+  # case x.kind
+  # of kList:
+    # var i = 0
+    # while i < x.kLen:
+      # yield x.kArr[i]
+      # inc(i)
   # of kVecInt:
   #   var i = 0
   #   while i < x.intLen:
@@ -85,7 +86,7 @@ iterator mitems*(x: K0): var K0 =
     # while i < x.stringLen:
       # yield x.stringArr[i]
       # inc(i)
-  else: raise newException(KError, "mitems is not supported for " & $x.kind)
+  # else: raise newException(KError, "mitems is not supported for " & $x.kind)
 
 proc newKDict*(kt, vt: int): K =
   let header = ktn(kt, 0)
@@ -108,6 +109,9 @@ proc add*(x: var K0, v: cint) =
 
 proc add*(x: var K0, v: int) =
   add(x, v.cint)
+
+proc add*(x: var K, v: int) =
+  add(x.k, v)
 
 proc add*(x: var K0, v: K0) =
   case x.kind
@@ -152,20 +156,21 @@ proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
 
-proc `[]`*(x: K0, i: int64): K =
-  case x.kind
-  of kVecBool: x.boolArr[i].toK()
-  of kVecInt: x.intArr[i].toK()
-  of kVecLong: x.longArr[i].toK()
-  of kVecFloat: x.floatArr[i].toK()
-  of kVecSym: x.stringArr[i].toK()
-  of kVecTimestamp: x.tsArr[i].toKTimestamp()
-  of kVecDate: x.dateArr[i].toKDate()
-  of kVecDateTime: x.dtArr[i].toKDateTime()
-  of kVecTimespan: x.tpArr[i].toKTimespan()
-  of kVecTime: x.ttArr[i].toKTime()
-  of kList: x.kArr[i]
-  else: raise newException(KError, "`[]` is not supported for " & $x.kind)
+proc `[]`*(x: K, i: int64): K =
+  discard r1(x.k)
+  case x.k.kind
+  of kVecBool: x.k.boolArr[i].toK()
+  of kVecInt: x.k.intArr[i].toK()
+  of kVecLong: x.k.longArr[i].toK()
+  of kVecFloat: x.k.floatArr[i].toK()
+  of kVecSym: x.k.stringArr[i].toK()
+  of kVecTimestamp: x.k.tsArr[i].toKTimestamp()
+  of kVecDate: x.k.dateArr[i].toKDate()
+  of kVecDateTime: x.k.dtArr[i].toKDateTime()
+  of kVecTimespan: x.k.tpArr[i].toKTimespan()
+  of kVecTime: x.k.ttArr[i].toKTime()
+  of kList: r1(x.k.kArr[i])
+  else: raise newException(KError, "`[]` is not supported for " & $x.k.kind)
 
 proc `[]=`*(x: var K, k: K, v: K) =
   var x = x.k

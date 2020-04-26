@@ -17,20 +17,22 @@ proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for i in 0..<x.k.dict.keys.stringLen:
-    header.add $x.k.dict.keys.stringArr[i]  # to remove quoted names
+  for x in r1(x.k.dict.keys): # TODO: strange r1
+    header.add $x  # to remove quoted names
   t.setHeaders(header)
 
-  for i in 0..<x.k.dict.values.kArr[0].len:
+  for i in 0..<x.k.dict.keys.len:
     var row: seq[string] = @[]
-    for j in 0..<x.k.dict.values.kLen:
-      case x.k.dict.values.kArr[j].kind
-      of kVecInt: 
-        row.add $x.k.dict.values.kArr[j].intArr[i]
-      of kList: # TODO: temporary
-        row.add $x.k.dict.values.kArr[j].kArr[i].ss
-      else:
-        row.add "fail: " & $x.k.dict.values.kArr[j].kind
+    # for c in r1(x.k.dict.values):
+      # echo "aaa"
+      # row.add $c[i]
+      # case c.k.kind
+      # of kVecInt: 
+        # row.add $c.k.intArr[i]
+      # of kList: # TODO: temporary
+        # row.add $c.k.kArr[i].ss
+      # else:
+        # row.add "fail: " & $c.k.kArr[i].kind
     t.addRow(row)
 
   result = t.render()
@@ -41,20 +43,7 @@ proc fmtKDict(x: K): string =
   for i in 0..<x.k.keys.len:
     if i > 0:
       result.add "; "
-    case x.k.keys.kind
-    of kVecInt: 
-      result.add $x.k.keys[i]
-    else:
-      result.add "fail: " & $x.k.keys.kind
-    # result.add $x.k.keys[i] & ": " & $x.k.values[i]
-    result.add ": "
-    case x.k.values.kind
-    of kVecInt: 
-      result.add $x.k.values[i]
-    of kList: 
-      result.add $x.k.values.kArr[i].ss
-    else:
-      result.add "fail: " & $x.k.values.kind
+    result.add $x.k.keys[i] & ": " & $x.k.values[i]
   result.add "}"
 
 proc `$`*(x: K): string =
