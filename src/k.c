@@ -3,7 +3,7 @@
 
 K km(int months) {
     K k = ki(months);
-    k->t = KM;
+    k->t = -KM;
     return k;
 }
 
