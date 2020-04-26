@@ -4,6 +4,8 @@ export k_proc
 import strutils
 import times
 import terminaltables
+import uuids
+import endians
 
 const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
@@ -55,6 +57,13 @@ proc fmtKVec(x: K): string =
     result.add $x.k[i]
   result.add "]"
 
+proc fmtKGUID(x: K): string =
+  var twoInts64 = cast[ptr UncheckedArray[int64]](x.k.gg.g.addr)
+  bigEndian64(twoInts64[0].addr, twoInts64[0].addr)
+  bigEndian64(twoInts64[1].addr, twoInts64[1].addr)
+  let u = initUUID(twoInts64[0], twoInts64[1])
+  $u
+
 proc `$`*(x: K): string =
   case x.k.kind
   of kList:
@@ -63,6 +72,8 @@ proc `$`*(x: K): string =
     result.add fmtKTable(x)
   of kDict:
     result.add fmtKDict(x)
+  of kGUID:
+    result.add fmtKGUID(x)
   of kInt:
     result.add $x.k.ii
   of kLong:
@@ -97,5 +108,7 @@ proc `$`*(x: K): string =
     result.add '"' & str & '"'
   of kVecInt, kVecSym:
     result.add fmtKVec(x)
+  of kVecGUID:
+    result.add "guid"
   else:
     result.add $x.k.kind & ": unknown"

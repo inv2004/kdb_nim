@@ -37,6 +37,9 @@ converter toKTime*(x: cint): K =
 converter toK*(x: bool): K =
   K(k: kb(x))
 
+converter toK*(x: GUID): K =
+  K(k: ku(x))
+
 converter toK*(x: K0): K =
   K(k: x)
 
@@ -50,6 +53,7 @@ proc len*(x: K0): clonglong =
   of kVecLong: x.longLen
   of kVecSym: x.stringLen
   of kVecDate: x.dateLen
+  of kVecTime: x.timeLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
 iterator pairs*(x: K0): (int, K0) =  # it is copy of items, better to merge somehow
@@ -129,9 +133,16 @@ iterator items*(x: K): K =
       # inc(i)
   # else: raise newException(KError, "mitems is not supported for " & $x.kind)
 
-proc newKDict*(kt, vt: int): K =
-  let header = ktn(kt, 0)
-  let data = ktn(vt, 0)
+proc typeToKType*[T](): int =
+  when T is int: 6
+  elif T is int64: 7
+  elif T is string: 11 # TOD: not sure
+  elif T is void: 0
+  else: raise newException(KError, "cannot convert type")
+
+proc newKDict*[KT, VT](): K =
+  let header = ktn(typeToKType[KT](), 0)
+  let data = ktn(typeToKType[VT](), 0)
   result = K(k: xD(header, data))
   # r1(header)
   # r1(data)
@@ -168,28 +179,28 @@ proc add*(x: var K0, v: K0) =
 proc add*(x: var K, v: K) =
   add(x.k, v.k)
 
-proc newKVec*(x: int): K =
-  let k0 = ktn(x.cint, 0)
+proc newKVec*[T](): K =
+  let k0 = ktn(typeToKType[T](), 0)
   result = K(k: k0)
 
 proc newKVecSym*(): K =
-  newKVec(11)
+  newKVec[string]()
 
 proc newKList*(): K =
   result = K(k: knk(0))
 
-proc addColumn*(t: var K, name: cstring, x: int) =
+proc addColumn*[T](t: var K, name: string) =
   if t.k == nil:
     var header = newKVecSym()
     header.add(name)
     var data = newKList()
-    var c1 = newKVec(x)
+    var c1 = newKVec[T]()
     data.add(c1)
     let d0 = xD(r1(header.k), r1(data.k))
     t.k = xT(d0)
   else:
     t.k.dict.keys.add(name)
-    var c1 = newKVec(x)
+    var c1 = newKVec[T]()
     t.k.dict.values.add(c1.k)
 
 proc addRow*(t: var K, vals: varargs[K]) =
@@ -206,6 +217,7 @@ proc `[]`*(x: K, i: int64): K =
   discard r1(x.k)
   case x.k.kind
   of kVecBool: x.k.boolArr[i].toK()
+  of kVecGUID: x.k.guidArr[i].toK()
   of kVecInt: x.k.intArr[i].toK()
   of kVecLong: x.k.longArr[i].toK()
   of kVecFloat: x.k.floatArr[i].toK()
@@ -214,7 +226,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecDate: x.k.dateArr[i].toKDate()
   of kVecDateTime: x.k.dtArr[i].toKDateTime()
   of kVecTimespan: x.k.tpArr[i].toKTimespan()
-  of kVecTime: x.k.ttArr[i].toKTime()
+  of kVecTime: x.k.timeArr[i].toKTime()
   of kList: r1(x.k.kArr[i])
   else: raise newException(KError, "`[]` is not supported for " & $x.k.kind)
 

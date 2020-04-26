@@ -9,8 +9,12 @@ type
   KKind* {.size: 1.} = enum
     kList = 0
     kVecBool = 1
+    kVecGUID = 2
+    kVecByte = 4
+    kVecShort = 5
     kVecInt = 6
     kVecLong = 7
+    kVecReal = 8
     kVecFloat = 9
     kVecChar = 10
     kVecSym = 11
@@ -28,9 +32,16 @@ type
     kTimestamp = 256-12
     kSym = 256-11
     kFloat = 256-9
+    kReal = 256-8
     kLong = 256-7
     kInt = 256-6
+    kShort = 256-5
+    kByte = 256-4
+    kGUID = 256-2
     kBool = 256-1
+
+  GUID* {.importc: "U".} = object
+    g* {.importc.}: array[16, byte]
 
   K0* = ptr object {.packed.}
     m*: cchar
@@ -46,6 +57,21 @@ type
       vbr*: cint
       boolInt*: clonglong
       boolArr*: UncheckedArray[bool]
+    of kVecGUID:
+      vgu*: cchar
+      vgr*: cint
+      guidLen*: clonglong
+      guidArr*: UncheckedArray[GUID]
+    of kVecByte:
+      vyu*: cchar
+      vyr*: cint
+      byteLen*: clonglong
+      byteArr*: UncheckedArray[byte]
+    of kVecShort:
+      vhu*: cchar
+      vhr*: cint
+      shortLen*: clonglong
+      shortArr*: UncheckedArray[cshort]
     of kVecInt:
       viu*: cchar
       vir*: cint
@@ -56,6 +82,11 @@ type
       vjr*: cint
       longLen*: clonglong
       longArr*: UncheckedArray[clonglong]
+    of kVecReal:
+      vru*: cchar
+      vrr*: cint
+      realLen*: clonglong
+      realArr*: UncheckedArray[cfloat]
     of kVecFloat:
       vfu*: cchar
       vfr*: cint
@@ -94,8 +125,8 @@ type
     of kVecTime:
       vttu*: cchar
       vttr*: cint
-      ttLen*: clonglong
-      ttArr*: UncheckedArray[cint]
+      timeLen*: clonglong
+      timeArr*: UncheckedArray[cint]
     of kTable:
       tu*: cchar
       tr*: cint
@@ -134,6 +165,10 @@ type
       fu*: cchar
       fr*: cint
       ff*: cdouble
+    of kReal:
+      rru*: cchar
+      rrr*: cint
+      rr*: cfloat
     of kLong:
       ju*: cchar
       jr*: cint
@@ -142,6 +177,19 @@ type
       iu*: cchar
       ir*: cint
       ii*: cint
+    of kShort:
+      hu*: cchar
+      hr*: cint
+      sh*: cshort
+    of kByte:
+      yu*: cchar
+      yr*: cint
+      by*: byte
+    of kGUID:
+      gu*: cchar
+      gr*: cint
+      gn*: clonglong # probably 2
+      gg*: GUID
     of kBool:
       bu*: cchar
       br*: cint

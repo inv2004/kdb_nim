@@ -10,5 +10,7 @@ void check_c_struct_offset() {
     printf("  r: %ld\n", offsetof(struct k0, r));
     printf("  k: %ld\n", offsetof(struct k0, k));
     printf("  n: %ld\n", offsetof(struct k0, n));
-    printf("  g: %ld\n", offsetof(struct k0, G0));
+    printf(" g0: %ld\n", offsetof(struct k0, G0));
+    printf("  g: %ld\n", offsetof(struct k0, g));
+    printf("U.g: %ld\n", offsetof(U, g));
 }

@@ -13,6 +13,9 @@ proc kp*(x: cstring): K0 {.
 proc kpn*(x: cstring, n: clonglong): K0 {.
   importc: "kpn", header: "k.h".}
 
+proc ku*(x: GUID): K0 {.
+  importc: "ku", header: "k.h".}
+
 proc ki*(x: cint): K0 {.
   importc: "ki", header: "k.h".}
 
@@ -85,5 +88,8 @@ proc checkNimStructOffset*() =
   echo "  r: ", offsetof(K0, tr)
   echo "  k: ", offsetof(K0, dict)
   echo "  n: ", offsetof(K0, kLen)
-  echo "  g: ", offsetof(K0, kArr)
+  echo " g0: ", offsetof(K0, kArr)
+  echo "  g: ", offsetof(K0, gg)
+  # echo "U.g: ", offsetof(GUID, g)
+
 

@@ -12,3 +12,4 @@ bin           = @["k_nim"]
 
 requires "nim >= 1.2.0"
 requires "terminaltables >= 0.1.1"
+requires "uuids >= 0.1.10"
