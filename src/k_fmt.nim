@@ -7,6 +7,7 @@ import terminaltables
 import uuids
 import endians
 
+const monthFormat = initTimeFormat("yyyy-MM")
 const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
 const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
@@ -96,6 +97,10 @@ proc `$`*(x: K): string =
     let d = initDuration(nanoseconds = x.k.ts)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(timestampFormat)
+  of kMonth:
+    let d = initTimeInterval(months = x.k.mo)
+    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
+    result.add dt.format(monthFormat)
   of kDate:
     let d = initDuration(days = x.k.dd)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
@@ -114,7 +119,8 @@ proc `$`*(x: K): string =
     var str = newString(x.k.charLen)
     copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
     result.add '"' & str & '"'
-  of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort, kVecLong, kVecReal, kVecFloat:
+  of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort,
+        kVecLong, kVecReal, kVecFloat, kVecMonth:
     result.add fmtKVec(x)
   of kVecGUID:
     result.add "guid"

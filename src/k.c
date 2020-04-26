@@ -1,6 +1,12 @@
 #include <stddef.h>
 #include "k.h"
 
+K km(int months) {
+    K k = ki(months);
+    k->t = KM;
+    return k;
+}
+
 void check_c_struct_offset() {
     printf("C-struct-offset:\n");
     printf("  m: %ld\n", offsetof(struct k0, m));

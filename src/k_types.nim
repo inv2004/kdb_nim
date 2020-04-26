@@ -19,6 +19,7 @@ type
     kVecChar = 10
     kVecSym = 11
     kVecTimestamp = 12
+    kVecMonth = 13
     kVecDate = 14
     kVecDateTime = 15
     kVecTimespan = 16
@@ -29,6 +30,7 @@ type
     kTimespan = 256-16
     kDateTIme = 256-15
     kDate = 256-14
+    kMonth = 256-13
     kTimestamp = 256-12
     kSym = 256-11
     kChar = 256-10
@@ -108,6 +110,11 @@ type
       vtsr*: cint
       tsLen*: clonglong
       tsArr*: UncheckedArray[clonglong]
+    of kVecMonth:
+      vmu*: cchar
+      vmr*: cint
+      monthLen*: clonglong
+      monthArr*: UncheckedArray[cint]
     of kVecDate:
       vdu*: cchar
       vdr*: cint
@@ -154,6 +161,10 @@ type
       eu*: cchar
       er*: cint
       dd*: cint
+    of kMonth:
+      mu*: cchar
+      mr*: cint
+      mo*: cint
     of kTimestamp:
       tsu*: cchar
       tsr*: cint

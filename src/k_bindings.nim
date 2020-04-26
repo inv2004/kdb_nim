@@ -28,6 +28,9 @@ proc ki*(x: cint): K0 {.
 proc kf*(x: cdouble): K0 {.
   importc: "kf", header: "k.h".}
 
+proc km*(x: cint): K0 {.
+  importc: "km".}
+
 proc kd*(x: cint): K0 {.
   importc: "kd", header: "k.h".}
 

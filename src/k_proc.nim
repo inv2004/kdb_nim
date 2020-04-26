@@ -28,6 +28,9 @@ converter toK*(x: string): K =
 converter toK*(x: cstring): K =
   K(k: kpn(x, x.len.clonglong))
 
+converter toKMonth*(x: cint): K =
+  K(k: km(x))
+
 converter toKDate*(x: cint): K =
   K(k: kd(x))
 
@@ -69,6 +72,7 @@ proc len*(x: K0): clonglong =
   of kVecReal: x.realLen
   of kVecFloat: x.floatLen
   of kVecSym: x.stringLen
+  of kVecMonth: x.monthLen
   of kVecDate: x.dateLen
   of kVecTime: x.timeLen
   else: raise newException(KError, "Not List: " & $x.kind)
@@ -243,6 +247,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecFloat: x.k.floatArr[i].toK()
   of kVecSym: x.k.stringArr[i].toSym()
   of kVecTimestamp: x.k.tsArr[i].toKTimestamp()
+  of kVecMonth: x.k.monthArr[i].toKMonth()
   of kVecDate: x.k.dateArr[i].toKDate()
   of kVecDateTime: x.k.dtArr[i].toKDateTime()
   of kVecTimespan: x.k.tpArr[i].toKTimespan()
