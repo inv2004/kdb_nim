@@ -13,6 +13,15 @@ const timeFormat = "HH:mm:ss\'.\'fff"
 
 proc `$`*(x: K): string
 
+proc fmtKList(x: K): string =
+  result.add "("
+  for i in 0..<x.k.kLen:
+    if i > 0:
+      result.add "; "
+    result.add $r1(x.k.kArr[i])
+  result.add ")"
+
+
 proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
   t.separateRows = false
@@ -40,6 +49,8 @@ proc fmtKDict(x: K): string =
 
 proc `$`*(x: K): string =
   case x.k.kind
+  of kList:
+    result.add fmtKList(x)
   of kTable:
     result.add fmtKTable(x)
   of kDict:

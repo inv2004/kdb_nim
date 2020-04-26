@@ -7,6 +7,12 @@ proc kb*(x: bool): K0 {.
 proc ks*(x: cstring): K0 {.
   importc: "ks", header: "k.h".}
 
+proc kp*(x: cstring): K0 {.
+  importc: "kp", header: "k.h".}
+
+proc kpn*(x: cstring, n: clonglong): K0 {.
+  importc: "kpn", header: "k.h".}
+
 proc ki*(x: cint): K0 {.
   importc: "ki", header: "k.h".}
 

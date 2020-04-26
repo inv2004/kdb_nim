@@ -1,6 +1,9 @@
 import k_bindings
 export k_bindings
 
+proc toSym*(x: cstring): K =
+  K(k: ks(x))
+
 converter toK*(x: int): K=
   K(k: ki(x.cint))
 
@@ -11,10 +14,10 @@ converter toK*(x: float64): K =
   K(k: kf(x.cdouble))
 
 converter toK*(x: string): K =
-  K(k: ks(x.cstring))
+  K(k: kpn(x.cstring, x.len.cint))
 
 converter toK*(x: cstring): K =
-  K(k: ks(x))
+  K(k: kpn(x, x.len.clonglong))
 
 converter toKDate*(x: cint): K =
   K(k: kd(x))
@@ -64,7 +67,7 @@ iterator items*(x: K0): K0 =
   of kVecSym:
     var i = 0
     while i < x.stringLen:
-      yield x.stringArr[i].toK().k
+      yield x.stringArr[i].toSym().k
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.kind)
 
@@ -84,7 +87,7 @@ iterator items*(x: K): K =
   of kVecSym:
     var i = 0
     while i < x.k.stringLen:
-      yield x.k.stringArr[i].toK()
+      yield x.k.stringArr[i].toSym()
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
@@ -115,7 +118,12 @@ proc newKDict*(kt, vt: int): K =
   # r1(data)
 
 proc add*(x: var K0, v: cstring) =
-  js(x.addr, ss(v))
+  case x.kind
+  of kList:
+    let v = v.toK()
+    jk(x.addr, r1(v.k))
+  of kVecSym: js(x.addr, ss(v))
+  else: raise newException(KError, "add[cstring] is not supported for " & $x.kind)
 
 proc add*(x: var K, v: cstring) =
   add(x.k, v)
@@ -182,7 +190,7 @@ proc `[]`*(x: K, i: int64): K =
   of kVecInt: x.k.intArr[i].toK()
   of kVecLong: x.k.longArr[i].toK()
   of kVecFloat: x.k.floatArr[i].toK()
-  of kVecSym: x.k.stringArr[i].toK()
+  of kVecSym: x.k.stringArr[i].toSym()
   of kVecTimestamp: x.k.tsArr[i].toKTimestamp()
   of kVecDate: x.k.dateArr[i].toKDate()
   of kVecDateTime: x.k.dtArr[i].toKDateTime()
