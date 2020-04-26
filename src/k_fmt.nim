@@ -74,12 +74,20 @@ proc `$`*(x: K): string =
     result.add fmtKDict(x)
   of kGUID:
     result.add fmtKGUID(x)
+  of kByte:
+    result.add $x.k.by.int  # TODO: cannot convert via byte: fix
+  of kShort:
+    result.add $x.k.sh
   of kInt:
     result.add $x.k.ii
   of kLong:
     result.add $x.k.jj
+  of kReal:
+    result.add $x.k.rr
   of kFloat:
     result.add $x.k.ff
+  of kChar:
+    result.add "'" & $x.k.ch & "'"
   of kSym:
     result.add x.k.ss
   of kBool:
@@ -106,7 +114,7 @@ proc `$`*(x: K): string =
     var str = newString(x.k.charLen)
     copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
     result.add '"' & str & '"'
-  of kVecInt, kVecSym:
+  of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort, kVecLong, kVecReal, kVecFloat:
     result.add fmtKVec(x)
   of kVecGUID:
     result.add "guid"

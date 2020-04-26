@@ -4,6 +4,9 @@ export k_bindings
 proc toSym*(x: cstring): K =
   K(k: ks(x))
 
+converter toK*(x: cshort): K=
+  K(k: kh(x))
+
 converter toK*(x: int): K=
   K(k: ki(x.cint))
 
@@ -34,6 +37,9 @@ converter toKTimespan*(x: clonglong): K =
 converter toKTime*(x: cint): K =
   K(k: kt(x))
 
+converter toK*(x: byte): K =
+  K(k: kg(x.cint))
+
 converter toK*(x: bool): K =
   K(k: kb(x))
 
@@ -49,8 +55,13 @@ proc `%`*(x: int): K =
 proc len*(x: K0): clonglong =
   case x.kind
   of kList: x.kLen
+  of kVecBool: x.boolLen
+  of kVecByte: x.byteLen
+  of kVecShort: x.shortLen
   of kVecInt: x.intLen
   of kVecLong: x.longLen
+  of kVecReal: x.realLen
+  of kVecFloat: x.floatLen
   of kVecSym: x.stringLen
   of kVecDate: x.dateLen
   of kVecTime: x.timeLen
@@ -218,8 +229,11 @@ proc `[]`*(x: K, i: int64): K =
   case x.k.kind
   of kVecBool: x.k.boolArr[i].toK()
   of kVecGUID: x.k.guidArr[i].toK()
+  of kVecByte: x.k.byteArr[i].toK()
+  of kVecShort: x.k.shortArr[i].toK()
   of kVecInt: x.k.intArr[i].toK()
   of kVecLong: x.k.longArr[i].toK()
+  of kVecReal: x.k.realArr[i].toK()
   of kVecFloat: x.k.floatArr[i].toK()
   of kVecSym: x.k.stringArr[i].toSym()
   of kVecTimestamp: x.k.tsArr[i].toKTimestamp()

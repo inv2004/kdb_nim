@@ -16,6 +16,12 @@ proc kpn*(x: cstring, n: clonglong): K0 {.
 proc ku*(x: GUID): K0 {.
   importc: "ku", header: "k.h".}
 
+proc kh*(x: cint): K0 {.
+  importc: "kh", header: "k.h".}
+
+proc kg*(x: cint): K0 {.
+  importc: "kg", header: "k.h".}
+
 proc ki*(x: cint): K0 {.
   importc: "ki", header: "k.h".}
 

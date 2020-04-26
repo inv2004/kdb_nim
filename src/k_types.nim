@@ -31,6 +31,7 @@ type
     kDate = 256-14
     kTimestamp = 256-12
     kSym = 256-11
+    kChar = 256-10
     kFloat = 256-9
     kReal = 256-8
     kLong = 256-7
@@ -55,7 +56,7 @@ type
     of kVecBool:
       vbu*: cchar
       vbr*: cint
-      boolInt*: clonglong
+      boolLen*: clonglong
       boolArr*: UncheckedArray[bool]
     of kVecGUID:
       vgu*: cchar
@@ -161,6 +162,10 @@ type
       su*: cchar
       sr*: cint
       ss*: cstring
+    of kChar:
+      cu*: cchar
+      cr*: cint
+      ch*: cchar
     of kFloat:
       fu*: cchar
       fr*: cint
