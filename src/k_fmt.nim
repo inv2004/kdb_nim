@@ -9,9 +9,11 @@ import endians
 
 const monthFormat = initTimeFormat("yyyy-MM")
 const dateFormat = initTimeFormat("yyyy-MM-dd")
-const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss")
+const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fff")
 const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
 const timespanFormat = "HH:mm:ss\'.\'fffffffff"
+const minuteFormat = "HH:mm"
+const secondFormat = "HH:mm:ss"
 const timeFormat = "HH:mm:ss\'.\'fff"
 
 proc `$`*(x: K): string
@@ -111,7 +113,14 @@ proc `$`*(x: K): string =
     result.add dt.format(dateTimeFormat)
   of kTimespan:
     let d = initTime(0, 0) + initDuration(nanoseconds = x.k.tp)
-    result.add d.format(timespanFormat, zone = utc())
+    let days = int(d.toSeconds() / (24*3600))
+    result.add $days & "D" & d.format(timespanFormat, zone = utc())
+  of kMinute:
+    let d = initTime(0, 0) + initDuration(minutes = x.k.mi)
+    result.add d.format(minuteFormat, zone = utc())
+  of kSecond:
+    let d = initTime(0, 0) + initDuration(seconds = x.k.se)
+    result.add d.format(secondFormat, zone = utc())
   of kTime:
     let d = initTime(0, 0) + initDuration(milliseconds = x.k.tt)
     result.add d.format(timeFormat, zone = utc())
@@ -120,7 +129,9 @@ proc `$`*(x: K): string =
     copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
     result.add '"' & str & '"'
   of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort,
-        kVecLong, kVecReal, kVecFloat, kVecMonth:
+        kVecLong, kVecReal, kVecFloat,
+        kVecMonth, kVecMinute, kVecSecond,
+        kVecDateTime, kVecTimestamp, kVecTimespan:
     result.add fmtKVec(x)
   of kVecGUID:
     result.add "guid"

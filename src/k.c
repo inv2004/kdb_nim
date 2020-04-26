@@ -7,6 +7,18 @@ K km(int months) {
     return k;
 }
 
+K kmi(int minutes) {
+    K k = ki(minutes);
+    k->t = -KU;
+    return k;
+}
+
+K kse(int seconds) {
+    K k = ki(seconds);
+    k->t = -KV;
+    return k;
+}
+
 void check_c_struct_offset() {
     printf("C-struct-offset:\n");
     printf("  m: %ld\n", offsetof(struct k0, m));

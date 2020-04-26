@@ -31,6 +31,12 @@ converter toK*(x: cstring): K =
 converter toKMonth*(x: cint): K =
   K(k: km(x))
 
+converter toKMinute*(x: cint): K =
+  K(k: kmi(x))
+
+converter toKSecond*(x: cint): K =
+  K(k: kse(x))
+
 converter toKDate*(x: cint): K =
   K(k: kd(x))
 
@@ -72,9 +78,14 @@ proc len*(x: K0): clonglong =
   of kVecReal: x.realLen
   of kVecFloat: x.floatLen
   of kVecSym: x.stringLen
+  of kVecTimestamp: x.tsLen
   of kVecMonth: x.monthLen
   of kVecDate: x.dateLen
+  of kVecDateTime: x.dtLen
   of kVecTime: x.timeLen
+  of kVecMinute: x.minuteLen
+  of kVecTimespan: x.tpLen
+  of kVecSecond: x.secondLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
 iterator pairs*(x: K0): (int, K0) =  # it is copy of items, better to merge somehow
@@ -251,6 +262,8 @@ proc `[]`*(x: K, i: int64): K =
   of kVecDate: x.k.dateArr[i].toKDate()
   of kVecDateTime: x.k.dtArr[i].toKDateTime()
   of kVecTimespan: x.k.tpArr[i].toKTimespan()
+  of kVecMinute: x.k.minuteArr[i].toKMinute()
+  of kVecSecond: x.k.secondArr[i].toKSecond()
   of kVecTime: x.k.timeArr[i].toKTime()
   of kList: r1(x.k.kArr[i])
   else: raise newException(KError, "`[]` is not supported for " & $x.k.kind)
