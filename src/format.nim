@@ -1,5 +1,5 @@
-import k_proc
-export k_proc
+import procs
+export procs
 
 import strutils
 import times

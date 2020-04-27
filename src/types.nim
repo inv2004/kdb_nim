@@ -1,6 +1,6 @@
-{.compile: "k.c".}
 {.passC: "-DKXVER=3".}
 {.link: "c.o".}
+{.compile: "k.c".}
 
 type
   KError* = object of Exception

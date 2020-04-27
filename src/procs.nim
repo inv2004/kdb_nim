@@ -1,11 +1,9 @@
-import k_bindings
-export k_bindings
+import bindings
+export bindings
 
-proc init*() = 
+proc initMemory*() = 
   echo "Init KDB Memory"
   discard khp("", -1)
-
-init()
 
 proc toSym*(x: cstring): K =
   K(k: ks(x))

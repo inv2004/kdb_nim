@@ -1,4 +1,4 @@
-import k_fmt
+import kdb
 
 proc checkStructOffset*() =
   checkCStructOffset()

@@ -1,5 +1,5 @@
-import k_types
-export k_types
+import types
+export types
 
 proc kb*(x: bool): K0 {.
   importc: "kb", header: "k.h".}
@@ -104,7 +104,5 @@ proc checkNimStructOffset*() =
   echo "  k: ", offsetof(K0, dict)
   echo "  n: ", offsetof(K0, kLen)
   echo " g0: ", offsetof(K0, kArr)
-  echo "  g: ", offsetof(K0, gg)
-  # echo "U.g: ", offsetof(GUID, g)
 
 
