@@ -25,8 +25,17 @@ proc kg*(x: cint): K0 {.
 proc ki*(x: cint): K0 {.
   importc: "ki", header: "k.h".}
 
+proc kj*(x: clonglong): K0 {.
+  importc: "kj", header: "k.h".}
+
+proc ke*(x: cfloat): K0 {.
+  importc: "ke", header: "k.h".}
+
 proc kf*(x: cdouble): K0 {.
   importc: "kf", header: "k.h".}
+
+proc kc*(x: cchar): K0 {.
+  importc: "kc", header: "k.h".}
 
 proc km*(x: cint): K0 {.
   importc: "km".}

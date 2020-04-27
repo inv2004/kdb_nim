@@ -5,49 +5,61 @@ proc initMemory*() =
   echo "Init KDB Memory"
   discard khp("", -1)
 
-proc toSym*(x: cstring): K =
-  K(k: ks(x))
-
-converter toK*(x: cshort): K=
-  K(k: kh(x))
-
-converter toK*(x: int): K=
-  K(k: ki(x.cint))
-
-converter toK*(x: int64): K =
-  K(k: ki(x.cint))
-
-converter toK*(x: float64): K =
-  K(k: kf(x.cdouble))
+converter toK*(x: cstring): K =
+  K(k: kpn(x, x.len.clonglong))
 
 converter toK*(x: string): K =
   K(k: kpn(x.cstring, x.len.cint))
 
-converter toK*(x: cstring): K =
-  K(k: kpn(x, x.len.clonglong))
+converter toK*(x: int16): K=
+  K(k: kh(x))
+
+converter toK*(x: int32): K=
+  K(k: ki(x))
+
+converter toK*(x: int64): K =
+  K(k: kj(x.clonglong))
+
+converter toK*(x: float32): K =
+  K(k: ke(x.cfloat))
+
+converter toK*(x: float64): K =
+  K(k: kf(x.cdouble))
+
+converter toK*(x: char): K =
+  K(k: kc(x))
+
+proc toSym*(x: cstring): K =
+  K(k: ks(x))
+
+proc toSym*(x: string): K =
+  K(k: ks(x.cstring))
+
+proc `s`*(x: string): K =
+  K(k: ks(x.cstring))
 
 converter toKMonth*(x: cint): K =
   K(k: km(x))
 
-converter toKMinute*(x: cint): K =
+proc toKMinute*(x: cint): K =
   K(k: kmi(x))
 
-converter toKSecond*(x: cint): K =
+proc toKSecond*(x: cint): K =
   K(k: kse(x))
 
-converter toKDate*(x: cint): K =
+proc toKDate*(x: cint): K =
   K(k: kd(x))
 
-converter toKDateTime*(x: cdouble): K =
+proc toKDateTime*(x: cdouble): K =
   K(k: kz(x))
 
-converter toKTimestamp*(x: clonglong): K =
+proc toKTimestamp*(x: clonglong): K =
   K(k: ktj(KKind.kTimestamp.byte, x))
 
-converter toKTimespan*(x: clonglong): K =
+proc toKTimespan*(x: clonglong): K =
   K(k: ktj(KKind.kTimespan.byte, x))
 
-converter toKTime*(x: cint): K =
+proc toKTime*(x: cint): K =
   K(k: kt(x))
 
 converter toK*(x: byte): K =
@@ -62,7 +74,7 @@ converter toK*(x: GUID): K =
 converter toK*(x: K0): K =
   K(k: x)
 
-proc `%`*(x: int): K =
+template `%`*(x: untyped): K =
   toK(x)
 
 proc kind*(x: K): KKind {.inline.} =

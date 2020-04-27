@@ -18,8 +18,20 @@ type
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
 
-test "atoms":
-  check (%10.int).kind == KKind.kInt
-  # check (%10.byte).k.kind == KKind.kInt
+test "simple_atoms":
+  check (%true).kind == KKind.kBool
+  check (%10.byte).kind == KKind.kByte
+  check (%10.int16).kind == KKind.kShort
+  check (%10.int32).kind == KKind.kInt
+  check (%10.int).kind == KKind.kLong
+  check (%10.int64).kind == KKind.kLong
+  check (%10.float32).kind == KKind.kReal
+  check (%10.float).kind == KKind.kFloat
+  check (%10.float64).kind == KKind.kFloat
+  check (%'a').kind == KKind.kChar
+  check toSym("aaa").kind == KKind.kSym
+  check s"aaa".kind == KKind.kSym
 
+test "guid":
+  check initUUID
 
