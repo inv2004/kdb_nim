@@ -10,5 +10,16 @@
 import unittest
 import kdb
 
-test "can add":
-  check (5+5) == 10
+type
+  GUID* {.importc: "U", header: "k.h".} = object
+    g* {.importc.}: array[16, byte]
+
+  
+proc r0*(x: K0) {.
+  importc: "r0", header: "k.h".}
+
+test "atoms":
+  check (%10.int).kind == KKind.kInt
+  # check (%10.byte).k.kind == KKind.kInt
+
+

@@ -65,6 +65,9 @@ converter toK*(x: K0): K =
 proc `%`*(x: int): K =
   toK(x)
 
+proc kind*(x: K): KKind {.inline.} =
+  x.k.kind
+
 proc len*(x: K0): clonglong =
   case x.kind
   of kList: x.kLen
