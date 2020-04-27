@@ -55,6 +55,9 @@ proc knk*(i: int): K0 {.
 proc jk*(l: ptr K0, x: K0) {.
   importc: "jk", header: "k.h".}
 
+proc jv*(l: ptr K0, x: K0) {.
+  importc: "jv", header: "k.h".}
+
 proc ktn*(t:int, i: int): K0 {.
   importc: "ktn", header: "k.h".}
 

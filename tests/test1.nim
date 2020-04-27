@@ -5,8 +5,10 @@
 #
 # To run these tests, simply execute `nimble test`.
 
-import unittest
+{.passC: "-Isrc".}
 
-import k_nim
+import unittest
+import kdb
+
 test "can add":
-  check add(5, 5) == 10
+  check (5+5) == 10

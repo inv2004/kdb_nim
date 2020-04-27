@@ -62,10 +62,23 @@ proc main() =
         echo y
     echo vv
 
+proc main3() =
+  while true:
+    var l = newKList()
+    var v = newKVec[int]()
+    v.add(10)
+    l.add(v)
+    v.add(20)
+    v.add(30)
+    v.add(40)
+    v.add(50)
+    echo l
+    break
+
 proc rc(x: K0): string =
   result.add $x.kind
   result.add ": "
   result.add $cast[ptr UncheckedArray[cint]](x)[1]
 
 when isMainModule:
-  main()
+  main3()
