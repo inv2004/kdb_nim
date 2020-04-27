@@ -9,8 +9,8 @@
 ### Features / TODO:
 - [x] Support all Kdb types
 - [x] Automatic memory management
-- [/] Implicit casting between Nim and Kdb types
 - [x] Remote connection
+- [ ] Implicit casting between Nim and Kdb types
 - [ ] Separate types for static garanties
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
