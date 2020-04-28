@@ -1,6 +1,8 @@
 import bindings
 export bindings
 
+import uuids
+
 proc initMemory*() = 
   echo "Init KDB Memory"
   discard khp("", -1)
@@ -65,6 +67,7 @@ proc toKTimespan*(x: clonglong): K =
 proc toKTime*(x: cint): K =
   K(k: kt(x))
 
+
 converter toK*(x: byte): K =
   K(k: kg(x.cint))
 
@@ -73,6 +76,11 @@ converter toK*(x: bool): K =
 
 converter toK*(x: GUID): K =
   K(k: ku(x))
+
+proc toGUID*(x: string): K =
+  let uuid = parseUUID(x)
+  let guid = cast[GUID](uuid)
+  K(k: ku(guid))
 
 converter toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)

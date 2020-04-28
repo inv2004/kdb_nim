@@ -28,5 +28,9 @@ test "simple_atoms":
   check s"aaa".kind == KKind.kSym
 
 test "guid":
-  check (%[0.byte,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]).kind == KKind.kGUID
+  let guid1 = %[10.byte,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+  check guid1.kind == KKind.kGUID
+  let guid2 = toGUID("0A000000-0000-0000-0000-000000000001")
+  check guid2.kind == KKind.kGUID
+  check guid1 == guid2
 
