@@ -10,7 +10,7 @@ The one of reasons of the package is not only to provide bindings between the tw
 ### Features / TODO:
 - [x] Support all Kdb types
 - [x] Automatic memory management
-- [x] Remote connection
+- [x] IPC
 - [ ] Implicit casting between Nim and Kdb types
 - [ ] Separate types for static garanties
 - [ ] Historical files access
