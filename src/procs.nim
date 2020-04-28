@@ -212,8 +212,9 @@ proc newKDict*[KT, VT](): K =
   let header = ktn(typeToKType[KT](), 0)
   let data = ktn(typeToKType[VT](), 0)
   result = K(k: xD(header, data))
-  # r1(header)
-  # r1(data)
+
+proc newKDict*(keys, values: K): K =
+  result = K(k: xD(r1(keys.k), r1(values.k)))
 
 proc add*(x: var K0, v: cstring) =
   case x.kind
@@ -268,7 +269,7 @@ proc addColumn*[T](t: var K, name: string) =
     var data = newKList()
     var c1 = newKVec[T]()
     data.add(c1)
-    let dict = K(k: xD(r1(header.k), r1(data.k)))
+    let dict = newKDict(header, data)
     t.k = xT(r1(dict.k))
   else:
     t.k.dict.keys.add(name)
