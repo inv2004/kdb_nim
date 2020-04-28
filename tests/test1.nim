@@ -9,11 +9,6 @@
 
 import unittest
 import kdb
-
-type
-  GUID* {.importc: "U", header: "k.h".} = object
-    g* {.importc.}: array[16, byte]
-
   
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
@@ -33,5 +28,5 @@ test "simple_atoms":
   check s"aaa".kind == KKind.kSym
 
 test "guid":
-  check initUUID
+  check (%[0.byte,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]).kind == KKind.kGUID
 

@@ -17,6 +17,9 @@ converter toK*(x: int16): K=
 converter toK*(x: int32): K=
   K(k: ki(x))
 
+converter toK*(x: int): K =
+  K(k: kj(x.clonglong))
+
 converter toK*(x: int64): K =
   K(k: kj(x.clonglong))
 
@@ -70,6 +73,10 @@ converter toK*(x: bool): K =
 
 converter toK*(x: GUID): K =
   K(k: ku(x))
+
+converter toK*(x: array[16, byte]): K =
+  let guid = GUID(g: x)
+  toK(guid)
 
 converter toK*(x: K0): K =
   K(k: x)
