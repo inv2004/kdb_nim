@@ -204,7 +204,7 @@ iterator items*(x: K): K =
 proc typeToKType*[T](): int =
   when T is int: 6
   elif T is int64: 7
-  elif T is string: 11 # TOD: not sure
+  elif T is string: 11 # TODO: not sure
   elif T is void: 0
   else: raise newException(KError, "cannot convert type")
 
@@ -232,6 +232,9 @@ proc add*(x: var K, v: string) =
 proc add*(x: var K0, v: cint) =
   ja(x.addr, v.unsafeAddr)
 
+proc add*(x: var K0, v: clonglong) =
+  ja(x.addr, v.unsafeAddr)
+
 proc add*(x: var K0, v: int) =
   add(x, v.cint)
 
@@ -242,6 +245,7 @@ proc add*(x: var K0, v: K0) =
   case x.kind
   of kList: jk(x.addr, r1(v))
   of kVecInt: add(x, v.ii.cint)
+  of kVecLong: add(x, v.jj.clonglong)
   else: raise newException(KError, "add is not supported for " & $x.kind)
 
 proc add*(x: var K, v: K) =
@@ -264,8 +268,8 @@ proc addColumn*[T](t: var K, name: string) =
     var data = newKList()
     var c1 = newKVec[T]()
     data.add(c1)
-    let d0 = xD(r1(header.k), r1(data.k))
-    t.k = xT(d0)
+    let dict = K(k: xD(r1(header.k), r1(data.k)))
+    t.k = xT(r1(dict.k))
   else:
     t.k.dict.keys.add(name)
     var c1 = newKVec[T]()
@@ -312,7 +316,7 @@ proc `[]=`*(x: var K, k: K, v: K) =
     x.values.add(v.k)
   else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
 
-proc `[]=`*(x: var K, i: int, v: K) =
+proc `[]=`*(x: var K, i: SomeInteger, v: K) =
   case x.k.kind
   of kDict:
     x.k.keys.add(i)

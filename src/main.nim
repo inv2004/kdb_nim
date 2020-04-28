@@ -26,7 +26,7 @@ proc main1() =
 proc main() =
   while true:
     var t = newKTable()
-    t.addColumn[:int]("aaa")
+    t.addColumn[:int64]("aaa")
     t.addColumn[:void]("bbb")
     t.addRow(3, "30")
     t.addRow(4, "40")
@@ -37,7 +37,7 @@ proc main() =
     d[1] = "one"
     d[2] = "two"
     echo d
-    var dd = newKDict[int, int]()
+    var dd = newKDict[int, int64]()
     dd[1] = 11
     dd[2] = 22
     echo dd
@@ -81,4 +81,4 @@ proc rc(x: K0): string =
   result.add $cast[ptr UncheckedArray[cint]](x)[1]
 
 when isMainModule:
-  main3()
+  main()

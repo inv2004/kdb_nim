@@ -73,7 +73,7 @@ proc ktn*(t:int, i: int): K0 {.
 proc js*(l: ptr K0, x: cstring) {.
   importc: "js", header: "k.h".}
 
-proc ja*(l: ptr K0, x: ptr cint) {.
+proc ja*(l: ptr K0, x: ptr SomeNumber) {.
   importc: "ja", header: "k.h".}
 
 proc ss*(x: cstring): cstring {.
