@@ -97,6 +97,10 @@ proc `$`*(x: K): string =
     result.add x.k.ss
   of kBool:
     result.add $x.k.bb.bool
+  of kId:
+    result.add "(::)"
+  of kError:
+    result.add $x.k.msg
   of kTimestamp:
     let d = initDuration(nanoseconds = x.k.ts)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d

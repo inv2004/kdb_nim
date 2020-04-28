@@ -37,3 +37,4 @@ test "guid":
   check guid2.kind == KKind.kGUID
   check guid1.k.gg == guid2.k.gg
   check $guid1 == guidStr
+

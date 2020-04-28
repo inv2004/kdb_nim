@@ -20,8 +20,13 @@ proc main2() =
 
 proc main1() =
   let h = connect("test-kdb", 9999)
-  let r = h.exec("f", 10)
+  var r = h.exec0("f")
   echo r
+  r = h.exec("f")
+  echo r
+  r = h.exec("f1", 1)
+  echo r
+  h.execAsync0("{`a set 13}")
 
 proc main() =
   while true:
@@ -81,4 +86,4 @@ proc rc(x: K0): string =
   result.add $cast[ptr UncheckedArray[cint]](x)[1]
 
 when isMainModule:
-  main()
+  main1()

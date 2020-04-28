@@ -4,6 +4,7 @@
 
 type
   KError* = object of Exception
+  KErrorRemote* = object of Exception
 
 type
   KKind* {.size: 1.} = enum
@@ -28,6 +29,8 @@ type
     kVecTime = 19
     kTable = 98
     kDict = 99
+    kId = 101
+    kError = 128
     kTime = 256-19
     kSecond = 256-18
     kMinute = 256-17
@@ -159,6 +162,14 @@ type
       dn*: clonglong  # always 2
       keys*: K0
       values*: K0
+    of kId:
+      idu*: cchar
+      idr*: cint
+      idg*: byte
+    of kError:
+      eru*: cchar
+      err*: cint
+      msg*: cstring
     of kTime:
       ttu*: cchar
       ttr*: cint
