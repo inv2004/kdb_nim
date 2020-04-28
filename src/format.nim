@@ -62,9 +62,11 @@ proc fmtKVec(x: K): string =
 
 proc fmtKGUID(x: K): string =
   var twoInts64 = cast[ptr UncheckedArray[int64]](x.k.gg.g.addr)
-  bigEndian64(twoInts64[0].addr, twoInts64[0].addr)
-  bigEndian64(twoInts64[1].addr, twoInts64[1].addr)
-  let u = initUUID(twoInts64[0], twoInts64[1])
+  var most: int64
+  var least: int64
+  bigEndian64(most.addr, twoInts64[0].addr)
+  bigEndian64(least.addr, twoInts64[1].addr)
+  let u = initUUID(most, least)
   $u
 
 proc `$`*(x: K): string =

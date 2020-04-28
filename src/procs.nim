@@ -2,6 +2,7 @@ import bindings
 export bindings
 
 import uuids
+import endians
 
 proc initMemory*() = 
   echo "Init KDB Memory"
@@ -79,7 +80,14 @@ converter toK*(x: GUID): K =
 
 proc toGUID*(x: string): K =
   let uuid = parseUUID(x)
-  let guid = cast[GUID](uuid)
+  let src1 = uuid.mostSigBits
+  let src2 = uuid.leastSigBits
+  var dst1: int64
+  var dst2: int64
+  bigEndian64(dst1.addr, src1.unsafeAddr)
+  bigEndian64(dst2.addr, src2.unsafeAddr)
+
+  let guid = cast[GUID]((dst1, dst2))
   K(k: ku(guid))
 
 converter toK*(x: array[16, byte]): K =

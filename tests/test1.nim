@@ -9,7 +9,9 @@
 
 import unittest
 import kdb
-  
+
+import strutils
+
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
 
@@ -30,7 +32,8 @@ test "simple_atoms":
 test "guid":
   let guid1 = %[10.byte,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
   check guid1.kind == KKind.kGUID
-  let guid2 = toGUID("0A000000-0000-0000-0000-000000000001")
+  let guidStr = "0a000000-0000-0000-0000-000000000001"
+  let guid2 = toGUID(guidStr)
   check guid2.kind == KKind.kGUID
-  check guid1 == guid2
-
+  check guid1.k.gg == guid2.k.gg
+  check $guid1 == guidStr
