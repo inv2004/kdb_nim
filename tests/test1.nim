@@ -38,3 +38,9 @@ test "guid":
   check guid1.k.gg == guid2.k.gg
   check $guid1 == guidStr
 
+test "lists":
+  var v = newKVec[bool]()
+  v.add(123)
+  v.add(0)
+  for x in v:
+    echo x

@@ -128,31 +128,17 @@ proc len*(x: K0): clonglong =
   of kVecSecond: x.secondLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
-iterator pairs*(x: K0): (int, K0) =  # it is copy of items, better to merge somehow
-  case x.kind
-  of kList:
-    var i = 0
-    while i < x.kLen:
-      yield (i, x.kArr[i])
-      inc(i)
-  of kVecInt:
-    var i = 0
-    while i < x.intLen:
-      yield (i, x.intArr[i].toK().k)
-      inc(i)
-  of kVecSym:
-    var i = 0
-    while i < x.stringLen:
-      yield (i, x.stringArr[i].toSym().k)
-      inc(i)
-  else: raise newException(KError, "items is not supported for " & $x.kind)
-
 iterator items*(x: K0): K0 =
   case x.kind
   of kList:
     var i = 0
     while i < x.kLen:
       yield x.kArr[i]
+      inc(i)
+  of kVecBool:
+    var i = 0
+    while i < x.boolLen:
+      yield x.intArr[i].toK().k
       inc(i)
   of kVecInt:
     var i = 0
@@ -173,6 +159,11 @@ iterator items*(x: K): K =
     while i < x.k.kLen:
       let v = r1(x.k.kArr[i])
       yield v
+      inc(i)
+  of kVecBool:
+    var i = 0
+    while i < x.k.boolLen:
+      yield x.k.boolArr[i].toK()
       inc(i)
   of kVecInt:
     var i = 0
@@ -206,7 +197,11 @@ iterator items*(x: K): K =
   # else: raise newException(KError, "mitems is not supported for " & $x.kind)
 
 proc typeToKType*[T](): int =
-  when T is int: 6
+  when T is bool: 1
+  elif T is byte: 4
+  elif T is int16: 4
+  elif T is int32: 6
+  elif T is int: 7
   elif T is int64: 7
   elif T is string: 11 # TODO: not sure
   elif T is void: 0

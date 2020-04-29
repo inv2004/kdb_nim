@@ -11,7 +11,7 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [x] Support all Kdb types
 - [x] Automatic memory management
 - [x] IPC
-- [ ] Implicit casting between Nim and Kdb types
+- [x] Implicit casting between Nim and Kdb types
 - [ ] Separate types for static garanties
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
