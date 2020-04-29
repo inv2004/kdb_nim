@@ -37,6 +37,9 @@ proc kf*(x: cdouble): K0 {.
 proc kc*(x: cchar): K0 {.
   importc: "kc", header: "k.h".}
 
+proc ka*(x: byte): K0 {.
+  importc: "ka", header: "k.h".}
+
 proc km*(x: cint): K0 {.
   importc: "km".}
 

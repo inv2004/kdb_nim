@@ -8,6 +8,10 @@ proc initMemory*() =
   echo "Init KDB Memory"
   discard khp("", -1)
 
+converter toK*(x: type(nil)): K =
+  result = K(k: ka(101))
+  result.k.idg = 0
+
 converter toK*(x: cstring): K =
   K(k: kpn(x, x.len.clonglong))
 
@@ -332,11 +336,31 @@ proc connect*(hostname: string, port: int): FileHandle =
   if result <= 0:
     raise newException(KError, "Connection error")
 
-proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
+proc execIntenal(h: FileHandle, s: string, args: varargs[K]): K0 =
   case args.len
-  of 0: result = K(k: k(h, s.cstring, nil))
-  of 1: result = K(k: k(h, s.cstring, args[0].k, nil))
-  of 2: result = K(k: k(h, s.cstring, args[0].k, args[1].k, nil))
-  of 3: result = K(k: k(h, s.cstring, args[0].k, args[1].k, args[2].k, nil))
+  of 0: result = k(h, s.cstring, nil)
+  of 1: result = k(h, s.cstring, args[0].k, nil)
+  of 2: result = k(h, s.cstring, args[0].k, args[1].k, nil)
+  of 3: result = k(h, s.cstring, args[0].k, args[1].k, args[2].k, nil)
   else: raise newException(KError, "Cannot exec with more than 3 arguments")
 
+  if result.kind == KKind.kError:
+    raise newException(KErrorRemote, $result.msg)
+
+
+proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
+  let k0 = execIntenal(h, s, args)
+
+  if k0.kind == KKind.kError:
+    raise newException(KErrorRemote, $result.k.msg)
+  else:
+    K(k: k0)
+
+proc exec0*(h: FileHandle, s: string): K =
+  exec(h, s, nil.toK())
+
+proc execAsync*(h: FileHandle, s: string, args: varargs[K]) =
+  discard execIntenal(-h, s, args)
+
+proc execAsync0*(h: FileHandle, s: string, args: varargs[K]) =
+  execAsync(h, s, nil.toK())
