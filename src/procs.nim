@@ -128,6 +128,9 @@ proc len*(x: K0): clonglong =
   of kVecSecond: x.secondLen
   else: raise newException(KError, "Not List: " & $x.kind)
 
+proc len*(x: K): int =
+  len(x.k).int
+
 iterator items*(x: K0): K0 =
   case x.kind
   of kList:
@@ -229,10 +232,19 @@ proc add*(x: var K, v: cstring) =
 proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
 
+proc add*(x: var K0, v: bool) =
+  assert x.kind == KKind.kVecBool
+  ja(x.addr, v.unsafeAddr)
+
+proc add*(x: var K, v: bool) =
+  add(x.k, v)
+
 proc add*(x: var K0, v: cint) =
+  assert x.kind == KKind.kVecInt
   ja(x.addr, v.unsafeAddr)
 
 proc add*(x: var K0, v: clonglong) =
+  assert x.kind == KKind.kVecLong
   ja(x.addr, v.unsafeAddr)
 
 proc add*(x: var K0, v: int) =
@@ -244,9 +256,7 @@ proc add*(x: var K, v: int) =
 proc add*(x: var K0, v: K0) =
   case x.kind
   of kList: jk(x.addr, r1(v))
-  of kVecInt: add(x, v.ii.cint)
-  of kVecLong: add(x, v.jj.clonglong)
-  else: raise newException(KError, "add is not supported for " & $x.kind)
+  else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 
 proc add*(x: var K, v: K) =
   add(x.k, v.k)
@@ -325,6 +335,22 @@ proc `[]=`*(x: var K, i: SomeInteger, v: K) =
     assert v.k.kind == kSym     # /-------\
     x.k.stringArr[i] = v.k.ss   # TODO: fix
   else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
+
+proc `==`*(a: K, b: K): bool =
+  if a.k.kind != b.k.kind:
+    return false
+  case a.k.kind
+  of kBool: a.k.bb == b.k.bb
+  of kGUID: a.k.gg.g == b.k.gg.g
+  of kByte: a.k.by == b.k.by
+  of kShort: a.k.sh == b.k.sh
+  of kInt: a.k.ii == b.k.ii
+  of kLong: a.k.jj == b.k.jj
+  of kReal: a.k.rr == b.k.rr
+  of kFloat: a.k.ff == b.k.ff
+  of kChar: a.k.ch == b.k.ch
+  of kSym: a.k.ss == b.k.ss
+  else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
 
 proc connect*(hostname: string, port: int): FileHandle =
   result = khp(hostname, port)

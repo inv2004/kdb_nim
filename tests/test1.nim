@@ -38,9 +38,22 @@ test "guid":
   check guid1.k.gg == guid2.k.gg
   check $guid1 == guidStr
 
-test "lists":
+test "vectors":
   var v = newKVec[bool]()
-  v.add(123)
-  v.add(0)
-  for x in v:
-    echo x
+  try:
+    v.add(10)
+    check false
+  except:
+    check true
+    discard
+  v.add(true)
+  v.add(false)
+  check v[0] == true
+  check v[1] == false
+  check v.len == 2
+
+test "simple_lists":
+  var l = newKList()
+  l.add(false)
+  l.add(10)
+  check l.len == 2
