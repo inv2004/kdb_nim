@@ -50,6 +50,8 @@ type
     kGUID = 256-2
     kBool = 256-1
 
+  KSym* = object
+
   GUID* {.importc: "U", header: "k.h".} = object
     g* {.importc.}: array[16, byte]
 

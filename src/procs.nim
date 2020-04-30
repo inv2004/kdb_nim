@@ -43,7 +43,7 @@ proc toSym*(x: cstring): K =
   K(k: ks(x))
 
 proc toSym*(x: string): K =
-  K(k: ks(x.cstring))
+  toSym(x.cstring)
 
 proc `s`*(x: string): K =
   K(k: ks(x.cstring))
@@ -126,6 +126,7 @@ proc len*(x: K0): clonglong =
   of kVecMinute: x.minuteLen
   of kVecTimespan: x.tpLen
   of kVecSecond: x.secondLen
+  of kDict: x.keys.len
   else: raise newException(KError, "Not List: " & $x.kind)
 
 proc len*(x: K): int =
@@ -206,9 +207,10 @@ proc typeToKType*[T](): int =
   elif T is int32: 6
   elif T is int: 7
   elif T is int64: 7
-  elif T is string: 11 # TODO: not sure
+  elif T is KSym: 11
+  elif T is string: 0
   elif T is void: 0
-  else: raise newException(KError, "cannot convert type")
+  else: raise newException(KError, "cannot convert type " & $T)
 
 proc newKDict*[KT, VT](): K =
   let header = ktn(typeToKType[KT](), 0)
@@ -218,48 +220,62 @@ proc newKDict*[KT, VT](): K =
 proc newKDict*(keys, values: K): K =
   result = K(k: xD(r1(keys.k), r1(values.k)))
 
-proc add*(x: var K0, v: cstring) =
+proc addToList(x: var K0, v: K) =
   case x.kind
-  of kList:
-    let v = v.toK()
-    jk(x.addr, r1(v.k))
-  of kVecSym: js(x.addr, ss(v))
-  else: raise newException(KError, "add[cstring] is not supported for " & $x.kind)
-
-proc add*(x: var K, v: cstring) =
-  add(x.k, v)
-
-proc add*(x: var K, v: string) =
-  add(x.k, v.cstring)
+  of kList: jk(x.addr, r1(v.k))
+  else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 
 proc add*(x: var K0, v: bool) =
-  assert x.kind == KKind.kVecBool
-  ja(x.addr, v.unsafeAddr)
+  if x.kind == KKind.kVecBool:
+    ja(x.addr, v.unsafeAddr)
+  else:
+    addToList(x, v.toK())
 
 proc add*(x: var K, v: bool) =
   add(x.k, v)
 
 proc add*(x: var K0, v: cint) =
-  assert x.kind == KKind.kVecInt
-  ja(x.addr, v.unsafeAddr)
+  if x.kind == KKind.kVecInt:
+    ja(x.addr, v.unsafeAddr)
+  else:
+    addToList(x, v.toK())
+
+proc add*(x: var K, v: int32) =
+  add(x.k, v.cint)
 
 proc add*(x: var K0, v: clonglong) =
-  assert x.kind == KKind.kVecLong
-  ja(x.addr, v.unsafeAddr)
-
-proc add*(x: var K0, v: int) =
-  add(x, v.cint)
+  if x.kind == KKind.kVecLong:
+    ja(x.addr, v.unsafeAddr)
+  else:
+    addToList(x, v.toK())
 
 proc add*(x: var K, v: int) =
-  add(x.k, v)
+  add(x.k, v.clonglong)
 
-proc add*(x: var K0, v: K0) =
+proc add*(x: var K, v: int64) =
+  add(x.k, v.clonglong)
+
+proc add*(x: var K0, v: cstring) =
+  if x.kind == KKind.kVecSym:
+    js(x.addr, ss(v))
+  else:
+    addToList(x, v.toK())
+
+proc add*(x: var K, v: string) =
+  add(x.k, v.cstring)
+
+proc add*(x: var K0, v: K) =
   case x.kind
-  of kList: jk(x.addr, r1(v))
+  of kList: jk(x.addr, r1(v.k))
+  of kVecLong: add(x, v.k.jj)
+  of kVecSym:
+    if v.k.kind != KKind.kSym:
+      raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
+    add(x, v.k.ss)
   else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 
 proc add*(x: var K, v: K) =
-  add(x.k, v.k)
+  add(x.k, v)
 
 proc newKVec*[T](): K =
   let k0 = ktn(typeToKType[T](), 0)
@@ -288,7 +304,7 @@ proc addColumn*[T](t: var K, name: string) =
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.k.dict.values.len == vals.len
   for i in 0..<t.k.dict.values.len:
-    t.k.dict.values.kArr[i].add(vals[i].k)
+    t.k.dict.values.kArr[i].add(vals[i])
 
 # proc newKTable*(fromDict = newKDict(10, 0)): K =
 proc newKTable*(): K =
@@ -319,22 +335,21 @@ proc `[]`*(x: K, i: int64): K =
   else: raise newException(KError, "`[]` is not supported for " & $x.k.kind)
 
 proc `[]=`*(x: var K, k: K, v: K) =
-  var x = x.k
-  case x.kind
-  of kDict:
-    x.keys.add(k.k)
-    x.values.add(v.k)
-  else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
-
-proc `[]=`*(x: var K, i: SomeInteger, v: K) =
   case x.k.kind
   of kDict:
-    x.k.keys.add(i)
-    x.k.values.add(v.k)
-  of kVecSym:
-    assert v.k.kind == kSym     # /-------\
-    x.k.stringArr[i] = v.k.ss   # TODO: fix
-  else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
+    x.k.keys.add(k)
+    x.k.values.add(v)
+  else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
+
+# proc `[]=`*(x: var K, i: SomeInteger, v: K) =
+#   case x.k.kind
+#   of kDict:
+#     x.k.keys.add(i)
+#     x.k.values.add(v.k)
+#   of kVecSym:
+#     assert v.k.kind == kSym     # /-------\
+#     x.k.stringArr[i] = v.k.ss   # TODO: fix
+#   else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
 
 proc `==`*(a: K, b: K): bool =
   if a.k.kind != b.k.kind:

@@ -39,17 +39,17 @@ test "guid":
   check $guid1 == guidStr
 
 test "vectors":
-  var v = newKVec[bool]()
+  var v = newKVec[int]()
+  check v.kind == KKind.kVecLong
   try:
-    v.add(10)
+    v.add(false)
     check false
   except:
     check true
-    discard
-  v.add(true)
-  v.add(false)
-  check v[0] == true
-  check v[1] == false
+  v.add(10)
+  v.add(20)
+  check v[0] == 10
+  check v[1] == 20
   check v.len == 2
 
 test "simple_lists":
@@ -57,3 +57,37 @@ test "simple_lists":
   l.add(false)
   l.add(10)
   check l.len == 2
+  check l[0] == false
+  check l[1] == 10
+
+test "list_of_vecs":
+  var v1 = newKVec[bool]()
+  v1.add(false)
+  v1.add(true)
+  var v2 = newKVec[int]()
+  v2.add(10)
+  var l2 = newKList()
+  l2.add(100)
+  var l = newKList()
+  l.add(v1)
+  l.add(v2)
+  l.add(l2)
+  check $l == "([false, true]; [10]; (100))"
+
+test "dict":
+  var d = newKDict[int, string]()
+  d[1] = "one"
+  d[10] = "ten"
+  check d.len == 2
+  check $d == "{1: \"one\"; 10: \"ten\"}"
+
+  var dd = newKDict[int, Ksym]()
+  try:
+    dd[1] = "one"
+    check false
+  except:
+    check true
+  dd[2] = s"two"
+  dd[10] = s"ten"
+  echo "echo"
+  echo dd
