@@ -160,7 +160,7 @@ iterator items*(x: K0): K0 =
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.kind)
 
-iterator items*(x: K): K =
+iterator items*(x: K): K =  # TODO: delete copy
   case x.k.kind
   of kList:
     var i = 0

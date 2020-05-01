@@ -131,3 +131,30 @@ test "test_tables":
   check tStr.startsWith "|id: [0a000000-0000-0000-0000-000000000001, 0a000000-"
   check tStr.contains "nick: [nick1, nick2, nick3, nick4]"
   check tStr.contains """name: ("name1"; "name2"; "name3"; "name4")|"""
+
+test "iterators":
+  var t = newKVec[KSym]()
+  t.add(s"aa")
+  t.add(s"bb")
+  t.add(s"cc")
+  var str = ""
+  for x in t:
+    str.add $x
+  check str == "aabbcc"
+
+  str = ""
+  for i, x in t:
+    str.add $x
+  check str == "102030"
+
+
+  var l = newKList()
+  l.add(10)
+  l.add(20)
+  l.add(30)
+  str = ""
+  for x in l:
+    str.add $x
+  check str == "102030"
+
+
