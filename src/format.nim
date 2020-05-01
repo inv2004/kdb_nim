@@ -94,11 +94,9 @@ proc `$`*(x: K): string =
   of kChar:
     result.add "'" & $x.k.ch & "'"
   of kSym:
-    echo "S: ", $x.k.ss
-    var str = newString(4)
-    copyMem(str[0].addr, x.k.ss.addr, 4)
-
-    result.add $str
+    # var str = newString(4)
+    # copyMem(str[0].addr, x.k.ss.addr, 4)
+    result.add $x.k.ss
   of kBool:
     result.add $x.k.bb.bool
   of kId:

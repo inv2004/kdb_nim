@@ -74,12 +74,12 @@ test "list_of_vecs":
   l.add(l2)
   check $l == "([false, true]; [10]; (100))"
 
-test "dict":
+test "dicts_simple":
   var d = newKDict[int, string]()
   d[1] = "one"
   d[10] = "ten"
   check d.len == 2
-  check $d == "{1: \"one\"; 10: \"ten\"}"
+  check $d == """{1: "one"; 10: "ten"}"""
 
   var dd = newKDict[int, Ksym]()
   try:
@@ -89,5 +89,21 @@ test "dict":
     check true
   dd[2] = s"two"
   dd[10] = s"ten"
-  echo "echo"
-  echo dd
+  check $dd == "{2: two; 10: ten}"
+
+  var ddd = newKDict[int, nil]()
+  ddd[1] = 111
+  ddd[10] = "ten"
+  check $ddd == """{1: 111; 10: "ten"}"""
+
+test "dict_of_dict":
+  var d = newKDict[nil, string]()
+  var d1 = newKDict[int, KSym]()
+  d1[1] = s"one"
+  d1[2] = s"two"
+  var d2 = newKDict[int, string]()
+  d2[11] = "eleven"
+  d[d1] = "11"
+  d[d2] = "22"
+  check $d == """{{1: one; 2: two}: "11"; {11: "eleven"}: "22"}"""
+

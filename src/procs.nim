@@ -209,7 +209,7 @@ proc typeToKType*[T](): int =
   elif T is int64: 7
   elif T is KSym: 11
   elif T is string: 0
-  elif T is void: 0
+  elif T is typeof(nil): 0
   else: raise newException(KError, "cannot convert type " & $T)
 
 proc newKDict*[KT, VT](): K =
@@ -233,6 +233,9 @@ proc add*(x: var K0, v: bool) =
 
 proc add*(x: var K, v: bool) =
   add(x.k, v)
+
+proc checkAdd(x: var K0, v: cint): bool =
+  x.kind == KKind.kVecInt or x.kind == KKind.kList
 
 proc add*(x: var K0, v: cint) =
   if x.kind == KKind.kVecInt:
@@ -263,6 +266,13 @@ proc add*(x: var K0, v: cstring) =
 
 proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
+
+proc checkAdd(x: var K0, v: K): bool =
+  case x.kind
+  of kList: result = true
+  of kVecLong: result = v.k.kind == KKind.kLong
+  of kVecSym: result = v.k.kind == KKind.kSym
+  else: raise newException(KError, "checkAdd[K] is not supported for " & $x.kind)
 
 proc add*(x: var K0, v: K) =
   case x.kind
@@ -337,8 +347,11 @@ proc `[]`*(x: K, i: int64): K =
 proc `[]=`*(x: var K, k: K, v: K) =
   case x.k.kind
   of kDict:
-    x.k.keys.add(k)
-    x.k.values.add(v)
+    if x.k.values.checkAdd(v):
+      x.k.keys.add(k)
+      x.k.values.add(v)
+    else:
+      raise newException(KError, "checkAdd failed for " & $x.k.values.kind)
   else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
 
 # proc `[]=`*(x: var K, i: SomeInteger, v: K) =
