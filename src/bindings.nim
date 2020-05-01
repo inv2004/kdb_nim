@@ -82,6 +82,9 @@ proc ja*(l: ptr K0, x: ptr SomeNumber) {.
 proc ja*(l: ptr K0, x: ptr bool) {.
   importc: "ja", header: "k.h".}
 
+proc ja*(l: ptr K0, x: ptr GUID) {.
+  importc: "ja", header: "k.h".}
+
 proc ss*(x: cstring): cstring {.
   importc: "ss", header: "k.h".}
 

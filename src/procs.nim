@@ -108,9 +108,12 @@ proc kind*(x: K): KKind {.inline.} =
   x.k.kind
 
 proc len*(x: K0): clonglong =
+  if x == nil:
+    return 0
   case x.kind
   of kList: x.kLen
   of kVecBool: x.boolLen
+  of kVecGUID: x.guidLen
   of kVecByte: x.byteLen
   of kVecShort: x.shortLen
   of kVecInt: x.intLen
@@ -127,6 +130,7 @@ proc len*(x: K0): clonglong =
   of kVecTimespan: x.tpLen
   of kVecSecond: x.secondLen
   of kDict: x.keys.len
+  of kTable: x.dict.values.kArr[0].len
   else: raise newException(KError, "Not List: " & $x.kind)
 
 proc len*(x: K): int =
@@ -174,6 +178,11 @@ iterator items*(x: K): K =
     while i < x.k.intLen:
       yield x.k.intArr[i].toK()
       inc(i)
+  of kVecLong:
+    var i = 0
+    while i < x.k.longLen:
+      yield x.k.longArr[i].toK()
+      inc(i)
   of kVecSym:
     var i = 0
     while i < x.k.stringLen:
@@ -202,6 +211,7 @@ iterator items*(x: K): K =
 
 proc typeToKType*[T](): int =
   when T is bool: 1
+  elif T is GUID: 2
   elif T is byte: 4
   elif T is int16: 4
   elif T is int32: 6
@@ -223,7 +233,7 @@ proc newKDict*(keys, values: K): K =
 proc addToList(x: var K0, v: K) =
   case x.kind
   of kList: jk(x.addr, r1(v.k))
-  else: raise newException(KError, "add[K] is not supported for " & $x.kind)
+  else: raise newException(KError, "addToList[K] is not supported for " & $x.kind)
 
 proc add*(x: var K0, v: bool) =
   if x.kind == KKind.kVecBool:
@@ -234,8 +244,15 @@ proc add*(x: var K0, v: bool) =
 proc add*(x: var K, v: bool) =
   add(x.k, v)
 
-proc checkAdd(x: var K0, v: cint): bool =
-  x.kind == KKind.kVecInt or x.kind == KKind.kList
+proc add*(x: var K0, v: GUID) =
+  if x.kind == KKind.kVecGUID:
+    ja(x.addr, v.unsafeAddr)
+  else:
+    addToList(x, v.toK())
+
+proc add*(x: var K, v: GUID) =
+  add(x.k, v)
+
 
 proc add*(x: var K0, v: cint) =
   if x.kind == KKind.kVecInt:
@@ -279,9 +296,11 @@ proc add*(x: var K0, v: K) =
   of kList: jk(x.addr, r1(v.k))
   of kVecLong: add(x, v.k.jj)
   of kVecSym:
-    if v.k.kind != KKind.kSym:
-      raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
-    add(x, v.k.ss)
+    case v.k.kind
+    of kSym: add(x, v.k.ss)
+    # of kVecChar: add(x, cast[cstring](v.k.charArr)) # TODO: not sure
+    else: raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
+  of kVecGUID: add(x, v.k.gg)
   else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 
 proc add*(x: var K, v: K) =
@@ -291,25 +310,22 @@ proc newKVec*[T](): K =
   let k0 = ktn(typeToKType[T](), 0)
   result = K(k: k0)
 
-proc newKVecSym*(): K =
-  newKVec[string]()
-
 proc newKList*(): K =
   result = K(k: knk(0))
 
 proc addColumn*[T](t: var K, name: string) =
   if t.k == nil:
-    var header = newKVecSym()
-    header.add(name)
-    var data = newKList()
+    var header = newKVec[KSym]()
+    header.k.add(name.cstring)
     var c1 = newKVec[T]()
+    var data = newKList()
     data.add(c1)
     let dict = newKDict(header, data)
     t.k = xT(r1(dict.k))
   else:
-    t.k.dict.keys.add(name)
+    t.k.dict.keys.add(name.cstring)
     var c1 = newKVec[T]()
-    t.k.dict.values.add(c1.k)
+    t.k.dict.values.add(r1(c1.k))
 
 proc addRow*(t: var K, vals: varargs[K]) =
   assert t.k.dict.values.len == vals.len
@@ -321,28 +337,31 @@ proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
 
+proc `[]`*(x: K0, i: int64): K =
+  case x.kind
+  of kVecBool: x.boolArr[i].toK()
+  of kVecGUID: x.guidArr[i].toK()
+  of kVecByte: x.byteArr[i].toK()
+  of kVecShort: x.shortArr[i].toK()
+  of kVecInt: x.intArr[i].toK()
+  of kVecLong: x.longArr[i].toK()
+  of kVecReal: x.realArr[i].toK()
+  of kVecFloat: x.floatArr[i].toK()
+  of kVecSym: x.stringArr[i].toSym()
+  of kVecTimestamp: x.tsArr[i].toKTimestamp()
+  of kVecMonth: x.monthArr[i].toKMonth()
+  of kVecDate: x.dateArr[i].toKDate()
+  of kVecDateTime: x.dtArr[i].toKDateTime()
+  of kVecTimespan: x.tpArr[i].toKTimespan()
+  of kVecMinute: x.minuteArr[i].toKMinute()
+  of kVecSecond: x.secondArr[i].toKSecond()
+  of kVecTime: x.timeArr[i].toKTime()
+  of kList: r1(x.kArr[i])
+  else: raise newException(KError, "`[]` is not supported for " & $x.kind)
+
 proc `[]`*(x: K, i: int64): K =
-  discard r1(x.k)
-  case x.k.kind
-  of kVecBool: x.k.boolArr[i].toK()
-  of kVecGUID: x.k.guidArr[i].toK()
-  of kVecByte: x.k.byteArr[i].toK()
-  of kVecShort: x.k.shortArr[i].toK()
-  of kVecInt: x.k.intArr[i].toK()
-  of kVecLong: x.k.longArr[i].toK()
-  of kVecReal: x.k.realArr[i].toK()
-  of kVecFloat: x.k.floatArr[i].toK()
-  of kVecSym: x.k.stringArr[i].toSym()
-  of kVecTimestamp: x.k.tsArr[i].toKTimestamp()
-  of kVecMonth: x.k.monthArr[i].toKMonth()
-  of kVecDate: x.k.dateArr[i].toKDate()
-  of kVecDateTime: x.k.dtArr[i].toKDateTime()
-  of kVecTimespan: x.k.tpArr[i].toKTimespan()
-  of kVecMinute: x.k.minuteArr[i].toKMinute()
-  of kVecSecond: x.k.secondArr[i].toKSecond()
-  of kVecTime: x.k.timeArr[i].toKTime()
-  of kList: r1(x.k.kArr[i])
-  else: raise newException(KError, "`[]` is not supported for " & $x.k.kind)
+  result = x.k[i]
+  # discard r1(result.k)  # TODO: not sure
 
 proc `[]=`*(x: var K, k: K, v: K) =
   case x.k.kind

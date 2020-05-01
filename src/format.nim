@@ -26,6 +26,14 @@ proc fmtKList(x: K): string =
     result.add $r1(x.k.kArr[i])
   result.add ")"
 
+proc flatTable*(x: K): string =
+  result.add "|"
+  for i in 0..<x.k.dict.keys.len:
+    if i > 0:
+      result.add ", "
+    result.add $x.k.dict.keys[i] & ": "
+    result.add $x.k.dict.values[i]
+  result.add "|"
 
 proc fmtKTable(x: K): string =
   let t = newUnicodeTable()
@@ -142,6 +150,6 @@ proc `$`*(x: K): string =
         kVecDateTime, kVecTimestamp, kVecTimespan:
     result.add fmtKVec(x)
   of kVecGUID:
-    result.add "guid"
+    result.add fmtKVec(x)
   else:
     result.add $x.k.kind & ": unknown"

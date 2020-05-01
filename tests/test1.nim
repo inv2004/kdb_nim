@@ -107,3 +107,27 @@ test "dict_of_dict":
   d[d2] = "22"
   check $d == """{{1: one; 2: two}: "11"; {11: "eleven"}: "22"}"""
 
+test "test_tables":
+  var t = newKTable()
+  check t.len == 0
+  t.addColumn[:int]("aaa")
+  t.addColumn[:string]("bbb")
+  check t.len == 0
+  t.addRow(3, "30")
+  t.addRow(4, "40")
+  t.addRow(5, "50")
+  check t.len == 3
+  check t.flatTable() == """|aaa: [3, 4, 5], bbb: ("30"; "40"; "50")|"""
+
+  var tt = newKTable()
+  tt.addColumn[:GUID]("id")
+  tt.addColumn[:KSym]("nick")
+  tt.addColumn[:string]("name")
+  tt.addRow("0a000000-0000-0000-0000-000000000001".toGUID(), s"nick1", "name1")
+  tt.addRow("0a000000-0000-0000-0000-000000000002".toGUID(), s"nick2", "name2")
+  tt.addRow("0a000000-0000-0000-0000-000000000003".toGUID(), s"nick3", "name3")
+  tt.addRow("0a000000-0000-0000-0000-000000000004".toGUID(), s"nick4", "name4")
+  let tStr = tt.flatTable()
+  check tStr.startsWith "|id: [0a000000-0000-0000-0000-000000000001, 0a000000-"
+  check tStr.contains "nick: [nick1, nick2, nick3, nick4]"
+  check tStr.contains """name: ("name1"; "name2"; "name3"; "name4")|"""
