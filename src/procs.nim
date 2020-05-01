@@ -136,31 +136,7 @@ proc len*(x: K0): clonglong =
 proc len*(x: K): int =
   len(x.k).int
 
-iterator items*(x: K0): K0 =
-  case x.kind
-  of kList:
-    var i = 0
-    while i < x.kLen:
-      yield x.kArr[i]
-      inc(i)
-  of kVecBool:
-    var i = 0
-    while i < x.boolLen:
-      yield x.intArr[i].toK().k
-      inc(i)
-  of kVecInt:
-    var i = 0
-    while i < x.intLen:
-      yield x.intArr[i].toK().k
-      inc(i)
-  of kVecSym:
-    var i = 0
-    while i < x.stringLen:
-      yield x.stringArr[i].toSym().k
-      inc(i)
-  else: raise newException(KError, "items is not supported for " & $x.kind)
-
-iterator items*(x: K): K =  # TODO: delete copy
+iterator items*(x: K): K =
   case x.k.kind
   of kList:
     var i = 0
@@ -189,6 +165,21 @@ iterator items*(x: K): K =  # TODO: delete copy
       yield x.k.stringArr[i].toSym()
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
+
+proc `[]`*(x: K0, i: int64): K
+
+iterator pairs*(x: K): (K, K) =
+  case x.k.kind
+  of KKind.kDict:
+    var i = 0
+    for k in x.k.keys:
+      yield (k, x.k.values[i])
+      inc(i)
+  else:
+    var i = 0
+    for v in x:
+      yield (i.toK(), v)
+      inc(i)
 
 # iterator mitems*(x: K0): var K0 =
   # case x.kind
@@ -414,7 +405,6 @@ proc execIntenal(h: FileHandle, s: string, args: varargs[K]): K0 =
 
   if result.kind == KKind.kError:
     raise newException(KErrorRemote, $result.msg)
-
 
 proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
   let k0 = execIntenal(h, s, args)

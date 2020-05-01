@@ -144,9 +144,8 @@ test "iterators":
 
   str = ""
   for i, x in t:
-    str.add $x
-  check str == "102030"
-
+    str.add $i & ":" & $x
+  check str == "0:aa1:bb2:cc"
 
   var l = newKList()
   l.add(10)
@@ -157,4 +156,11 @@ test "iterators":
     str.add $x
   check str == "102030"
 
+  var d = newKDict[int, KSym]()
+  d[1] = s"one"
+  d[2] = s"two"
+  str = ""
+  for k, v in d:
+    str.add $k & ":" & $v
 
+  check str == "1:one2:two"
