@@ -1,5 +1,5 @@
-import procs
-export procs
+import bindings
+export bindings
 
 import strutils
 import times
@@ -17,6 +17,8 @@ const secondFormat = "HH:mm:ss"
 const timeFormat = "HH:mm:ss\'.\'fff"
 
 proc `$`*(x: K): string
+
+include procs
 
 proc fmtKList(x: K): string =
   result.add "("

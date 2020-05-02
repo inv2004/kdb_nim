@@ -78,6 +78,12 @@ test "dicts_simple":
   var d = newKDict[int, string]()
   d[1] = "one"
   d[10] = "ten"
+  check d[10] == "ten"
+  # try:
+  discard d[11]
+    # check false
+  # except:
+    # check true
   check d.len == 2
   check $d == """{1: "one"; 10: "ten"}"""
 

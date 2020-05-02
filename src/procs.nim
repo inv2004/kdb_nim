@@ -1,6 +1,3 @@
-import bindings
-export bindings
-
 import uuids
 import endians
 
@@ -359,6 +356,8 @@ proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
 
+proc dictLookup(d: K0, k: K): K
+
 proc `[]`*(x: K0, i: int64): K =
   case x.kind
   of kVecBool: x.boolArr[i].toK()
@@ -378,6 +377,7 @@ proc `[]`*(x: K0, i: int64): K =
   of kVecMinute: x.minuteArr[i].toKMinute()
   of kVecSecond: x.secondArr[i].toKSecond()
   of kVecTime: x.timeArr[i].toKTime()
+  of kDict: dictLookup(x, i.toK())
   of kList: r1(x.kArr[i])
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 
@@ -419,7 +419,16 @@ proc `==`*(a: K, b: K): bool =
   of kFloat: a.k.ff == b.k.ff
   of kChar: a.k.ch == b.k.ch
   of kSym: a.k.ss == b.k.ss
+  of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
+
+proc dictLookup(d: K0, k: K): K =
+  var i = 0
+  for x in d.keys:
+    if x == k:
+      return d.values[i]
+    inc(i)
+  raise newException(KeyError, "key not found: " & $k)
 
 proc connect*(hostname: string, port: int): FileHandle =
   result = khp(hostname, port)
