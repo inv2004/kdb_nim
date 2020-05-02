@@ -1,5 +1,10 @@
+# hard to include c-header in nim :)
+import os
+
 {.passC: "-DKXVER=3".}
-{.link: "c.o".}
+{.passC: "-I" & currentSourcePath.parentDir().}
+{.passL: "-L" & currentSourcePath.parentDir().parentDir().}
+{.link: currentSourcePath.parentDir().parentDir() & "/c.o".}
 {.compile: "k.c".}
 
 type

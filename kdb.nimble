@@ -6,7 +6,7 @@ description   = "A new awesome nimble package"
 license       = "Apache-2.0"
 srcDir        = "src"
 
-bin           = @["main"]
+# bin           = @["main"]
 
 # Dependencies
 
