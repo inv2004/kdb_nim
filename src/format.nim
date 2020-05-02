@@ -129,7 +129,7 @@ proc `$`*(x: K): string =
     result.add dt.format(dateTimeFormat)
   of kTimespan:
     let d = initTime(0, 0) + initDuration(nanoseconds = x.k.tp)
-    let days = int(d.toSeconds() / (24*3600))
+    let days = int(d.toUnixFloat() / (24*3600))
     result.add $days & "D" & d.format(timespanFormat, zone = utc())
   of kMinute:
     let d = initTime(0, 0) + initDuration(minutes = x.k.mi)
