@@ -242,6 +242,9 @@ proc typeToKType*[T](): int =
   elif T is int32: 6
   elif T is int: 7
   elif T is int64: 7
+  elif T is float32: 8
+  elif T is float64: 9
+  elif T is float: 9
   elif T is KSym: 11
   elif T is KTimestamp: 12
   elif T is string: 0
