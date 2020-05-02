@@ -153,6 +153,11 @@ iterator items*(x: K0): K0 =
     while i < x.intLen:
       yield x.intArr[i].toK().k
       inc(i)
+  of kVecLong:
+    var i = 0
+    while i < x.longLen:
+      yield x.longArr[i].toK().k
+      inc(i)
   of kVecSym:
     var i = 0
     while i < x.stringLen:
@@ -192,18 +197,18 @@ iterator items*(x: K): K =
 
 proc `[]`*(x: K0, i: int64): K
 
-# iterator pairs*(x: K): (K, K) =
-#   case x.k.kind
-#   of KKind.kDict:
-#     var i = 0
-#     for k in x.k.keys:
-#       yield (k, x.k.values[i])
-#       inc(i)
-#   else:
-#     var i = 0
-#     for v in x:
-#       yield (i.toK(), v)
-#       inc(i)
+iterator pairs*(x: K): (K, K) =
+  case x.k.kind
+  of KKind.kDict:
+    var i = 0
+    for k in x.k.keys:
+      yield (k.toK(), x.k.values[i])
+      inc(i)
+  else:
+    var i = 0
+    for v in x:
+      yield (i.toK(), v)
+      inc(i)
 
 # iterator mitems*(x: K0): var K0 =
   # case x.kind
@@ -236,14 +241,6 @@ proc typeToKType*[T](): int =
   elif T is string: 0
   elif T is typeof(nil): 0
   else: raise newException(KError, "cannot convert type " & $T)
-
-proc newKDict*[KT, VT](): K =
-  let header = ktn(typeToKType[KT](), 0)
-  let data = ktn(typeToKType[VT](), 0)
-  result = K(k: xD(header, data))
-
-proc newKDict*(keys, values: K): K =
-  result = K(k: xD(r1(keys.k), r1(values.k)))
 
 proc addToList(x: var K0, v: K) =
   case x.kind
@@ -327,6 +324,16 @@ proc newKVec*[T](): K =
 
 proc newKList*(): K =
   result = K(k: knk(0))
+
+proc newKDict*[KT, VT](): K =
+  # let header = ktn(typeToKType[KT](), 0)
+  # let data = ktn(typeToKType[VT](), 0)
+  let header = newKVec[KT]()
+  let data = newKVec[VT]()
+  result = K(k: xD(r1(header.k), r1(data.k)))  # TODO: not sure about refC == 1 or 0
+
+proc newKDict*(keys, values: K): K =
+  result = K(k: xD(r1(keys.k), r1(values.k)))
 
 proc addColumn*[T](t: var K, name: string) =
   if t.k == nil:

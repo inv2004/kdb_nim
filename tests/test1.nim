@@ -143,8 +143,8 @@ test "iterators":
   check str == "aabbcc"
 
   str = ""
-  # for i, x in t:
-    # str.add $i & ":" & $x
+  for i, x in t:
+    str.add $i & ":" & $x
   check str == "0:aa1:bb2:cc"
 
   var l = newKList()
@@ -160,7 +160,6 @@ test "iterators":
   d[1] = s"one"
   d[2] = s"two"
   str = ""
-  # for k, v in d:
-    # str.add $k & ":" & $v
-
+  for k, v in d:
+    str.add $k & ":" & $v
   check str == "1:one2:two"
