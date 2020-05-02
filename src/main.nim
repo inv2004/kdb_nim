@@ -86,4 +86,5 @@ proc rc(x: K0): string =
   result.add $cast[ptr UncheckedArray[cint]](x)[1]
 
 when isMainModule:
-  checkStructOffset()
+  # checkStructOffset()
+  main()
