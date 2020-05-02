@@ -12,6 +12,10 @@ type
   KErrorRemote* = object of Exception
 
 type
+  KSym* = object
+  KTimestamp* = object
+
+type
   KKind* {.size: 1.} = enum
     kList = 0
     kVecBool = 1
@@ -54,8 +58,6 @@ type
     kByte = 256-4
     kGUID = 256-2
     kBool = 256-1
-
-  KSym* = object
 
   GUID* {.importc: "U", header: "k.h".} = object
     g* {.importc.}: array[16, byte]
@@ -273,3 +275,4 @@ proc `=`*(a: var K, b: K) =
 proc `=sink`*(a: var K; b: K) =
   `=destroy`(a)
   a.k = b.k
+

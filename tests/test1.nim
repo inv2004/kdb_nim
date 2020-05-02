@@ -11,6 +11,7 @@ import unittest
 import kdb
 
 import strutils
+import times
 
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
@@ -169,3 +170,12 @@ test "iterators":
   for k, v in d:
     str.add $k & ":" & $v
   check str == "1:one2:two"
+
+test "times":
+  var v = newKVec[KTimestamp]()
+  let time = now()
+  v.add(time)
+  v.add(time)
+  check v.len == 2
+  check v[0] == time
+  check v[1] == time

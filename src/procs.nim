@@ -3,6 +3,7 @@
 
 import uuids
 import endians
+import times
 
 proc initMemory*() = 
   echo "Init KDB Memory"
@@ -72,7 +73,6 @@ proc toKTimespan*(x: clonglong): K =
 proc toKTime*(x: cint): K =
   K(k: kt(x))
 
-
 converter toK*(x: byte): K =
   K(k: kg(x.cint))
 
@@ -97,6 +97,11 @@ proc toGUID*(x: string): K =
 converter toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)
   toK(guid)
+
+converter toKTimestamp*(x: DateTime): K =
+  let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
+  let dn = d.inNanoseconds()
+  toKTimestamp(dn.clonglong)
 
 converter toK*(x: K0): K =
   K(k: x)
@@ -238,6 +243,7 @@ proc typeToKType*[T](): int =
   elif T is int: 7
   elif T is int64: 7
   elif T is KSym: 11
+  elif T is KTimestamp: 12
   elif T is string: 0
   elif T is typeof(nil): 0
   else: raise newException(KError, "cannot convert type " & $T)
@@ -264,7 +270,6 @@ proc add*(x: var K0, v: GUID) =
 
 proc add*(x: var K, v: GUID) =
   add(x.k, v)
-
 
 proc add*(x: var K0, v: cint) =
   if x.kind == KKind.kVecInt:
@@ -295,6 +300,17 @@ proc add*(x: var K0, v: cstring) =
 
 proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
+
+proc add*(x: var K0, v: DateTime) =
+  let d = v - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
+  let dn = d.inNanoseconds()
+  if x.kind == KKind.kVecTimestamp:
+    ja(x.addr, dn.unsafeAddr)
+  else:
+    addToList(x, dn.toK())
+
+proc add*(x: var K, v: DateTime) =
+  add(x.k, v)
 
 proc checkAdd(x: var K0, v: K): bool =
   case x.kind
@@ -422,6 +438,7 @@ proc `==`*(a: K, b: K): bool =
   of kFloat: a.k.ff == b.k.ff
   of kChar: a.k.ch == b.k.ch
   of kSym: a.k.ss == b.k.ss
+  of kTimestamp: a.k.ts == b.k.ts
   of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
 
