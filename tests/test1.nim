@@ -192,6 +192,6 @@ test "times":
   # let v = %[10.1, 11.2, 12.3]
   # echo v
 
-include mem
+# include mem
 
 # include remote
