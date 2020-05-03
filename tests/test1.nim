@@ -210,7 +210,8 @@ test "list_seq":
   l.add %[1, 2, 3]  # TODO: cannot implicit convert
   l.add %[4, 5, 6]
   l.add %[7, 8, 9]
-  check $l == "([1, 2, 3]; [4, 5, 6]; [7, 8, 9])"
+  l.add %[10.0, 11.0, 12.0]
+  check $l == "([1, 2, 3]; [4, 5, 6]; [7, 8, 9]; [10.0, 11.0, 12.0])"
 
 # include mem
 
