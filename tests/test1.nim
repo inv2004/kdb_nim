@@ -207,7 +207,7 @@ test "seq":
 
 test "list_seq":
   var l = newKList()
-  l.add %[1, 2, 3] # TODO: cannot implicit convert
+  l.add %[1, 2, 3]  # TODO: cannot implicit convert
   l.add %[4, 5, 6]
   l.add %[7, 8, 9]
   check $l == "([1, 2, 3]; [4, 5, 6]; [7, 8, 9])"
