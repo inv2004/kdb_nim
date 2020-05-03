@@ -1,6 +1,6 @@
 
 test "testMem":
-  while false:
+  while true:
     var t = newKTable()
     t.addColumn[:int64]("aaa")
     t.addColumn[:nil]("bbb")

@@ -102,12 +102,15 @@ proc toNanos(x: DateTime): int64 =
   let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
   d.inNanoseconds()
 
-proc toMillis(x: DateTime): int64 =
-  let d = x - initDateTime(1, mJan, 1970, 0, 0, 0, utc())
-  int64(d.inMilliseconds().float64 / 86400000) - 10957
+proc toMillis(x: DateTime): float64 =
+  let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
+  d.inMilliseconds().float64 / 86400000
 
 converter toKTimestamp*(x: DateTime): K =
   toKTimestamp(x.toNanos())
+
+proc toKDateTime*(x: DateTime): K =
+  toKDateTime(x.toMillis())
 
 converter toK*(x: K0): K =
   K(k: x)
@@ -253,6 +256,7 @@ proc typeToKType*[T](): int =
   elif T is float: 9
   elif T is KSym: 11
   elif T is KTimestamp: 12
+  elif T is KDateTime: 15
   elif T is KList: 0
   elif T is string: 0
   elif T is typeof(nil): 0
@@ -458,6 +462,7 @@ proc `==`*(a: K, b: K): bool =
   of kChar: a.k.ch == b.k.ch
   of kSym: a.k.ss == b.k.ss
   of kTimestamp: a.k.ts == b.k.ts
+  of kDateTime: a.k.dt == b.k.dt
   of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
 

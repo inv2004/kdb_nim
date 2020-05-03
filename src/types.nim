@@ -14,6 +14,7 @@ type
 type
   KSym* = object
   KTimestamp* = object
+  KDateTime* = object
   KList* = object
 
 type
@@ -45,7 +46,7 @@ type
     kSecond = 256-18
     kMinute = 256-17
     kTimespan = 256-16
-    kDateTIme = 256-15
+    kDateTime = 256-15
     kDate = 256-14
     kMonth = 256-13
     kTimestamp = 256-12

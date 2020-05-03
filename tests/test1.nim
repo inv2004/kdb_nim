@@ -173,13 +173,25 @@ test "iterators":
 
 test "times":
   var v = newKVec[KTimestamp]()
-  let time = now()
-  v.add(time)
-  v.add(time)
+  let dt = now().utc()
+  v.add(dt)
+  v.add(dt)
   check v.len == 2
-  check v[0] == time
-  check v[1] == time
+  check v[0].kind == KKind.kTimestamp
+  check v[0] == dt
+  check v[1] == dt
+
+  var vv = newKVec[KDateTime]()
+  vv.add(dt)
+  vv.add(dt)
+  check vv[0].kind == KKind.kDateTime
+  check vv[0] == dt.toKDateTime()
+  check vv[1] == dt.toKDateTime()
+
+# test "seq":
+  # let v = %[10.1, 11.2, 12.3]
+  # echo v
 
 include mem
 
-include remote
+# include remote
