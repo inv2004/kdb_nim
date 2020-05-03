@@ -74,7 +74,7 @@ proc toKTime*(x: int32): K =
   K(k: kt(x))
 
 converter toK*(x: byte): K =
-  K(k: kg(x.cint))
+  K(k: kg(x.int32))
 
 converter toK*(x: bool): K =
   K(k: kb(x))
@@ -101,7 +101,7 @@ converter toK*(x: array[16, byte]): K =
 converter toKTimestamp*(x: DateTime): K =
   let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
   let dn = d.inNanoseconds()
-  toKTimestamp(dn.clonglong)
+  toKTimestamp(dn)
 
 converter toK*(x: K0): K =
   K(k: x)
@@ -279,7 +279,7 @@ proc add*(x: var K0, v: int32) =
     add(x, v.toK())
 
 proc add*(x: var K, v: int32) =
-  add(x.k, v.cint)
+  add(x.k, v)
 
 proc add*(x: var K0, v: int64) =
   case x.kind
@@ -297,7 +297,7 @@ proc add*(x: var K0, v: float64) =
   ja(x.addr, v.unsafeAddr)
 
 proc add*(x: var K, v: float) =
-  add(x.k, v.cdouble)
+  add(x.k, v)
 
 proc add*(x: var K0, v: cstring) =
   if x.kind == KKind.kVecSym:
