@@ -14,10 +14,10 @@ converter toK*(x: type(nil)): K =
   result.k.idg = 0
 
 converter toK*(x: cstring): K =
-  K(k: kpn(x, x.len.clonglong))
+  K(k: kpn(x, x.len))
 
 converter toK*(x: string): K =
-  K(k: kpn(x.cstring, x.len.cint))
+  K(k: kpn(x.cstring, x.len))
 
 converter toK*(x: int16): K=
   K(k: kh(x))
@@ -26,16 +26,16 @@ converter toK*(x: int32): K=
   K(k: ki(x))
 
 converter toK*(x: int): K =
-  K(k: kj(x.clonglong))
+  K(k: kj(x))
 
 converter toK*(x: int64): K =
-  K(k: kj(x.clonglong))
+  K(k: kj(x))
 
 converter toK*(x: float32): K =
-  K(k: ke(x.cfloat))
+  K(k: ke(x))
 
 converter toK*(x: float64): K =
-  K(k: kf(x.cdouble))
+  K(k: kf(x))
 
 converter toK*(x: char): K =
   K(k: kc(x))
@@ -49,28 +49,28 @@ proc toSym*(x: string): K =
 proc `s`*(x: string): K =
   K(k: ks(x.cstring))
 
-converter toKMonth*(x: cint): K =
+converter toKMonth*(x: int32): K =
   K(k: km(x))
 
-proc toKMinute*(x: cint): K =
+proc toKMinute*(x: int32): K =
   K(k: kmi(x))
 
-proc toKSecond*(x: cint): K =
+proc toKSecond*(x: int32): K =
   K(k: kse(x))
 
-proc toKDate*(x: cint): K =
+proc toKDate*(x: int32): K =
   K(k: kd(x))
 
-proc toKDateTime*(x: cdouble): K =
+proc toKDateTime*(x: float64): K =
   K(k: kz(x))
 
-proc toKTimestamp*(x: clonglong): K =
+proc toKTimestamp*(x: int64): K =
   K(k: ktj(KKind.kTimestamp.byte, x))
 
-proc toKTimespan*(x: clonglong): K =
+proc toKTimespan*(x: int64): K =
   K(k: ktj(KKind.kTimespan.byte, x))
 
-proc toKTime*(x: cint): K =
+proc toKTime*(x: int32): K =
   K(k: kt(x))
 
 converter toK*(x: byte): K =
@@ -112,7 +112,7 @@ template `%`*(x: untyped): K =
 proc kind*(x: K): KKind {.inline.} =
   x.k.kind
 
-proc len*(x: K0): clonglong =
+proc len*(x: K0): int64 =
   if x == nil:
     return 0
   case x.kind
@@ -247,20 +247,18 @@ proc typeToKType*[T](): int =
   elif T is float: 9
   elif T is KSym: 11
   elif T is KTimestamp: 12
+  elif T is KList: 0
   elif T is string: 0
   elif T is typeof(nil): 0
   else: raise newException(KError, "cannot convert type " & $T)
 
-proc addToList(x: var K0, v: K) =
-  case x.kind
-  of kList: jk(x.addr, r1(v.k))
-  else: raise newException(KError, "addToList[K] is not supported for " & $x.kind)
+proc add*(x: var K0, v: K)
 
 proc add*(x: var K0, v: bool) =
   if x.kind == KKind.kVecBool:
     ja(x.addr, v.unsafeAddr)
   else:
-    addToList(x, v.toK())
+    add(x, v.toK())
 
 proc add*(x: var K, v: bool) =
   add(x.k, v)
@@ -269,37 +267,43 @@ proc add*(x: var K0, v: GUID) =
   if x.kind == KKind.kVecGUID:
     ja(x.addr, v.unsafeAddr)
   else:
-    addToList(x, v.toK())
+    add(x, v.toK())
 
 proc add*(x: var K, v: GUID) =
   add(x.k, v)
 
-proc add*(x: var K0, v: cint) =
+proc add*(x: var K0, v: int32) =
   if x.kind == KKind.kVecInt:
     ja(x.addr, v.unsafeAddr)
   else:
-    addToList(x, v.toK())
+    add(x, v.toK())
 
 proc add*(x: var K, v: int32) =
   add(x.k, v.cint)
 
-proc add*(x: var K0, v: clonglong) =
-  if x.kind == KKind.kVecLong:
+proc add*(x: var K0, v: int64) =
+  case x.kind
+  of KKind.kVecLong:
+    ja(x.addr, v.unsafeAddr)
+  of KKind.kVecTimestamp:
     ja(x.addr, v.unsafeAddr)
   else:
-    addToList(x, v.toK())
+    add(x, v.toK())
 
 proc add*(x: var K, v: int) =
-  add(x.k, v.clonglong)
+  add(x.k, v.int64)
 
-proc add*(x: var K, v: int64) =
-  add(x.k, v.clonglong)
+proc add*(x: var K0, v: float64) =
+  ja(x.addr, v.unsafeAddr)
+
+proc add*(x: var K, v: float) =
+  add(x.k, v.cdouble)
 
 proc add*(x: var K0, v: cstring) =
   if x.kind == KKind.kVecSym:
     js(x.addr, ss(v))
   else:
-    addToList(x, v.toK())
+    add(x, v.toK())
 
 proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
@@ -310,7 +314,7 @@ proc add*(x: var K0, v: DateTime) =
   if x.kind == KKind.kVecTimestamp:
     ja(x.addr, dn.unsafeAddr)
   else:
-    addToList(x, dn.toK())
+    add(x, dn.toK())
 
 proc add*(x: var K, v: DateTime) =
   add(x.k, v)
@@ -326,11 +330,13 @@ proc add*(x: var K0, v: K) =
   case x.kind
   of kList: jk(x.addr, r1(v.k))
   of kVecLong: add(x, v.k.jj)
+  of kVecFloat: add(x, v.k.ff)
   of kVecSym:
     case v.k.kind
     of kSym: add(x, v.k.ss)
     # of kVecChar: add(x, cast[cstring](v.k.charArr)) # TODO: not sure
     else: raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
+  of kVecTimestamp: add(x, v.k.ts)
   of kVecGUID: add(x, v.k.gg)
   else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 

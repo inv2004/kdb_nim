@@ -14,6 +14,7 @@ type
 type
   KSym* = object
   KTimestamp* = object
+  KList* = object
 
 type
   KKind* {.size: 1.} = enum
@@ -69,98 +70,98 @@ type
     of kList:
       lu*: cchar
       lr*: cint
-      kLen*: clonglong
+      kLen*: int64
       kArr*: UncheckedArray[K0]
     of kVecBool:
       vbu*: cchar
       vbr*: cint
-      boolLen*: clonglong
+      boolLen*: int64
       boolArr*: UncheckedArray[bool]
     of kVecGUID:
       vgu*: cchar
       vgr*: cint
-      guidLen*: clonglong
+      guidLen*: int64
       guidArr*: UncheckedArray[GUID]
     of kVecByte:
       vyu*: cchar
       vyr*: cint
-      byteLen*: clonglong
+      byteLen*: int64
       byteArr*: UncheckedArray[byte]
     of kVecShort:
       vhu*: cchar
       vhr*: cint
-      shortLen*: clonglong
-      shortArr*: UncheckedArray[cshort]
+      shortLen*: int64
+      shortArr*: UncheckedArray[int16]
     of kVecInt:
       viu*: cchar
       vir*: cint
-      intLen*: clonglong
-      intArr*: UncheckedArray[cint]
+      intLen*: int64
+      intArr*: UncheckedArray[int32]
     of kVecLong:
       vju*: cchar
       vjr*: cint
-      longLen*: clonglong
-      longArr*: UncheckedArray[clonglong]
+      longLen*: int64
+      longArr*: UncheckedArray[int64]
     of kVecReal:
       vru*: cchar
       vrr*: cint
-      realLen*: clonglong
-      realArr*: UncheckedArray[cfloat]
+      realLen*: int64
+      realArr*: UncheckedArray[float32]
     of kVecFloat:
       vfu*: cchar
       vfr*: cint
-      floatLen*: clonglong
-      floatArr*: UncheckedArray[cdouble]
+      floatLen*: int64
+      floatArr*: UncheckedArray[float64]
     of kVecChar:
       vcu*: cchar
       vcr*: cint
-      charLen*: clonglong
+      charLen*: int64
       charArr*: UncheckedArray[char]
     of kVecSym:
       vsu*: cchar
       vsr*: cint
-      stringLen*: clonglong
+      stringLen*: int64
       stringArr*: UncheckedArray[cstring]
     of kVecTimestamp:
       vtsu*: cchar
       vtsr*: cint
-      tsLen*: clonglong
-      tsArr*: UncheckedArray[clonglong]
+      tsLen*: int64
+      tsArr*: UncheckedArray[int64]
     of kVecMonth:
       vmu*: cchar
       vmr*: cint
-      monthLen*: clonglong
-      monthArr*: UncheckedArray[cint]
+      monthLen*: int64
+      monthArr*: UncheckedArray[int32]
     of kVecDate:
       vdu*: cchar
       vdr*: cint
-      dateLen*: clonglong
-      dateArr*: UncheckedArray[cint]
+      dateLen*: int64
+      dateArr*: UncheckedArray[int32]
     of kVecDateTime:
       vdtu*: cchar
       vdtr*: cint
-      dtLen*: clonglong
-      dtArr*: UncheckedArray[cdouble]
+      dtLen*: int64
+      dtArr*: UncheckedArray[float64]
     of kVecTimespan:
       vtpu*: cchar
       vtpr*: cint
-      tpLen*: clonglong
-      tpArr*: UncheckedArray[clonglong]
+      tpLen*: int64
+      tpArr*: UncheckedArray[int64]
     of kVecMinute:
       vmiu*: cchar
       vmir*: cint
-      minuteLen*: clonglong
-      minuteArr*: UncheckedArray[cint]
+      minuteLen*: int64
+      minuteArr*: UncheckedArray[int32]
     of kVecSecond:
       vseu*: cchar
       vser*: cint
-      secondLen*: clonglong
-      secondArr*: UncheckedArray[cint]
+      secondLen*: int64
+      secondArr*: UncheckedArray[int32]
     of kVecTime:
       vttu*: cchar
       vttr*: cint
-      timeLen*: clonglong
-      timeArr*: UncheckedArray[cint]
+      timeLen*: int64
+      timeArr*: UncheckedArray[int32]
     of kTable:
       tu*: cchar
       tr*: cint
@@ -168,7 +169,7 @@ type
     of kDict:
       du*: cchar
       dr*: cint
-      dn*: clonglong  # always 2
+      dn*: int64  # always 2
       keys*: K0
       values*: K0
     of kId:
@@ -182,35 +183,35 @@ type
     of kTime:
       ttu*: cchar
       ttr*: cint
-      tt*: cint
+      tt*: int32
     of kSecond:
       seu*: cchar
       ser*: cint
-      se*: cint
+      se*: int32
     of kMinute:
       miu*: cchar
       mir*: cint
-      mi*: cint
+      mi*: int32
     of kTimespan:
       tpu*: cchar
       tpr*: cint
-      tp*: clonglong
+      tp*: int64
     of kDateTime:
       dtu*: cchar
       dtr*: cint
-      dt*: cdouble
+      dt*: float64
     of kDate:
       eu*: cchar
       er*: cint
-      dd*: cint
+      dd*: int32
     of kMonth:
       mu*: cchar
       mr*: cint
-      mo*: cint
+      mo*: int32
     of kTimestamp:
       tsu*: cchar
       tsr*: cint
-      ts*: clonglong
+      ts*: int64
     of kSym:
       su*: cchar
       sr*: cint
@@ -218,27 +219,27 @@ type
     of kChar:
       cu*: cchar
       cr*: cint
-      ch*: cchar
+      ch*: char
     of kFloat:
       fu*: cchar
       fr*: cint
-      ff*: cdouble
+      ff*: float64
     of kReal:
       rru*: cchar
       rrr*: cint
-      rr*: cfloat
+      rr*: float32
     of kLong:
       ju*: cchar
       jr*: cint
-      jj*: clonglong
+      jj*: int64
     of kInt:
       iu*: cchar
       ir*: cint
-      ii*: cint
+      ii*: int32
     of kShort:
       hu*: cchar
       hr*: cint
-      sh*: cshort
+      sh*: int16
     of kByte:
       yu*: cchar
       yr*: cint
