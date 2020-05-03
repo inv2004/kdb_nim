@@ -128,7 +128,7 @@ proc `$`*(x: K): string =
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(dateFormat)
   of kDateTime:
-    let d = initDuration(seconds = int64(86400*(x.k.dt+10957)))
+    let d = initDuration(milliseconds = int64(86400000*(x.k.dt+10957)))
     let dt = initDateTime(1, mJan, 1970, 0, 0, 0, utc()) + d
     result.add dt.format(dateTimeFormat)
   of kTimespan:

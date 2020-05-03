@@ -98,10 +98,16 @@ converter toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)
   toK(guid)
 
-converter toKTimestamp*(x: DateTime): K =
+proc toNanos(x: DateTime): int64 =
   let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
-  let dn = d.inNanoseconds()
-  toKTimestamp(dn)
+  d.inNanoseconds()
+
+proc toMillis(x: DateTime): int64 =
+  let d = x - initDateTime(1, mJan, 1970, 0, 0, 0, utc())
+  int64(d.inMilliseconds().float64 / 86400000) - 10957
+
+converter toKTimestamp*(x: DateTime): K =
+  toKTimestamp(x.toNanos())
 
 converter toK*(x: K0): K =
   K(k: x)
@@ -309,12 +315,16 @@ proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
 
 proc add*(x: var K0, v: DateTime) =
-  let d = v - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
-  let dn = d.inNanoseconds()
-  if x.kind == KKind.kVecTimestamp:
-    ja(x.addr, dn.unsafeAddr)
+  case x.kind
+  of KKind.kVecDateTime:
+    let n = v.toMillis()
+    ja(x.addr, n.unsafeAddr)
+  of KKind.kVecTimestamp:
+    let n = v.toNanos()
+    ja(x.addr, n.unsafeAddr)
   else:
-    add(x, dn.toK())
+    let n = v.toNanos()
+    add(x, n.toK())
 
 proc add*(x: var K, v: DateTime) =
   add(x.k, v)

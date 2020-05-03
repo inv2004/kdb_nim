@@ -179,3 +179,7 @@ test "times":
   check v.len == 2
   check v[0] == time
   check v[1] == time
+
+include mem
+
+include remote
