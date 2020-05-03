@@ -8,6 +8,25 @@ proc initMemory*() =
 proc kind*(x: K): KKind {.inline.} =
   x.k.kind
 
+proc typeToKType*[T](): int =
+  when T is bool: 1
+  elif T is GUID: 2
+  elif T is byte: 4
+  elif T is int16: 4
+  elif T is int32: 6
+  elif T is int: 7
+  elif T is int64: 7
+  elif T is float32: 8
+  elif T is float64: 9
+  elif T is float: 9
+  elif T is KSym: 11
+  elif T is KTimestamp: 12
+  elif T is KDateTime: 15
+  elif T is KList: 0
+  elif T is string: 0
+  elif T is typeof(nil): 0
+  else: raise newException(KError, "cannot convert type " & $T)
+
 proc len*(x: K0): int64 =
   if x == nil:
     return 0
@@ -36,6 +55,8 @@ proc len*(x: K0): int64 =
 
 proc len*(x: K): int =
   len(x.k).int
+
+include converters
 
 iterator items*(x: K0): K0 =
   case x.kind
@@ -129,25 +150,6 @@ iterator pairs*(x: K): (K, K) =
       # yield x.stringArr[i]
       # inc(i)
   # else: raise newException(KError, "mitems is not supported for " & $x.kind)
-
-proc typeToKType*[T](): int =
-  when T is bool: 1
-  elif T is GUID: 2
-  elif T is byte: 4
-  elif T is int16: 4
-  elif T is int32: 6
-  elif T is int: 7
-  elif T is int64: 7
-  elif T is float32: 8
-  elif T is float64: 9
-  elif T is float: 9
-  elif T is KSym: 11
-  elif T is KTimestamp: 12
-  elif T is KDateTime: 15
-  elif T is KList: 0
-  elif T is string: 0
-  elif T is typeof(nil): 0
-  else: raise newException(KError, "cannot convert type " & $T)
 
 proc add*(x: var K0, v: K)
 
@@ -314,15 +316,26 @@ proc `[]`*(x: K, i: int64): K =
   result = x.k[i]
   # discard r1(result.k)  # TODO: not sure
 
-proc `[]=`*(x: var K, k: K, v: K) =
-  case x.k.kind
+proc `[]=`*(x: var K0, k: K, v: K) =
+  case x.kind
   of kDict:
-    if x.k.values.checkAdd(v):
-      x.k.keys.add(k)
-      x.k.values.add(v)
+    if x.values.checkAdd(v):
+      x.keys.add(k)
+      x.values.add(v)
     else:
-      raise newException(KError, "checkAdd failed for " & $x.k.values.kind)
+      raise newException(KError, "checkAdd failed for " & $x.values.kind)
   else: raise newException(KError, "[K;K;K]`[]=` is not supported for " & $x.kind)
+
+proc `[]=`*(x: var K, k: K, v: K) =
+  `[]=`(x.k, k, v)
+
+proc `[]=`*(x: var K0, i: int64, v: K) =
+  case x.kind
+  of kVecFloat: x.floatArr[i] = v.k.ff
+  else: `[]=`(x, i.toK(), v)
+
+proc `[]=`*(x: var K, i: int64, v: K) =
+  `[]=`(x.k, i, v)
 
 # proc `[]=`*(x: var K, i: SomeInteger, v: K) =
 #   case x.k.kind
@@ -351,6 +364,12 @@ proc `==`*(a: K, b: K): bool =
   of kTimestamp: a.k.ts == b.k.ts
   of kDateTime: a.k.dt == b.k.dt
   of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
+  of kVecFloat:
+    var vA: seq[float]
+    vA.add toOpenArray(a.k.floatArr.addr, 0, a.k.floatLen.int)
+    var vB: seq[float]
+    vB.add toOpenArray(b.k.floatArr.addr, 0, b.k.floatLen.int)
+    vA == vB
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
 
 proc dictLookup(d: K0, k: K): K =

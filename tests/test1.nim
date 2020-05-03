@@ -188,9 +188,29 @@ test "times":
   check vv[0] == dt.toKDateTime()
   check vv[1] == dt.toKDateTime()
 
-# test "seq":
-  # let v = %[10.1, 11.2, 12.3]
-  # echo v
+test "amend":
+  var v = newKVec[float]()
+  v.add(10.1)
+  v.add(11.2)
+  v.add(12.3)
+  v[0] = 110.1
+  v[2] = 112.3
+  check $v == "[110.1, 11.2, 112.3]"
+
+test "seq":
+  let v = %[10.1, 11.2, 12.3]
+  check $v == "[10.1, 11.2, 12.3]"
+  var vv = %[10.1, 111.2, 12.3]
+  check v != vv
+  vv[1] = 11.2.toK()
+  check v == vv
+
+test "list_seq":
+  var l = newKList()
+  l.add %[1, 2, 3] # TODO: cannot implicit convert
+  l.add %[4, 5, 6]
+  l.add %[7, 8, 9]
+  check $l == "([1, 2, 3]; [4, 5, 6]; [7, 8, 9])"
 
 # include mem
 

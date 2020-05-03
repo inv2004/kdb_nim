@@ -1,6 +1,3 @@
-import bindings
-export bindings
-
 import uuids
 import endians
 import times
@@ -32,6 +29,17 @@ converter toK*(x: float32): K =
 
 converter toK*(x: float64): K =
   K(k: kf(x))
+
+proc `[]=`*(x: var K0, i: int64, v: SomeNumber) =  #TODO: ~ duplicate from proc
+  case x.kind
+  of kVecLong: x.longArr[i] = v.int64
+  of kVecFloat: x.floatArr[i] = v.float
+  else: raise newException(KError, "stop")
+
+converter toK*[T](v: openArray[T]): K =
+  result = K(k: ktn(typeToKType[T](), v.len))
+  for i, x in v:
+    result.k[i] = x
 
 converter toK*(x: char): K =
   K(k: kc(x))
