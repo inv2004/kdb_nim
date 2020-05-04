@@ -56,8 +56,6 @@ proc len*(x: K0): int64 =
 proc len*(x: K): int =
   len(x.k).int
 
-include converters
-
 iterator items*(x: K0): K0 =
   case x.kind
   of kList:
