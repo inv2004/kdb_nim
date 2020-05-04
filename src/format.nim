@@ -12,7 +12,7 @@ import endians
 const monthFormat = initTimeFormat("yyyy-MM")
 const dateFormat = initTimeFormat("yyyy-MM-dd")
 const dateTimeFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fff")
-const timestampFormat = initTimeFormat("yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff")
+const timestampFormat = "yyyy-MM-dd\'T\'HH:mm:ss\'.\'fffffffff"
 const timespanFormat = "HH:mm:ss\'.\'fffffffff"
 const minuteFormat = "HH:mm"
 const secondFormat = "HH:mm:ss"
@@ -116,9 +116,10 @@ proc `$`*(x: K): string =
   of kError:
     result.add $x.k.msg
   of kTimestamp:
-    let d = initDuration(nanoseconds = x.k.ts)
-    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
-    result.add dt.format(timestampFormat)
+    let seconds = (x.k.ts div 1000000000) + 10957*86400
+    let nanos = x.k.ts mod 1000000000
+    let t = initTime(seconds, nanos)
+    result.add t.utc().format(timestampFormat)
   of kMonth:
     let d = initTimeInterval(months = x.k.mo)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d

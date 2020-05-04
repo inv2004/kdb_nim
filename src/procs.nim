@@ -186,16 +186,22 @@ proc add*(x: var K0, v: cstring) =
 proc add*(x: var K, v: string) =
   add(x.k, v.cstring)
 
-proc add*(x: var K0, v: DateTime) =
+proc add*(x: var K0, v: Time) =
   case x.kind
-  of KKind.kVecDateTime:
-    let n = v.toMillis()
-    ja(x.addr, n.unsafeAddr)
   of KKind.kVecTimestamp:
     let n = v.toNanos()
     ja(x.addr, n.unsafeAddr)
   else:
     let n = v.toNanos()
+    add(x, n.toK())
+
+proc add*(x: var K0, v: DateTime) =
+  case x.kind
+  of KKind.kVecDateTime:
+    let n = v.toMillis()
+    ja(x.addr, n.unsafeAddr)
+  else:
+    let n = v.toMillis()
     add(x, n.toK())
 
 proc add*(x: var K, v: DateTime) =
@@ -218,7 +224,9 @@ proc add*(x: var K0, v: K) =
     of kSym: add(x, v.k.ss)
     # of kVecChar: add(x, cast[cstring](v.k.charArr)) # TODO: not sure
     else: raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
-  of kVecTimestamp: add(x, v.k.ts)
+  of kVecTimestamp:
+    assert v.k.kind == KKind.kTimestamp
+    add(x, v.k.ts)
   of kVecGUID: add(x, v.k.gg)
   else: raise newException(KError, "add[K] is not supported for " & $x.kind)
 

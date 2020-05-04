@@ -113,15 +113,15 @@ converter toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)
   toK(guid)
 
-proc toNanos*(x: DateTime): int64 =
-  let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
-  d.inNanoseconds()
+proc toNanos*(x: Time): int64 =
+  let seconds = x.toUnix() - 10957*86400
+  seconds*1000000000 + x.nanosecond()
 
 proc toMillis*(x: DateTime): float64 =
   let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
   d.inMilliseconds().float64 / 86400000
 
-converter toKTimestamp*(x: DateTime): K =
+converter toKTimestamp*(x: Time): K =
   toKTimestamp(x.toNanos())
 
 converter toK*(x: DateTime): K =

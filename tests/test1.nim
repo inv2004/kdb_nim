@@ -173,15 +173,16 @@ test "iterators":
 
 test "times":
   var v = newKVec[KTimestamp]()
-  let dt = now().utc()
-  v.add(dt)
-  v.add(dt)
+  let ts = getTime()
+  v.add(ts)
+  v.add(ts)
   check v.len == 2
   check v[0].kind == KKind.kTimestamp
-  check v[0] == dt
-  check v[1] == dt
+  check v[0] == ts
+  check v[1] == ts
 
   var vv = newKVec[KDateTime]()
+  let dt = now().utc()
   vv.add(dt)
   vv.add(dt)
   check vv[0].kind == KKind.kDateTime
