@@ -5,6 +5,25 @@ import uuids
 import endians
 import times
 
+proc typeToKType*[T](): int =
+  when T is bool: 1
+  elif T is GUID: 2
+  elif T is byte: 4
+  elif T is int16: 4
+  elif T is int32: 6
+  elif T is int: 7
+  elif T is int64: 7
+  elif T is float32: 8
+  elif T is float64: 9
+  elif T is float: 9
+  elif T is KSym: 11
+  elif T is KTimestamp: 12
+  elif T is KDateTime: 15
+  elif T is KList: 0
+  elif T is string: 0
+  elif T is typeof(nil): 0
+  else: raise newException(KError, "cannot convert type " & $T)
+
 converter toK*(x: type(nil)): K =
   result = K(k: ka(101))
   result.k.idg = 0
@@ -33,16 +52,22 @@ converter toK*(x: float32): K =
 converter toK*(x: float64): K =
   K(k: kf(x))
 
-proc `[]=`*(x: var K0, i: int64, v: SomeNumber) =  #TODO: ~ duplicate from proc
-  case x.kind
-  of kVecLong: x.longArr[i] = v.int64
-  of kVecFloat: x.floatArr[i] = v.float
-  else: raise newException(KError, "stop")
-
 converter toK*[T](v: openArray[T]): K =
-  result = K(k: ktn(typeToKType[T](), v.len))
-  for i, x in v:
-    result.k[i] = x
+  when T is DateTime:
+    result = K(k: ktn(typeToKType[KDateTime](), v.len))
+    for i, x in v:
+      result.k.dtArr[i] = x.toMillis()
+  when T is SomeNumber:
+    result = K(k: ktn(typeToKType[T](), v.len))
+    case result.k.kind
+    of kVecLong:
+      for i, x in v:
+        result.k.longArr[i] = x.int64
+    of kVecFloat:
+      for i, x in v:
+        result.k.floatArr[i] = x.float64
+    else: raise newException(KError, "openArray converter is not supported for " & $result.kind)
+  
 
 converter toK*(x: char): K =
   K(k: kc(x))
@@ -116,7 +141,7 @@ proc toMillis*(x: DateTime): float64 =
 converter toKTimestamp*(x: DateTime): K =
   toKTimestamp(x.toNanos())
 
-proc toKDateTime*(x: DateTime): K =
+converter toK*(x: DateTime): K =
   toKDateTime(x.toMillis())
 
 converter toK*(x: K0): K =

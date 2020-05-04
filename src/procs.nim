@@ -8,25 +8,6 @@ proc initMemory*() =
 proc kind*(x: K): KKind {.inline.} =
   x.k.kind
 
-proc typeToKType*[T](): int =
-  when T is bool: 1
-  elif T is GUID: 2
-  elif T is byte: 4
-  elif T is int16: 4
-  elif T is int32: 6
-  elif T is int: 7
-  elif T is int64: 7
-  elif T is float32: 8
-  elif T is float64: 9
-  elif T is float: 9
-  elif T is KSym: 11
-  elif T is KTimestamp: 12
-  elif T is KDateTime: 15
-  elif T is KList: 0
-  elif T is string: 0
-  elif T is typeof(nil): 0
-  else: raise newException(KError, "cannot convert type " & $T)
-
 proc len*(x: K0): int64 =
   if x == nil:
     return 0
@@ -265,9 +246,9 @@ proc addColumn*[T](t: var K, name: string) =
   if t.k == nil:
     var header = newKVec[KSym]()
     header.k.add(name.cstring)
-    var c1 = newKVec[T]()
+    let colData = newKVec[T]()
     var data = newKList()
-    data.add(c1)
+    data.add(colData)
     let dict = newKDict(header, data)
     t.k = xT(r1(dict.k))
   else:

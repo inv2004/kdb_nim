@@ -185,8 +185,8 @@ test "times":
   vv.add(dt)
   vv.add(dt)
   check vv[0].kind == KKind.kDateTime
-  check vv[0] == dt.toKDateTime()
-  check vv[1] == dt.toKDateTime()
+  check vv[0] == %dt
+  check vv[1] == %dt
 
 test "amend":
   var v = newKVec[float]()
@@ -207,11 +207,13 @@ test "seq":
 
 test "list_seq":
   var l = newKList()
-  l.add %[1, 2, 3]  # TODO: cannot implicit convert
-  l.add %[4, 5, 6]
+  let dt = now().utc()
+  l.add %[1]  # TODO: cannot implicit convert
+  l.add %[4, 5]
   l.add %[7, 8, 9]
-  l.add %[10.0, 11.0, 12.0]
-  check $l == "([1, 2, 3]; [4, 5, 6]; [7, 8, 9]; [10.0, 11.0, 12.0])"
+  l.add %[10.0, 11.0, 12.0, 13.0]
+  l.add %[dt, dt]
+  check $l == "([1]; [4, 5]; [7, 8, 9]; [10.0, 11.0, 12.0, 13.0]; [" & $ %dt & ", " & $ %dt & "])"
 
 # include mem
 
