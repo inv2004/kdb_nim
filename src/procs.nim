@@ -269,6 +269,9 @@ proc newKTable*(): K =
 proc dictLookup(d: K0, k: K): K
 
 proc `[]`*(x: K0, i: int64): K =
+  if x.kind != KKind.kDict:
+    if i >= x.len:
+      raise newException(KError, "index 10 not in 0 .. " & $(x.len - 1))
   case x.kind
   of kVecBool: x.boolArr[i].toK()
   of kVecGUID: x.guidArr[i].toK()
