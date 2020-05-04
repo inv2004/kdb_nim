@@ -2,9 +2,8 @@
 import os
 
 {.passC: "-DKXVER=3".}
-{.passC: "-I" & currentSourcePath.parentDir().}
-# {.passL: "-L" & currentSourcePath.parentDir().parentDir().}
-{.link: currentSourcePath.parentDir().parentDir() & "/c.o".}
+{.passC: "-I" & currentSourcePath.parentDir().parentDir().}
+{.link: currentSourcePath.parentDir().parentDir().parentDir() & "/c.o".}
 {.compile: "k.c".}
 
 type
