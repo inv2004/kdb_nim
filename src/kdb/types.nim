@@ -265,15 +265,17 @@ proc r1*(x: K0): K0 {.
 
 proc `=destroy`*(x: var K) =
   if x.k != nil:
-    # let rc = cast[ptr UncheckedArray[cint]](x.k)[1]
-    # echo "destroy K: ", x.k.kind, " rc = ", rc
+    let rc = cast[ptr UncheckedArray[cint]](x.k)[1]
+    echo "destroy K: ", x.k.kind, " rc = ", rc, " addr = " # , repr(x.k)
     r0(x.k)
 
 proc `=`*(a: var K, b: K) =
+  # echo "`=`"
   `=destroy`(a)
   a.k = r1(b.k)
 
 proc `=sink`*(a: var K; b: K) =
+  # echo "`=sink`"
   `=destroy`(a)
   a.k = b.k
 

@@ -1,6 +1,8 @@
 #import bindings  waiting module mutual imports
 #export bindings
 
+import sequtils
+
 proc initMemory*() = 
   echo "Init KDB Memory"
   discard khp("", -1)
@@ -41,9 +43,9 @@ iterator items*(x: K0): K0 =
   case x.kind
   of kList:
     var i = 0
-    while i < x.kLen:
-      yield x.kArr[i]
-      inc(i)
+    # while i < x.kLen:
+      # yield x.kArr[i]
+      # inc(i)
   of kVecBool:
     var i = 0
     while i < x.boolLen:
@@ -71,7 +73,7 @@ iterator items*(x: K): K =
   of kList:
     var i = 0
     while i < x.k.kLen:
-      let v = r1(x.k.kArr[i])
+      let v = r1(x.k.kArr[i])  #TODO: not sure
       yield v
       inc(i)
   of kVecBool:
@@ -237,6 +239,17 @@ proc newKVec*[T](): K =
   let k0 = ktn(typeToKType[T](), 0)
   result = K(k: k0)
 
+proc newKVecSym*(columns: openArray[string]): K =
+  let k0 = ktn(typeToKType[KSym](), 0)
+  # for i, x in columns:
+    # k0.stringArr[i] = ss(x.cstring)
+  result = K(k: k0)
+
+proc newKVecTyped(k: KKind): K =
+  let t = if 236 < k.int and k.int < 255: 256 - k.int else: k.int
+  let k0 = ktn(t, 0)
+  result = K(k: k0)
+
 proc newKList*(): K =
   result = K(k: knk(0))
 
@@ -269,7 +282,15 @@ proc addRow*(t: var K, vals: varargs[K]) =
   for i in 0..<t.k.dict.values.len:
     t.k.dict.values.kArr[i].add(vals[i])
 
-# proc newKTable*(fromDict = newKDict(10, 0)): K =
+proc newKTable*(cols: openArray[(string, KKind)]): K =
+  if cols.len > 0:
+    let header = newKVecSym(cols.mapIt(it[0]))
+    let data = %cols.mapIt(newKVecTyped(it[1]))
+    let dict = newKDict(header, data)
+    result = K(k: xT(r1(dict.k)))
+  else:
+    result = K(k: nil)
+
 proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
