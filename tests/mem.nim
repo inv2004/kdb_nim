@@ -38,11 +38,13 @@ test "testMem":
         echo y
     echo vv
     let x = K(k: ktn(typeToKType[KSym](), 0))
-  while true:
+
+test "testMemFailed":
+  for i in 0..100:
+    echo "DEBUG1"
     let vv = K(k: knk(0))
-    for x in vv:
+    for i in vv.k:
       discard
     let x = K(k: ktn(11, 0))
-    break
-    # let y = K(k: ktn(typeToKType[KSym](), 0))
+    echo "DEBUG2"
 
