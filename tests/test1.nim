@@ -13,8 +13,8 @@ import kdb
 import strutils
 import times
 
-# include basic
+include basic
 
-include mem
+# include mem
 
 # include remote

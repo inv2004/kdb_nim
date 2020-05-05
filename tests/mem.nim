@@ -1,6 +1,6 @@
 
 test "testMem":
-  while false:
+  while true:
     var t = newKTable()
     t.addColumn[:int64]("aaa")
     t.addColumn[:nil]("bbb")
@@ -37,14 +37,13 @@ test "testMem":
       for y in x:
         echo y
     echo vv
-    let x = K(k: ktn(typeToKType[KSym](), 0))
 
-test "testMemFailed":
-  for i in 0..100:
-    echo "DEBUG1"
-    let vv = K(k: knk(0))
-    for i in vv.k:
-      discard
-    let x = K(k: ktn(11, 0))
-    echo "DEBUG2"
+# test "testMemFailed":
+#   for i in 0..100:
+#     echo "DEBUG1"
+#     let vv = K(k: knk(0))
+#     for i in vv.k:
+#       discard
+#     let x = K(k: ktn(11, 0))
+#     echo "DEBUG2"
 

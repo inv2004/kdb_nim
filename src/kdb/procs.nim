@@ -43,9 +43,9 @@ iterator items*(x: K0): K0 =
   case x.kind
   of kList:
     var i = 0
-    # while i < x.kLen:
-      # yield x.kArr[i]
-      # inc(i)
+    while i < x.kLen:
+      yield x.kArr[i]
+      inc(i)
   of kVecBool:
     var i = 0
     while i < x.boolLen:
@@ -239,12 +239,6 @@ proc newKVec*[T](): K =
   let k0 = ktn(typeToKType[T](), 0)
   result = K(k: k0)
 
-proc newKVecSym*(columns: openArray[string]): K =
-  let k0 = ktn(typeToKType[KSym](), 0)
-  # for i, x in columns:
-    # k0.stringArr[i] = ss(x.cstring)
-  result = K(k: k0)
-
 proc newKVecTyped(k: KKind): K =
   let t = if 236 < k.int and k.int < 255: 256 - k.int else: k.int
   let k0 = ktn(t, 0)
@@ -263,6 +257,21 @@ proc newKDict*[KT, VT](): K =
 proc newKDict*(keys, values: K): K =
   result = K(k: xD(r1(keys.k), r1(values.k)))
 
+proc addColumn*[T](t: var K, name: string, col: K) =
+  if t.k == nil:
+    var header = newKVec[KSym]()
+    header.k.add(name.cstring)
+    var data = newKList()
+    data.add(col)
+    let dict = newKDict(header, data)
+    t.k = xT(r1(dict.k))
+  else:
+    assert typeToKType[T]() == col.k.kind.int
+    if t.len != col.len:
+      raise newException(KError, "column.len is not equal to table.len")
+    t.k.dict.keys.add(name.cstring)
+    t.k.dict.values.add(r1(col.k))
+
 proc addColumn*[T](t: var K, name: string) =
   if t.k == nil:
     var header = newKVec[KSym]()
@@ -277,19 +286,26 @@ proc addColumn*[T](t: var K, name: string) =
     var c1 = newKVec[T]()
     t.k.dict.values.add(r1(c1.k))
 
+# proc addRow*(t: var K, vals: openArray[K]) =
+#   assert t.k != nil
+#   assert t.k.dict.values.len == vals.len
+#   for i in 0..<t.k.dict.values.len:
+#     t.k.dict.values.kArr[i].add(vals[i])
+
 proc addRow*(t: var K, vals: varargs[K]) =
+  assert t.k != nil
   assert t.k.dict.values.len == vals.len
   for i in 0..<t.k.dict.values.len:
     t.k.dict.values.kArr[i].add(vals[i])
 
 proc newKTable*(cols: openArray[(string, KKind)]): K =
   if cols.len > 0:
-    let header = newKVecSym(cols.mapIt(it[0]))
+    let header = toSymVec(cols.mapIt(it[0]))
     let data = %cols.mapIt(newKVecTyped(it[1]))
     let dict = newKDict(header, data)
-    result = K(k: xT(r1(dict.k)))
+    K(k: xT(r1(dict.k)))
   else:
-    result = K(k: nil)
+    K(k: nil)
 
 proc newKTable*(): K =
   K(k: nil) # empty table is nil

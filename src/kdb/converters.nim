@@ -127,6 +127,12 @@ converter toKTimestamp*(x: Time): K =
 converter toK*(x: DateTime): K =
   toKDateTime(x.toMillis())
 
+proc toSymVec*(columns: openArray[string]): K =
+  let k0 = ktn(typeToKType[KSym](), columns.len)
+  for i, x in columns:
+    k0.stringArr[i] = ss(x.cstring)
+  result = K(k: k0)
+
 converter toK*[T](v: openArray[T]): K =
   when T is DateTime:
     result = K(k: ktn(typeToKType[KDateTime](), v.len))

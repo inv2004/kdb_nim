@@ -199,8 +199,26 @@ test "list_seq":
   check $l == "([1]; [4, 5]; [7, 8, 9]; [10.0, 11.0, 12.0, 13.0]; [" & $ %dt & ", " & $ %dt & "])"
 
 test "tables_from":
+  var tNil = newKTable()
+  tNil.addColumn[:int64]("aaa", %[1,2,3])
+  check tNil.len == 3
+
   var t = newKTable({"aaa": KKind.kLong, "bbb": KKind.kList})
-  let m = %[
-    %[1,2,3],
-    %[4,5,6]
-  ]
+  t.addRow(1,
+    %[
+      %[1,2,3],
+      %[4,5,6]
+    ]
+  )
+  try:
+    t.addColumn[:int64]("ccc", %[%2, %[1,2,3]])
+    check false
+  except:
+    check true
+
+  try:
+    t.addColumn[:int64]("ccc", %[1,2,3])
+    check false
+  except:
+    check true
+
