@@ -7,4 +7,8 @@
 test "testRemoteRead":
   let h = connect("test-kdb", 9999)
   let r = h.read()
-  echo repr(r)
+  echo r
+  let s = 1.toK()
+  check s.kind == KKind.kLong
+  h.send(1.toK())
+  echo "ok"

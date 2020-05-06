@@ -42,3 +42,7 @@ proc execAsync0*(h: FileHandle, s: string, args: varargs[K]) =
 proc read*(h: FileHandle): K =
   let k0 = k(h, nil)
   K(k: k0)
+
+proc send*(h: FileHandle, v: K) =
+  let r = k(-h, v.k, nil)
+  echo repr r

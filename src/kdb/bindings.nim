@@ -115,6 +115,9 @@ proc k*(h: cint, x: cstring, a, b, c: K0): K0 {.
 proc k*(h: cint, x: cstring, a, b, c, d: K0): K0 {.
   importc: "k", header: "k.h".}
 
+proc k*(h: cint, v: K0, n: typeof(nil)): K0 {.
+  importc: "k", header: "k.h".}
+
 proc checkCStructOffset*() {.
   importc: "check_c_struct_offset".}
 
