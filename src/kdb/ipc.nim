@@ -22,7 +22,11 @@ proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
   let k0 = execIntenal(h, s, args)
 
   if k0.kind == KKind.kError:
-    raise newException(KErrorRemote, $result.k.msg)
+    var str = newString(result.k.charLen)
+    copyMem(str[0].addr, result.k.charArr.addr, result.k.charLen)
+    r0(k0)
+
+    raise newException(KErrorRemote, str)
   else:
     K(k: k0)
 
@@ -35,3 +39,6 @@ proc execAsync*(h: FileHandle, s: string, args: varargs[K]) =
 proc execAsync0*(h: FileHandle, s: string, args: varargs[K]) =
   execAsync(h, s, nil.toK())
 
+proc read*(h: FileHandle): K =
+  let k0 = k(h, nil)
+  K(k: k0)

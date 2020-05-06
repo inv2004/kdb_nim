@@ -100,6 +100,9 @@ proc kK*(x: K0): K0 {.
 proc khp*(x: cstring, p: int): FileHandle {.
   importc: "khp", header: "k.h".}
 
+proc k*(h: cint, a: typeof(nil)): K0 {.
+  importc: "k", header: "k.h".}
+
 proc k*(h: cint, x: cstring, a: K0): K0 {.
   importc: "k", header: "k.h".}
 
