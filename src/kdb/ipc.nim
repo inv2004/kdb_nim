@@ -1,13 +1,14 @@
 import format
 export format
 
+import net
 
-proc connect*(hostname: string, port: int): FileHandle =
+proc connect*(hostname: string, port: int): SocketHandle =
   result = khp(hostname, port)
-  if result <= 0:
+  if result.int <= 0:
     raise newException(KError, "Connection error")
 
-proc execIntenal(h: FileHandle, s: string, args: varargs[K]): K0 =
+proc execIntenal(h: SocketHandle, s: string, args: varargs[K]): K0 =
   case args.len
   of 0: result = k(h, s.cstring, nil)
   of 1: result = k(h, s.cstring, args[0].k, nil)
@@ -18,7 +19,7 @@ proc execIntenal(h: FileHandle, s: string, args: varargs[K]): K0 =
   if result.kind == KKind.kError:
     raise newException(KErrorRemote, $result.msg)
 
-proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
+proc exec*(h: SocketHandle, s: string, args: varargs[K]): K =
   let k0 = execIntenal(h, s, args)
 
   if k0.kind == KKind.kError:
@@ -30,19 +31,31 @@ proc exec*(h: FileHandle, s: string, args: varargs[K]): K =
   else:
     K(k: k0)
 
-proc exec0*(h: FileHandle, s: string): K =
+proc exec0*(h: SocketHandle, s: string): K =
   exec(h, s, nil.toK())
 
-proc execAsync*(h: FileHandle, s: string, args: varargs[K]) =
-  discard execIntenal(-h, s, args)
+proc execAsync*(h: SocketHandle, s: string, args: varargs[K]) =
+  let negSocket = (-(h.int)).SocketHandle
+  discard execIntenal(negSocket, s, args)
 
-proc execAsync0*(h: FileHandle, s: string, args: varargs[K]) =
+proc execAsync0*(h: SocketHandle, s: string, args: varargs[K]) =
   execAsync(h, s, nil.toK())
 
-proc read*(h: FileHandle): K =
+proc read*(h: SocketHandle): K =
   let k0 = k(h, nil)
   K(k: k0)
 
-proc send*(h: FileHandle, v: K) =
-  let r = k(-h, v.k, nil)
-  echo repr r
+proc sendAsync*(h: SocketHandle, v: K) =
+  let socket = newSocket(h)
+  let data = b9(2, v.k)
+  data.byteArr[1] = 0  # async type
+  let sent = socket.send(data.byteArr.addr, data.byteLen.int)
+  assert sent == data.byteLen
+
+proc sendSyncReply*(h: SocketHandle, v: K) =
+  let socket = newSocket(h)
+  let data = b9(2, v.k)
+  data.byteArr[1] = 2  # response type
+  let sent = socket.send(data.byteArr.addr, data.byteLen.int)
+  assert sent == data.byteLen
+
