@@ -47,15 +47,17 @@ proc read*(h: SocketHandle): K =
 
 proc sendAsync*(h: SocketHandle, v: K) =
   let socket = newSocket(h)
-  let data = b9(2, v.k)
+  let data = b9(3, v.k)
   data.byteArr[1] = 0  # async type
   let sent = socket.send(data.byteArr.addr, data.byteLen.int)
   assert sent == data.byteLen
+  r0(data)
 
 proc sendSyncReply*(h: SocketHandle, v: K) =
   let socket = newSocket(h)
-  let data = b9(2, v.k)
+  let data = b9(3, v.k)
   data.byteArr[1] = 2  # response type
   let sent = socket.send(data.byteArr.addr, data.byteLen.int)
   assert sent == data.byteLen
+  r0(data)
 
