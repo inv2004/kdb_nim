@@ -1,6 +1,14 @@
 import types
 export types
 
+
+when defined(windows):
+  import winlean
+  export winlean.SocketHandle
+else:
+  import posix
+  export posix.SocketHandle
+
 proc kb*(x: bool): K0 {.
   importc: "kb", header: "k.h".}
 
@@ -97,26 +105,29 @@ proc xT*(x: K0): K0 {.
 proc kK*(x: K0): K0 {.
   importc: "kK", header: "k.h".}
 
-proc khp*(x: cstring, p: int): FileHandle {.
+proc khp*(x: cstring, p: int): SocketHandle {.
   importc: "khp", header: "k.h".}
 
-proc k*(h: cint, a: typeof(nil)): K0 {.
+proc k*(h: SocketHandle, a: typeof(nil)): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a: K0): K0 {.
+proc k*(h: SocketHandle, x: cstring, a: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b: K0): K0 {.
+proc k*(h: SocketHandle, x: cstring, a, b: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b, c: K0): K0 {.
+proc k*(h: SocketHandle, x: cstring, a, b, c: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, x: cstring, a, b, c, d: K0): K0 {.
+proc k*(h: SocketHandle, x: cstring, a, b, c, d: K0): K0 {.
   importc: "k", header: "k.h".}
 
-proc k*(h: cint, v: K0, n: typeof(nil)): K0 {.
+proc k*(h: SocketHandle, v: K0, n: typeof(nil)): K0 {.
   importc: "k", header: "k.h".}
+
+proc b9*(t: cint, v: K0): K0 {.
+  importc: "b9", header: "k.h".}
 
 proc checkCStructOffset*() {.
   importc: "check_c_struct_offset".}

@@ -17,4 +17,4 @@ include basic
 
 # include mem
 
-# include remote
+include remote
