@@ -7,6 +7,8 @@
 test "testRemoteRead":
   let h = connect("test-kdb", 9999)
   let r = h.read()
-  let rr = 10 + r[1].k.jj
+  # let rr = 10 + r[1].k.jj
+  let rr = "aaa".toError()
+  echo "error: ", rr
   h.sendSyncReply(rr)
   echo "ok"

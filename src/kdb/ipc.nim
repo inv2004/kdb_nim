@@ -47,6 +47,7 @@ proc read*(h: SocketHandle): K =
 
 proc sendAsync*(h: SocketHandle, v: K) =
   let socket = newSocket(h)
+   
   let data = b9(3, v.k)
   data.byteArr[1] = 0  # async type
   let sent = socket.send(data.byteArr.addr, data.byteLen.int)
