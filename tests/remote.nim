@@ -25,6 +25,7 @@ test "testRemoteRead":
         c2.add map[a.int]
       t.addColumn[:int]("z", %c1)
       t.addColumn[:string]("zz", %c2)
+      t.addColumn[:KSym]("zzz", c2.toSymVec())
       h.sendSyncReply(t)
     else:
       h.sendSyncReply("not_table".toError())

@@ -227,14 +227,17 @@ test "tables_idx":
   var t = newKTable()
   t.addColumn[:int64]("aaa", %[1,2,3])
   t.addColumn[:string]("bbb", %["aaa", "bbb", "ccc"])
+  t.addColumn[:KSym]("ccc", ["aaa", "bbb", "ccc"].toSymVec())
   check t.len == 3
 
   try:
-    discard t["ccc"]
+    discard t["zzz"]
     check false
   except:
     check true
 
+  check t["aaa"][0] == 1
   check t["bbb"][2] == "ccc"
+  check t["ccc"][1] == s"bbb"
 
 
