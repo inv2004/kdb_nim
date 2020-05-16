@@ -152,6 +152,11 @@ converter toK*[T](v: openArray[T]): K =
       for i, x in v:
         result.k.floatArr[i] = x.float64
     else: raise newException(KError, "openArray converter is not supported for " & $result.kind)
+  when T is string:
+    result = K(k: ktn(typeToKType[T](), v.len))
+    for i, x in v:
+      let k = x.toK()
+      result.k.kArr[i] = r1(k.k)
   when T is K:
     result = K(k: ktn(typeToKType[nil](), v.len))
     for i, x in v:

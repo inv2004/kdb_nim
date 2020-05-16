@@ -343,6 +343,10 @@ proc `[]`*(x: K, i: int64): K =
   result = x.k[i]
   # discard r1(result.k)  # TODO: not sure
 
+proc `[]`*(x: K, c: string): K =
+  assert x.kind == KKind.kTable
+  dictLookup(x.k.dict, c.toSym())
+
 proc `[]=`*(x: var K0, k: K, v: K) =
   case x.kind
   of kDict:

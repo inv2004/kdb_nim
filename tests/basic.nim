@@ -210,6 +210,7 @@ test "tables_from":
       %[4,5,6]
     ]
   )
+
   try:
     t.addColumn[:int64]("ccc", %[%2, %[1,2,3]])
     check false
@@ -222,7 +223,18 @@ test "tables_from":
   except:
     check true
 
-  let colStr = %["aaa", "bbb", "ccc"]
-  echo colStr
-  t.addColumn[:string]("str", colStr)
+test "tables_idx":
+  var t = newKTable()
+  t.addColumn[:int64]("aaa", %[1,2,3])
+  t.addColumn[:string]("bbb", %["aaa", "bbb", "ccc"])
+  check t.len == 3
+
+  try:
+    discard t["ccc"]
+    check false
+  except:
+    check true
+
+  check t["bbb"][2] == "ccc"
+
 
