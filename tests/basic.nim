@@ -222,3 +222,7 @@ test "tables_from":
   except:
     check true
 
+  let colStr = %["aaa", "bbb", "ccc"]
+  echo colStr
+  t.addColumn[:string]("str", colStr)
+

@@ -157,6 +157,7 @@ converter toK*[T](v: openArray[T]): K =
     for i, x in v:
       result.k.kArr[i] = r1(x.k)
     
+  # TODO: strange problem
   # else: raise newException(KError, "openArray converter is not supported for " & $T)
 
 converter toK*(x: K0): K =
