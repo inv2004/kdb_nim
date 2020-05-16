@@ -19,6 +19,12 @@ K kse(int seconds) {
     return k;
 }
 
+K kerr(char* x) {
+    K k = ks(x);
+    k->t = -128;
+    return k;
+}
+
 void check_c_struct_offset() {
     printf("C-struct-offset:\n");
     printf("  m: %ld\n", offsetof(struct k0, m));

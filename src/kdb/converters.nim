@@ -65,8 +65,7 @@ proc `s`*(x: string): K =
   K(k: ks(x.cstring))
 
 proc toError*(x: string): K =
-  let k0 = ka(128)
-  k0.msg = ss(x.cstring)
+  let k0 = kerr(x.cstring)
   K(k: k0)
 
 converter toKMonth*(x: int32): K =

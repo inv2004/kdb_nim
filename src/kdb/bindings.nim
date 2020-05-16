@@ -126,6 +126,9 @@ proc k*(h: SocketHandle, x: cstring, a, b, c, d: K0): K0 {.
 proc k*(h: SocketHandle, v: K0, n: typeof(nil)): K0 {.
   importc: "k", header: "k.h".}
 
+proc kerr*(x: cstring): K0 {.
+  importc: "kerr".}
+
 proc b9*(t: cint, v: K0): K0 {.
   importc: "b9", header: "k.h".}
 

@@ -2,6 +2,7 @@ import format
 export format
 
 import net
+import endians
 
 proc connect*(hostname: string, port: int): SocketHandle =
   result = khp(hostname, port)
@@ -56,9 +57,23 @@ proc sendAsync*(h: SocketHandle, v: K) =
 
 proc sendSyncReply*(h: SocketHandle, v: K) =
   let socket = newSocket(h)
-  let data = b9(3, v.k)
-  data.byteArr[1] = 2  # response type
-  let sent = socket.send(data.byteArr.addr, data.byteLen.int)
-  assert sent == data.byteLen
-  r0(data)
+
+  case v.kind
+  of kError:  # kError does not work via b9
+    let strLen = v.k.msg.len()
+    let len = 8 + 2 + strLen
+    var data = newString(len)
+    data[0] = 1.char  # little endian
+    data[1] = 2.char  # response type
+    littleEndian64(data[4].addr, len.unsafeAddr)
+    data[8] = 128.char
+    copyMem(data[9].addr, v.k.msg, strLen)
+    data[len-1] = 0.char
+    socket.send(data)
+  else:
+    let data = b9(3, v.k)
+    data.byteArr[1] = 2  # response type
+    let sent = socket.send(data.byteArr.addr, data.byteLen.int)
+    assert sent == data.byteLen
+    r0(data)
 
