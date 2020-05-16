@@ -5,6 +5,7 @@
 #   echo result
 
 import tables
+import sequtils
 
 test "testRemoteRead":
   let h = connect("test-kdb", 9999)
@@ -17,12 +18,8 @@ test "testRemoteRead":
     var t = r[1]
     case t.kind
     of kTable:
-      var c1 = newSeq[int]()
-      var c2 = newSeq[string]()
-      for i in 0..<t.len:
-        c1.add i
-        let a: int64 = t["a"][i].k.jj
-        c2.add map[a.int]
+      var c1 = (0..<t.len).toSeq()
+      let c2 = t["a"].mapIt(map.getOrDefault(it.k.jj.int))
       t.addColumn[:int]("z", %c1)
       t.addColumn[:string]("zz", %c2)
       t.addColumn[:KSym]("zzz", c2.toSymVec())

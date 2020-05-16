@@ -240,4 +240,22 @@ test "tables_idx":
   check t["bbb"][2] == "ccc"
   check t["ccc"][1] == s"bbb"
 
+import tables
+import sequtils
 
+test "table_cols":
+
+  const map = {1: "one", 2: "two", 3:"three"}.toTable
+
+  var t = newKTable()
+  t.addColumn[:int64]("a", %[1, 2, 3, 4])
+
+  var c1 = (0..<t.len).toSeq()
+  let c2 = t["a"].mapIt(map.getOrDefault(it.k.jj.int))
+  t.addColumn[:int]("z", %c1)
+  t.addColumn[:string]("zz", %c2)
+  t.addColumn[:KSym]("zzz", c2.toSymVec())
+
+  check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
+  check t.columns() == @["a", "z", "zz", "zzz"]
+  

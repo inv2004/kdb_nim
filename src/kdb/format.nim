@@ -149,7 +149,8 @@ proc `$`*(x: K): string =
     result.add d.format(timeFormat, zone = utc())
   of kVecChar:
     var str = newString(x.k.charLen)
-    copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
+    if str.len > 0:
+      copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
     result.add '"' & str & '"'
   of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort,
         kVecLong, kVecReal, kVecFloat,

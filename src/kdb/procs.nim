@@ -66,6 +66,11 @@ iterator items*(x: K0): K0 =
     while i < x.stringLen:
       yield x.stringArr[i].toSym().k
       inc(i)
+  of kTable:
+    var i = 0
+    while i < x.dict.len:
+      yield x.stringArr[i].toSym().k
+      inc(i)
   else: raise newException(KError, "items is not supported for " & $x.kind)
 
 iterator items*(x: K): K =
@@ -95,6 +100,11 @@ iterator items*(x: K): K =
     var i = 0
     while i < x.k.stringLen:
       yield x.k.stringArr[i].toSym()
+      inc(i)
+  of kTable:
+    var i = 0
+    while i < x.k.dict.keys.len:
+      yield x.k.dict.keys.stringArr[i].toSym()
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
@@ -397,11 +407,18 @@ proc `==`*(a: K, b: K): bool =
   of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
   of kVecFloat:
     var vA: seq[float]
-    vA.add toOpenArray(a.k.floatArr.addr, 0, a.k.floatLen.int)
+    vA.add toOpenArray(a.k.floatArr.addr, 0, a.k.floatLen.int - 1)
     var vB: seq[float]
-    vB.add toOpenArray(b.k.floatArr.addr, 0, b.k.floatLen.int)
+    vB.add toOpenArray(b.k.floatArr.addr, 0, b.k.floatLen.int - 1)
     vA == vB
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
+
+proc columns*(x: K): seq[string] =
+  assert x.kind == KKind.kTable
+  # result: seq[string]
+  var cResult: seq[cstring]
+  cResult.add toOpenArray(x.k.dict.keys.stringArr.addr, 0, x.k.dict.keys.stringLen.int - 1)
+  cResult.mapIt($it)
 
 proc dictLookup(d: K0, k: K): K =
   var i = 0
