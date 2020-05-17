@@ -77,3 +77,5 @@ proc sendSyncReply*(h: SocketHandle, v: K) =
     assert sent == data.byteLen
     r0(data)
 
+proc isCall*(x: K): bool =
+  (x.kind == KKind.kList or x.kind == kVecSym) and x.len >= 2

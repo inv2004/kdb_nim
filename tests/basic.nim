@@ -258,4 +258,3 @@ test "table_cols":
 
   check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
   check t.columns() == @["a", "z", "zz", "zzz"]
-  

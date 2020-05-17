@@ -10,7 +10,7 @@ import sequtils
 test "testRemoteRead":
   let h = connect("test-kdb", 9999)
   let r = h.read()
-  if r.kind != KKind.kList or r.len < 2:
+  if not r.isCall():
     h.sendSyncReply("not_call".toError())
   else:
     const map = {1: "one", 2: "two", 3:"three"}.toTable

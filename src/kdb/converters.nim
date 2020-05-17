@@ -142,7 +142,7 @@ converter toK*[T](v: openArray[T]): K =
     result = K(k: ktn(typeToKType[KDateTime](), v.len))
     for i, x in v:
       result.k.dtArr[i] = x.toMillis()
-  when T is SomeNumber:
+  elif T is SomeNumber:
     result = K(k: ktn(typeToKType[T](), v.len))
     case result.k.kind
     of kVecLong:
@@ -152,18 +152,17 @@ converter toK*[T](v: openArray[T]): K =
       for i, x in v:
         result.k.floatArr[i] = x.float64
     else: raise newException(KError, "openArray converter is not supported for " & $result.kind)
-  when T is string:
+  elif T is string:
     result = K(k: ktn(typeToKType[T](), v.len))
     for i, x in v:
       let k = x.toK()
       result.k.kArr[i] = r1(k.k)
-  when T is K:
+  elif T is K:
     result = K(k: ktn(typeToKType[nil](), v.len))
     for i, x in v:
       result.k.kArr[i] = r1(x.k)
-    
-  # TODO: strange problem
-  # else: raise newException(KError, "openArray converter is not supported for " & $T)
+  else:
+    raise newException(KError, "openArray converter is not supported for " & $T)
 
 converter toK*(x: K0): K =
   K(k: x)
