@@ -19,6 +19,7 @@ proc typeToKType*[T](): int =
   elif T is KSym: 11
   elif T is KTimestamp: 12
   elif T is KDateTime: 15
+  elif T is DateTime: 15
   elif T is KList: 0
   elif T is string: 0
   elif T is typeof(nil): 0
@@ -139,7 +140,7 @@ proc toSymVec*(columns: openArray[string]): K =
 
 converter toK*[T](v: openArray[T]): K =
   when T is DateTime:
-    result = K(k: ktn(typeToKType[KDateTime](), v.len))
+    result = K(k: ktn(typeToKType[T](), v.len))
     for i, x in v:
       result.k.dtArr[i] = x.toMillis()
   elif T is SomeNumber:
