@@ -244,7 +244,6 @@ import tables
 import sequtils
 
 test "table_cols":
-
   const map = {1: "one", 2: "two", 3:"three"}.toTable
 
   var t = newKTable()
@@ -258,3 +257,6 @@ test "table_cols":
 
   check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
   check t.columns() == @["a", "z", "zz", "zzz"]
+
+test "kdb_to_nim":
+  check true

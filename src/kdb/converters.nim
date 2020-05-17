@@ -171,3 +171,7 @@ converter toK*(x: K0): K =
 template `%`*(x: untyped): K =
   toK(x)
 
+# converter fromK(x: K): int =
+  # assert x.k.kind == KKind.kLong
+  # x.k.jj.int
+  
