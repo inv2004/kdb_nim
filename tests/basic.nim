@@ -258,8 +258,12 @@ test "table_cols":
   check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
   check t.columns() == @["a", "z", "zz", "zzz"]
 
-test "kdb_to_nim":
+test "kdb_basic_math":
   let a = %10
   let b = a + 2
-  echo b
-  # discard
+  check b < 14
+  check b <= 14
+  check b > 10
+  check b >= 10
+  check b == 12
+  check b*2 == 24
