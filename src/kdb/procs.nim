@@ -427,3 +427,4 @@ proc dictLookup(d: K0, k: K): K =
       return d.values[i]
     inc(i)
   raise newException(KeyError, "key not found: " & $k)
+

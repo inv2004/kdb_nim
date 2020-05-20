@@ -259,4 +259,7 @@ test "table_cols":
   check t.columns() == @["a", "z", "zz", "zzz"]
 
 test "kdb_to_nim":
-  check true
+  let a = %10
+  let b = a + 2
+  echo b
+  # discard
