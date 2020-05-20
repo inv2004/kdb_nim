@@ -46,6 +46,7 @@ template math1(op: untyped) =
 
 template math2(op: untyped) =
   proc op*(a, b: K): K =
+    assert a.k.kind == b.k.kind
     case a.k.kind
     of kByte: toK(op(a.k.by, b.k.by))
     of kShort: toK(op(a.k.sh, b.k.sh))
@@ -57,6 +58,7 @@ template math2(op: untyped) =
 
 template mathCmp(op: untyped) =
   proc op*(a, b: K): bool =
+    assert a.k.kind == b.k.kind
     case a.k.kind
     of kByte: op(a.k.by, b.k.by)
     of kShort: op(a.k.sh, b.k.sh)
