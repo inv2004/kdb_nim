@@ -258,7 +258,7 @@ test "table_cols":
   check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
   check t.columns() == @["a", "z", "zz", "zzz"]
 
-test "kdb_basic_math":
+test "basic_math":
   let a = %10
   let b = a + 2
   check b < 14
@@ -275,3 +275,26 @@ test "kdb_basic_math":
   check f == 12.5
   f *= 2.0
   check f == 25.0
+
+test "mitems":
+  var a = %[10, 20, 30]
+  for x in a.mitems[:int64]:
+    x *= 2
+  check a == %[20, 40, 60]
+
+  var b = %[10.1, 20.2, 30.3]
+  for x in b.mitems[:float64]:
+    x *= 2
+  check b == %[20.2, 40.4, 60.6]
+
+  var c = ["aa", "bb", "cc"].toSymVec()
+  for x in c.mitems[:cstring]:
+    x = ($x & $x).cstring
+  check c == ["aaaa", "bbbb", "cccc"].toSymVec()
+
+  var d = %["aa", "bb", "cc"]
+  for x in c.mitems[:cstring]:
+    x = ($x & $x).cstring
+  check d == %["aa", "bb", "cc"]
+
+

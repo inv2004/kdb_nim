@@ -108,6 +108,27 @@ iterator items*(x: K): K =
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
+iterator mitems*[T](x: var K): var T =
+  when T is int64:
+    assert x.k.kind == KKind.kVecLong
+    var i = 0
+    while i < x.k.longLen:
+      yield x.k.longArr[i]
+      inc(i)
+  elif T is float64:
+    assert x.k.kind == KKind.kVecFloat
+    var i = 0
+    while i < x.k.floatLen:
+      yield x.k.floatArr[i]
+      inc(i)
+  elif T is cstring:
+    assert x.k.kind == KKind.kVecSym
+    var i = 0
+    while i < x.k.stringLen:
+      yield x.k.stringArr[i]
+      inc(i)
+  else: raise newException(KError, "mitems is not supported for " & $x.k.kind)
+
 proc `[]`*(x: K0, i: int64): K
 
 iterator pairs*(x: K): (K, K) =

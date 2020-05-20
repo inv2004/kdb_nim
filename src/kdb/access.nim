@@ -119,11 +119,29 @@ proc `==`*(a: K, b: K): bool =
   of kTimestamp: a.k.ts == b.k.ts
   of kDateTime: a.k.dt == b.k.dt
   of kVecChar: cast[cstring](a.k.charArr) == cast[cstring](b.k.charArr)  # TODO not sure
+  of kVecLong:
+    var vA: seq[int64]
+    vA.add toOpenArray(a.k.longArr.addr, 0, a.k.longLen.int - 1)
+    var vB: seq[int64]
+    vB.add toOpenArray(b.k.longArr.addr, 0, b.k.longLen.int - 1)
+    vA == vB
   of kVecFloat:
     var vA: seq[float]
     vA.add toOpenArray(a.k.floatArr.addr, 0, a.k.floatLen.int - 1)
     var vB: seq[float]
     vB.add toOpenArray(b.k.floatArr.addr, 0, b.k.floatLen.int - 1)
+    vA == vB
+  of kVecSym:  # TODO: maybe slow: check
+    var vA: seq[cstring]
+    vA.add toOpenArray(a.k.stringArr.addr, 0, a.k.stringLen.int - 1)
+    var vB: seq[cstring]
+    vB.add toOpenArray(b.k.stringArr.addr, 0, b.k.stringLen.int - 1)
+    vA == vB
+  of kList:  # TODO: probably too slow: remake
+    var vA: seq[K0]
+    vA.add toOpenArray(a.k.kArr.addr, 0, a.k.kLen.int - 1)
+    var vB: seq[K0]
+    vB.add toOpenArray(b.k.kArr.addr, 0, b.k.kLen.int - 1)
     vA == vB
   else: raise newException(KError, "`==` is not supported for " & $a.k.kind)
 

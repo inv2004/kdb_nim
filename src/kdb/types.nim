@@ -256,7 +256,7 @@ type
 
   K* = object
     k*: K0
-
+  
 proc r0*(x: K0) {.
   importc: "r0", header: "k.h".}
 
