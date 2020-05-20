@@ -269,3 +269,9 @@ test "kdb_basic_math":
   let c = b*2
   check c == 24
   check -c == -24
+  var f = %2.5
+  check (f*(%2.0)) == 5.0
+  f += 10.0
+  check f == 12.5
+  f *= 2.0
+  check f == 25.0

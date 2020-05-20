@@ -41,7 +41,7 @@ template math1(op: untyped) =
     of kInt: toK(op(a.k.ii))
     of kLong: toK(op(a.k.jj))
     of kReal: op(a.k.rr)  # TODO: WHY ?
-    of kFloat: toK(op(a.k.jj))
+    of kFloat: toK(op(a.k.ff))
     else: raise newException(KError, "OP is not supported for " & $a.k.kind)
 
 template math2(op: untyped) =
@@ -52,8 +52,30 @@ template math2(op: untyped) =
     of kShort: toK(op(a.k.sh, b.k.sh))
     of kInt: toK(op(a.k.ii, b.k.ii))
     of kLong: toK(op(a.k.jj, b.k.jj))
-    of kReal: op(a.k.rr, b.k.rr)  # TODO: WHY ?
-    of kFloat: toK(op(a.k.jj, b.k.jj))
+    of kReal: toK(op(a.k.rr, b.k.rr))  # TODO: WHY ?
+    of kFloat: toK(op(a.k.ff, b.k.ff))
+    else: raise newException(KError, "OP is not supported for " & $a.k.kind)
+
+template math2Int(op: untyped) =
+  proc op*(a, b: K): K =
+    assert a.k.kind == b.k.kind
+    case a.k.kind
+    of kByte: toK(op(a.k.by, b.k.by))
+    of kShort: toK(op(a.k.sh, b.k.sh))
+    of kInt: toK(op(a.k.ii, b.k.ii))
+    of kLong: toK(op(a.k.jj, b.k.jj))
+    else: raise newException(KError, "OP is not supported for " & $a.k.kind)
+
+template math2var(op: untyped) =
+  proc op*(a: var K, b: K) =
+    assert a.k.kind == b.k.kind
+    case a.k.kind
+    of kByte: op(a.k.by, b.k.by)
+    of kShort: op(a.k.sh, b.k.sh)
+    of kInt: op(a.k.ii, b.k.ii)
+    of kLong: op(a.k.jj, b.k.jj)
+    of kReal: op(a.k.rr, b.k.rr)
+    of kFloat: op(a.k.ff, b.k.ff)
     else: raise newException(KError, "OP is not supported for " & $a.k.kind)
 
 template mathCmp(op: untyped) =
@@ -65,17 +87,20 @@ template mathCmp(op: untyped) =
     of kInt: op(a.k.ii, b.k.ii)
     of kLong: op(a.k.jj, b.k.jj)
     of kReal: op(a.k.rr, b.k.rr)
-    of kFloat: op(a.k.jj, b.k.jj)
+    of kFloat: op(a.k.ff, b.k.ff)
     else: raise newException(KError, "OP is not supported for " & $a.k.kind)
 
 math1(`-`)
 math2(`+`)
 math2(`-`)
 math2(`*`)
-math2(`div`)
-math2(`mod`)
+math2Int(`div`)
+math2Int(`mod`)
 mathCmp(`<`)
 mathCmp(`<=`)
+math2var(`+=`)
+math2var(`-=`)
+math2var(`*=`)
 
 proc `==`*(a: K, b: K): bool =
   if a.k.kind != b.k.kind:
