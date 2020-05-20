@@ -33,7 +33,18 @@ proc getFloat*(x: K): float =
   assert x.k.kind == KKind.kFloat
   x.k.ff
 
-template math(op: untyped) =
+template math1(op: untyped) =
+  proc op*(a: K): K =
+    case a.k.kind
+    of kByte: op(a.k.by)  # TODO: WHY ?
+    of kShort: toK(op(a.k.sh))
+    of kInt: toK(op(a.k.ii))
+    of kLong: toK(op(a.k.jj))
+    of kReal: op(a.k.rr)  # TODO: WHY ?
+    of kFloat: toK(op(a.k.jj))
+    else: raise newException(KError, "OP is not supported for " & $a.k.kind)
+
+template math2(op: untyped) =
   proc op*(a, b: K): K =
     case a.k.kind
     of kByte: toK(op(a.k.by, b.k.by))
@@ -51,15 +62,16 @@ template mathCmp(op: untyped) =
     of kShort: op(a.k.sh, b.k.sh)
     of kInt: op(a.k.ii, b.k.ii)
     of kLong: op(a.k.jj, b.k.jj)
-    of kReal: op(a.k.rr, b.k.rr)  # TODO: WHY ?
+    of kReal: op(a.k.rr, b.k.rr)
     of kFloat: op(a.k.jj, b.k.jj)
     else: raise newException(KError, "OP is not supported for " & $a.k.kind)
 
-math(`+`)
-math(`-`)
-math(`*`)
-math(`div`)
-math(`mod`)
+math1(`-`)
+math2(`+`)
+math2(`-`)
+math2(`*`)
+math2(`div`)
+math2(`mod`)
 mathCmp(`<`)
 mathCmp(`<=`)
 

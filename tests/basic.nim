@@ -266,4 +266,6 @@ test "kdb_basic_math":
   check b > 10
   check b >= 10
   check b == 12
-  check b*2 == 24
+  let c = b*2
+  check c == 24
+  check -c == -24
