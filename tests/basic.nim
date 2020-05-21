@@ -294,7 +294,7 @@ test "mitems":
 
   var d = %["aa", "bb", "cc"]
   for x in c.mitems[:cstring]:
-    x = ($x & $x).cstring
-  check d == %["aa", "bb", "cc"]
+    x = ($x & $x)
+  check d == %["aa", "bb", "cc"]  # TODO: check
 
 
