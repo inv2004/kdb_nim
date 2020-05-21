@@ -12,6 +12,7 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [x] Automatic memory management
 - [x] IPC + Sync Replay
 - [x] Implicit casting between Nim and Kdb types
+- [x] Iterators and mutable iterators
 - [ ] Separate types for static garanties
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
