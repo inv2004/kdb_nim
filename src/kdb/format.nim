@@ -18,7 +18,7 @@ const minuteFormat = "HH:mm"
 const secondFormat = "HH:mm:ss"
 const timeFormat = "HH:mm:ss\'.\'fff"
 
-proc `$`*(x: K): string
+proc `$`*(x: K): string {.gcsafe.}
 
 include procs
 
@@ -39,8 +39,12 @@ proc flatTable*(x: K): string =
     result.add $x.k.dict.values[i]
   result.add "|"
 
-proc fmtKTable(x: K): string =
-  let t = newUnicodeTable()
+proc fmtKTable(x: K): string {.gcsafe.} =
+  # let uS = deepCopy(unicodeStyle)
+  let localUnicodeStyle = Style(rowSeparator:"─", colSeparator:"│", cellEdgeLeft:"├", cellEdgeRight:"┤", topLeft:"┌", topRight:"┐", bottomLeft:"└", bottomRight:"┘", topRowSeparator:"┬", bottomRowSeparator:"┴", dashLineLeft:"├", dashLineRight:"┤", dashLineColSeparatorLastRow:"┴", dashLineColSeparatorTopRow:"┬", dashLineColSeparator:"┼")
+  ### ^ to make it gcsafe for threads
+
+  let t = newTerminalTable(localUnicodeStyle)
   t.separateRows = false
   var header: seq[string] = @[]
   for x in x.k.dict.keys: # TODO: strange r1
@@ -81,7 +85,7 @@ proc fmtKGUID(x: K): string =
   let u = initUUID(most, least)
   $u
 
-proc `$`*(x: K): string =
+proc `$`*(x: K): string {.gcsafe.} =
   if isNil(x.k):
     return "nil"
   case x.k.kind

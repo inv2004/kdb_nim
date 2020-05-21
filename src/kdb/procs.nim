@@ -129,7 +129,7 @@ iterator mitems*[T](x: var K): var T =
       inc(i)
   else: raise newException(KError, "mitems is not supported for " & $x.k.kind)
 
-proc `[]`*(x: K0, i: int64): K
+proc `[]`*(x: K0, i: int64): K {.gcsafe.}
 
 iterator pairs*(x: K): (K, K) =
   case x.k.kind
@@ -342,9 +342,9 @@ proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
 
-proc dictLookup(d: K0, k: K): K
+proc dictLookup(d: K0, k: K): K {.gcsafe.}
 
-proc `[]`*(x: K0, i: int64): K =
+proc `[]`*(x: K0, i: int64): K {.gcsafe.} =
   if x.kind != KKind.kDict:
     if i >= x.len:
       raise newException(KError, "index 10 not in 0 .. " & $(x.len - 1))
@@ -416,7 +416,7 @@ proc columns*(x: K): seq[string] =
   cResult.add toOpenArray(x.k.dict.keys.stringArr.addr, 0, x.k.dict.keys.stringLen.int - 1)
   cResult.mapIt($it)
 
-proc dictLookup(d: K0, k: K): K =
+proc dictLookup(d: K0, k: K): K {.gcsafe.} =
   var i = 0
   for x in d.keys:
     if x == k:

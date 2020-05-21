@@ -11,8 +11,9 @@ import os
 test "testRemote":
   proc server() {.gcsafe.} =
     let s = waitOnPort(9999)
-    let d = kdb.read(s)
-    check d.kind == KKind.kLong
+    lvar d = kdb.read(s)
+    check d.kind == KKind.kVecLong
+
 
   var worker1: Thread[void]
   createThread(worker1, server)
@@ -21,7 +22,7 @@ test "testRemote":
 
   let h = connect("localhost", 9999)
   check true
-  sendAsync(h, %100)
+  sendAsync(h, %[100, 200, 300])
 
   worker1.joinThread()
 
