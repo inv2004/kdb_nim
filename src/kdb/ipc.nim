@@ -79,3 +79,18 @@ proc sendSyncReply*(h: SocketHandle, v: K) =
 
 proc isCall*(x: K): bool =
   (x.kind == KKind.kList or x.kind == kVecSym) and x.len >= 2
+
+proc waitOnPort*(port: int, timeout = 1000): SocketHandle =
+  var server = newSocket()
+  server.setSockOpt(OptReuseAddr, true)
+  server.bindAddr(Port(port))
+  server.listen()
+  var client = newSocket()
+  server.accept(client)
+  let buf = net.recv(client, 3, timeout)
+  let version = if buf.len() > 1: max(3.byte, buf[^2].byte) else: 0.byte
+  var bufSend = "0"
+  bufSend[0] = version.char
+  send(client, bufSend)
+  client.getFd()
+
