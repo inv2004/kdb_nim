@@ -11,7 +11,7 @@ proc kind*(x: K): KKind {.inline.} =
   x.k.kind
 
 proc len*(x: K0): int64 =
-  if x == nil:
+  if isNil(x):
     return 0
   case x.kind
   of kList: x.kLen
@@ -289,7 +289,7 @@ proc newKDict*(keys, values: K): K =
   result = K(k: xD(r1(keys.k), r1(values.k)))
 
 proc addColumn*[T](t: var K, name: string, col: K) =
-  if t.k == nil:
+  if isNil(t.k):
     var header = newKVec[KSym]()
     header.k.add(name.cstring)
     var data = newKList()
@@ -304,7 +304,7 @@ proc addColumn*[T](t: var K, name: string, col: K) =
     t.k.dict.values.add(r1(col.k))
 
 proc addColumn*[T](t: var K, name: string) =
-  if t.k == nil:
+  if isNil(t.k):
     var header = newKVec[KSym]()
     header.k.add(name.cstring)
     let colData = newKVec[T]()
@@ -324,7 +324,7 @@ proc addColumn*[T](t: var K, name: string) =
 #     t.k.dict.values.kArr[i].add(vals[i])
 
 proc addRow*(t: var K, vals: varargs[K]) =
-  assert t.k != nil
+  assert not isNil(t.k)
   assert t.k.dict.values.len == vals.len
   for i in 0..<t.k.dict.values.len:
     t.k.dict.values.kArr[i].add(vals[i])

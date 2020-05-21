@@ -82,7 +82,7 @@ proc fmtKGUID(x: K): string =
   $u
 
 proc `$`*(x: K): string =
-  if x.k == nil:
+  if isNil(x.k):
     return "nil"
   case x.k.kind
   of kList:
