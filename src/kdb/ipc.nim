@@ -32,15 +32,15 @@ proc exec*(h: SocketHandle, s: string, args: varargs[K]): K =
   else:
     K(k: k0)
 
-proc exec0*(h: SocketHandle, s: string): K =
-  exec(h, s, nil.toK())
+# proc exec0*(h: SocketHandle, s: string): K =
+  # exec(h, s, nil.toK())
 
 proc execAsync*(h: SocketHandle, s: string, args: varargs[K]) =
   let negSocket = (-(h.int)).SocketHandle
   discard execIntenal(negSocket, s, args)
 
-proc execAsync0*(h: SocketHandle, s: string, args: varargs[K]) =
-  execAsync(h, s, nil.toK())
+# proc execAsync0*(h: SocketHandle, s: string) =
+  # execAsync(h, s, nil.toK())
 
 proc read*(h: SocketHandle): K =
   let k0 = k(h, nil)
@@ -89,8 +89,9 @@ proc waitOnPort*(port: int, timeout = 1000): SocketHandle =
   server.accept(client)
   let buf = net.recv(client, 3, timeout)
   let version = if buf.len() > 1: max(3.byte, buf[^2].byte) else: 0.byte
-  var bufSend = "0"
+  var bufSend = "_"
   bufSend[0] = version.char
   send(client, bufSend)
   client.getFd()
+
 
