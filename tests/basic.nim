@@ -328,8 +328,4 @@ test "iterators_specialized":
   let sSym = ["aaa", "bbb"].toSymVec()
   check toSeq(sSym.items(string)) == @["aaa", "bbb"]
 
-# test "getters_vec":
-#   check toK(%[true, false]).getVec[:bool] = [true, false]
-
-
 
