@@ -1,9 +1,25 @@
 import converters
 export converters
 
+import uuids
+import endians
+import times
+
 # Imported to compare two vecChars effective
 proc c_memcmp*(a, b: pointer, size: csize_t): cint {.
   importc: "memcmp", header: "<string.h>", noSideEffect.}
+
+proc getBool*(x: K): bool =
+  assert x.k.kind == KKind.kBool
+  x.k.bb
+
+proc getGUID*(x: K): UUID =
+  var twoInts64 = cast[ptr UncheckedArray[int64]](x.k.gg.g.addr)
+  var most: int64
+  var least: int64
+  bigEndian64(most.addr, twoInts64[0].addr)
+  bigEndian64(least.addr, twoInts64[1].addr)
+  initUUID(most, least)
 
 proc getByte*(x: K): byte =
   assert x.k.kind == KKind.kByte
@@ -36,6 +52,28 @@ proc getFloat64*(x: K): float64 =
 proc getFloat*(x: K): float =
   assert x.k.kind == KKind.kFloat
   x.k.ff
+
+proc getChar*(x: K): char =
+  assert x.k.kind == KKind.kChar
+  x.k.ch
+
+proc getStr*(x: K): string =
+  assert x.k.kind == KKind.kSym
+  result = newString(x.k.charLen)
+  if result.len > 0:
+    copyMem(result[0].addr, x.k.charArr.addr, x.k.charLen)
+
+proc getDateTime*(x: K): DateTime =
+  assert x.k.kind == KKind.kDateTime
+  let d = initDuration(milliseconds = int64(86400000*x.k.dt))
+  let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
+  dt
+
+proc getTime*(x: K): Time =
+  let seconds = (x.k.ts div 1000000000) + 10957*86400
+  let nanos = x.k.ts mod 1000000000
+  let t = initTime(seconds, nanos)
+  t
 
 template math1(op: untyped) =
   proc op*(a: K): K =

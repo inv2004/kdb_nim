@@ -77,13 +77,7 @@ proc fmtKVec(x: K): string =
   result.add "]"
 
 proc fmtKGUID(x: K): string =
-  var twoInts64 = cast[ptr UncheckedArray[int64]](x.k.gg.g.addr)
-  var most: int64
-  var least: int64
-  bigEndian64(most.addr, twoInts64[0].addr)
-  bigEndian64(least.addr, twoInts64[1].addr)
-  let u = initUUID(most, least)
-  $u
+  $x.getGUID()
 
 proc `$`*(x: K): string {.gcsafe.} =
   if isNil(x.k):
@@ -122,10 +116,7 @@ proc `$`*(x: K): string {.gcsafe.} =
   of kError:
     result.add $x.k.msg
   of kTimestamp:
-    let seconds = (x.k.ts div 1000000000) + 10957*86400
-    let nanos = x.k.ts mod 1000000000
-    let t = initTime(seconds, nanos)
-    result.add t.utc().format(timestampFormat)
+    result.add x.getTime().utc().format(timestampFormat)
   of kMonth:
     let d = initTimeInterval(months = x.k.mo)
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
@@ -135,9 +126,7 @@ proc `$`*(x: K): string {.gcsafe.} =
     let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
     result.add dt.format(dateFormat)
   of kDateTime:
-    let d = initDuration(milliseconds = int64(86400000*x.k.dt))
-    let dt = initDateTime(1, mJan, 2000, 0, 0, 0, utc()) + d
-    result.add dt.format(dateTimeFormat)
+    result.add $x.getDateTime()
   of kTimespan:
     let d = initTime(0, 0) + initDuration(nanoseconds = x.k.tp)
     let days = int(d.toUnixFloat() / (24*3600))
