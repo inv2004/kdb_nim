@@ -1,6 +1,10 @@
 import converters
 export converters
 
+# Imported to compare two vecChars effective
+proc c_memcmp*(a, b: pointer, size: csize_t): cint {.
+  importc: "memcmp", header: "<string.h>", noSideEffect.}
+
 proc getByte*(x: K): byte =
   assert x.k.kind == KKind.kByte
   x.k.by
@@ -123,11 +127,10 @@ proc `==`*(a: K0, b: K0): bool =
   of kTimestamp: a.ts == b.ts
   of kDateTime: a.dt == b.dt
   of kVecChar:
-    var vA = newString(a.charLen)
-    var vB = newString(b.charLen)
-    copyMem(vA[0].addr, a.charArr.addr, a.charLen)
-    copyMem(vB[0].addr, b.charArr.addr, b.charLen)
-    vA == vB
+    if a.charLen == b.charLen:
+      0 == c_memcmp(a.charArr.addr, b.charArr.addr, a.charLen.csize_t)
+    else:
+      false
   of kVecLong:
     var vA: seq[int64]
     vA.add toOpenArray(a.longArr.addr, 0, a.longLen.int - 1)
