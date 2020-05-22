@@ -297,4 +297,39 @@ test "mitems":
     x = ($x & $x)
   check d == %["aa", "bb", "cc"]  # TODO: check
 
+test "getters":
+  check toK(true).getBool() == true
+  let guid = genUUID()
+  check toK(guid).getGUID() == guid
+  check toK(10.int16).getInt16() == 10.int16
+  check toK(10.int32).getInt32() == 10.int32
+  check toK(10.int64).getInt() == 10.int64
+  check toK(10).getInt64() == 10
+  check toK(10.1.float32).getFloat32() == 10.1.float32
+  check toK(10.1.float64).getFloat64() == 10.1.float64
+  check toK(10.1).getFloat() == 10.1
+  check (s"test").getStr() == "test"
+  check toK("test").getStr() == "test"
+  let ts = getTime()
+  check toK(ts).getTime() == ts 
+  var dt = now().utc()
+  dt.nanosecond = 0
+  check toK(dt).getDateTime() == dt
+
+test "iterators_specialized":
+  let v = %[10, 20]
+  var i = 1
+  for x in v.items(int64):
+    check x == i * 10
+    inc(i)
+  for i, x in v.pairs(int64):
+    check x == (i+1) * 10
+
+  let sSym = ["aaa", "bbb"].toSymVec()
+  check toSeq(sSym.items(string)) == @["aaa", "bbb"]
+
+# test "getters_vec":
+#   check toK(%[true, false]).getVec[:bool] = [true, false]
+
+
 

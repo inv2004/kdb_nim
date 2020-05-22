@@ -12,6 +12,8 @@ import kdb
 
 import strutils
 import times
+import uuids
+import sequtils
 
 include basic
 

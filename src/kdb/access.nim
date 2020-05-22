@@ -26,7 +26,7 @@ proc getByte*(x: K): byte =
   x.k.by
 
 proc getInt16*(x: K): int16 =
-  assert x.k.kind == KKind.kInt
+  assert x.k.kind == KKind.kShort
   x.k.sh
 
 proc getInt32*(x: K): int64 =
@@ -58,10 +58,14 @@ proc getChar*(x: K): char =
   x.k.ch
 
 proc getStr*(x: K): string =
-  assert x.k.kind == KKind.kSym
-  result = newString(x.k.charLen)
-  if result.len > 0:
-    copyMem(result[0].addr, x.k.charArr.addr, x.k.charLen)
+  case x.k.kind
+  of KKind.kSym: result = $x.k.ss
+  of KKind.kVecChar:
+    result = newString(x.k.charLen)
+    if result.len > 0:
+      copyMem(result[0].addr, x.k.charArr.addr, x.k.charLen)
+  else:
+    raise newException(KError, "getStr() is not available for " & $x.k.kind)
 
 proc getDateTime*(x: K): DateTime =
   assert x.k.kind == KKind.kDateTime
@@ -197,3 +201,4 @@ proc `==`*(a: K0, b: K0): bool =
 
 proc `==`*(a, b: K): bool =
   a.k == b.k
+

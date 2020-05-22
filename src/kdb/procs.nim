@@ -108,6 +108,28 @@ iterator items*(x: K): K =
       inc(i)
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
+iterator items*[T](x: K, _: typedesc[T]): T =
+  when T is int64:
+    assert x.k.kind == KKind.kVecLong
+    var i = 0
+    while i < x.k.longLen:
+      yield x.k.longArr[i]
+      inc(i)
+  elif T is cstring:
+    assert x.k.kind == KKind.kVecSym
+    var i = 0
+    while i < x.k.stringLen:
+      yield x.k.stringArr[i]
+      inc(i)
+  elif T is string:
+    assert x.k.kind == KKind.kVecSym
+    var i = 0
+    while i < x.k.stringLen:
+      yield $x.k.stringArr[i]
+      inc(i)
+  else:
+    raise newException(KError, "items[T] is not supported for " & $x.k.kind)
+
 iterator mitems*[T](x: var K): var T =
   when T is int64:
     assert x.k.kind == KKind.kVecLong
@@ -143,6 +165,12 @@ iterator pairs*(x: K): (K, K) =
     for v in x:
       yield (i.toK(), v)
       inc(i)
+
+iterator pairs*[T](x: K, _: typedesc[T]): (int, T) =
+  var i = 0
+  for v in x.items(T):
+    yield (i, v)
+    inc(i)
 
 # iterator mitems*(x: K0): var K0 =
   # case x.kind

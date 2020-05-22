@@ -102,8 +102,7 @@ converter toK*(x: bool): K =
 converter toK*(x: GUID): K =
   K(k: ku(x))
 
-proc toGUID*(x: string): K =
-  let uuid = parseUUID(x)
+converter toK*(uuid: UUID): K =
   let src1 = uuid.mostSigBits
   let src2 = uuid.leastSigBits
   var dst1: int64
@@ -113,6 +112,10 @@ proc toGUID*(x: string): K =
 
   let guid = cast[GUID]((dst1, dst2))
   K(k: ku(guid))
+
+proc toGUID*(x: string): K =
+  let uuid = parseUUID(x)
+  toK(uuid)
 
 converter toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)
@@ -128,6 +131,9 @@ proc toMillis*(x: DateTime): float64 =
 
 converter toKTimestamp*(x: Time): K =
   toKTimestamp(x.toNanos())
+
+converter toK*(x: Time): K =
+  toKTimestamp(x)
 
 converter toK*(x: DateTime): K =
   toKDateTime(x.toMillis())
