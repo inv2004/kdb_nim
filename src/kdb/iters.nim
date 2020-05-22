@@ -1,4 +1,12 @@
 
+proc get*[T](x: K0, i: int): T =
+  when T is K: x.kArr[i]
+  elif T is int64: x.longArr[i]
+  elif T is float64: x.floatArr[i]
+  elif T is cstring: x.stringArr[i]
+  elif T is string: $x.stringArr[i]
+  else: raise newException(KError, "`[]` is not supported for " & $x.kind)
+
 iterator items*(x: K0): K0 =
   case x.kind
   of kList:
@@ -48,8 +56,8 @@ iterator items*(x: K): K =
       inc(i)
   of kVecInt:
     var i = 0
-    while i < x.k.intLen:
-      yield x.k.intArr[i].toK()
+    while i < x.k.len:
+      yield x.k.get[:int64](i).toK()
       inc(i)
   of kVecLong:
     var i = 0
@@ -69,26 +77,8 @@ iterator items*(x: K): K =
   else: raise newException(KError, "items is not supported for " & $x.k.kind)
 
 iterator items*[T](x: K, _: typedesc[T]): T =
-  when T is int64:
-    assert x.k.kind == KKind.kVecLong
-    var i = 0
-    while i < x.k.longLen:
-      yield x.k.longArr[i]
-      inc(i)
-  elif T is cstring:
-    assert x.k.kind == KKind.kVecSym
-    var i = 0
-    while i < x.k.stringLen:
-      yield x.k.stringArr[i]
-      inc(i)
-  elif T is string:
-    assert x.k.kind == KKind.kVecSym
-    var i = 0
-    while i < x.k.stringLen:
-      yield $x.k.stringArr[i]
-      inc(i)
-  else:
-    raise newException(KError, "items[T] is not supported for " & $x.k.kind)
+  for i in 0..<x.len:
+    yield x.k.get[:T](i)
 
 iterator mitems*[T](x: var K): var T =
   when T is int64:
