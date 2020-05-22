@@ -13,7 +13,7 @@ test "test_ipc_sync":
     let client = waitOnPort(9999)
     let d = kdb.read(client)
     check isCall(d)
-    check d[1].kind == KKind.kVecLong
+    check d[0] == "test"
     var t = d[1]
     for x in t.mitems[:int64]:
       x *= 2

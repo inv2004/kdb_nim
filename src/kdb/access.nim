@@ -122,7 +122,12 @@ proc `==`*(a: K0, b: K0): bool =
   of kSym: a.ss == b.ss
   of kTimestamp: a.ts == b.ts
   of kDateTime: a.dt == b.dt
-  of kVecChar: cast[cstring](a.charArr) == cast[cstring](b.charArr)  # TODO not sure
+  of kVecChar:
+    var vA = newString(a.charLen)
+    var vB = newString(b.charLen)
+    copyMem(vA[0].addr, a.charArr.addr, a.charLen)
+    copyMem(vB[0].addr, b.charArr.addr, b.charLen)
+    vA == vB
   of kVecLong:
     var vA: seq[int64]
     vA.add toOpenArray(a.longArr.addr, 0, a.longLen.int - 1)
