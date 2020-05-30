@@ -1,10 +1,6 @@
 name: Tests
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 jobs:
   tests:
@@ -13,7 +9,7 @@ jobs:
       matrix:
         nim: [ '1.2.0', 'stable' ]
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ matrix.nim }}
