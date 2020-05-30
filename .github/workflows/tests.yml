@@ -15,4 +15,4 @@ jobs:
         with:
           nim-version: '1.2.0'
       # - run: nimble build -Y
-      - run: nimble test
+      - run: nimble test -y
