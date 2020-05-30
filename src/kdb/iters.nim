@@ -26,8 +26,7 @@ iterator items*(x: K): K =
   of kList:
     var i = 0
     while i < x.k.kLen:
-      let v = x.k.kArr[i]  #TODO: not sure
-      yield v
+      yield x.k.kArr[i]  #TODO: not sure
       inc(i)
   of kTable:
     var i = 0
