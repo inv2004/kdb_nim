@@ -14,54 +14,19 @@ proc get*[T](x: K, i: int): T =
   else: raise newException(KError, "get is not supported for " & $x.kind)
 
 proc getM*[T](x: K0, i: int): var T =
-  when T is K: x.kArr[i]
+  when T is K0: x.kArr[i]
   elif T is int64: x.longArr[i]
   elif T is float64: x.floatArr[i]
   elif T is cstring: x.stringArr[i]
   elif T is string: $x.stringArr[i]
   else: raise newException(KError, "getM is not supported for " & $x.kind)
 
-# TODO: remove after format leaking check
-iterator items*(x: K0): K0 =
-  case x.kind
-  of kList:
-    var i = 0
-    while i < x.kLen:
-      yield x.kArr[i]
-      inc(i)
-  of kVecBool:
-    var i = 0
-    while i < x.boolLen:
-      yield x.boolArr[i].toK().k
-      inc(i)
-  of kVecInt:
-    var i = 0
-    while i < x.intLen:
-      yield x.intArr[i].toK().k
-      inc(i)
-  of kVecLong:
-    var i = 0
-    while i < x.longLen:
-      yield x.longArr[i].toK().k
-      inc(i)
-  of kVecSym:
-    var i = 0
-    while i < x.stringLen:
-      yield x.stringArr[i].toSym().k
-      inc(i)
-  of kTable:
-    var i = 0
-    while i < x.dict.len:
-      yield x.stringArr[i].toSym().k
-      inc(i)
-  else: raise newException(KError, "items is not supported for " & $x.kind)
-
 iterator items*(x: K): K =
   case x.k.kind
   of kList:
     var i = 0
     while i < x.k.kLen:
-      let v = r1(x.k.kArr[i])  #TODO: not sure
+      let v = x.k.kArr[i]  #TODO: not sure
       yield v
       inc(i)
   of kTable:
@@ -86,7 +51,7 @@ iterator pairs*(x: K): (K, K) =
   of KKind.kDict:
     var i = 0
     for k in x.k.keys:
-      yield (k.toK(), x.k.values[i])
+      yield (k, x.k.values[i])
       inc(i)
   else:
     var i = 0

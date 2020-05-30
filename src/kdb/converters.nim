@@ -172,7 +172,7 @@ converter toK*[T](v: openArray[T]): K =
     raise newException(KError, "openArray converter is not supported for " & $T)
 
 converter toK*(x: K0): K =
-  K(k: x)
+  K(k: r1(x))
 
 template `%`*(x: untyped): K =
   toK(x)

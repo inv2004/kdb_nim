@@ -179,7 +179,7 @@ proc addColumn*[T](t: var K, name: string, col: K) =
     if t.len != col.len:
       raise newException(KError, "column.len is not equal to table.len")
     t.k.dict.keys.add(name.cstring)
-    t.k.dict.values.add(r1(col.k))
+    t.k.dict.values.add(col.k)
 
 proc addColumn*[T](t: var K, name: string) =
   if isNil(t.k):
@@ -193,7 +193,7 @@ proc addColumn*[T](t: var K, name: string) =
   else:
     t.k.dict.keys.add(name.cstring)
     var c1 = newKVec[T]()
-    t.k.dict.values.add(r1(c1.k))
+    t.k.dict.values.add(c1.k)
 
 # proc addRow*(t: var K, vals: openArray[K]) =
 #   assert t.k != nil
@@ -245,7 +245,7 @@ proc `[]`*(x: K0, i: int64): K {.gcsafe.} =
   of kVecSecond: x.secondArr[i].toKSecond()
   of kVecTime: x.timeArr[i].toKTime()
   of kDict: dictLookup(x, i.toK())
-  of kList: r1(x.kArr[i])
+  of kList: x.kArr[i].toK()
   else: raise newException(KError, "`[]` is not supported for " & $x.kind)
 
 proc `[]`*(x: K, i: int64): K =

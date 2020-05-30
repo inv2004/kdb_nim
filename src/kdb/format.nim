@@ -27,7 +27,7 @@ proc fmtKList(x: K): string =
   for i in 0..<x.k.kLen:
     if i > 0:
       result.add "; "
-    result.add $r1(x.k.kArr[i])
+    result.add $x.k.kArr[i]
   result.add ")"
 
 proc flatTable*(x: K): string =
