@@ -17,6 +17,6 @@ import sequtils
 
 include basic
 
-include mem
+# include mem
 
 include remote
