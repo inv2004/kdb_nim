@@ -41,10 +41,10 @@ proc flatTable*(x: K): string =
 
 proc fmtKTable(x: K): string {.gcsafe.} =
   # let uS = deepCopy(unicodeStyle)
-  let localUnicodeStyle = Style(rowSeparator:"─", colSeparator:"│", cellEdgeLeft:"├", cellEdgeRight:"┤", topLeft:"┌", topRight:"┐", bottomLeft:"└", bottomRight:"┘", topRowSeparator:"┬", bottomRowSeparator:"┴", dashLineLeft:"├", dashLineRight:"┤", dashLineColSeparatorLastRow:"┴", dashLineColSeparatorTopRow:"┬", dashLineColSeparator:"┼")
+  # let localUnicodeStyle = Style(rowSeparator:"─", colSeparator:"│", cellEdgeLeft:"├", cellEdgeRight:"┤", topLeft:"┌", topRight:"┐", bottomLeft:"└", bottomRight:"┘", topRowSeparator:"┬", bottomRowSeparator:"┴", dashLineLeft:"├", dashLineRight:"┤", dashLineColSeparatorLastRow:"┴", dashLineColSeparatorTopRow:"┬", dashLineColSeparator:"┼")
   ### ^ to make it gcsafe for threads
 
-  let t = newTerminalTable(localUnicodeStyle)
+  let t = newTerminalTable()
   t.separateRows = false
   var header: seq[string] = @[]
   for x in x.k.dict.keys: # TODO: strange r1
