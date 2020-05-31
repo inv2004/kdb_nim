@@ -2,7 +2,7 @@
 proc get*[T](x: K, i: int): T =
   when T is K:
     case x.kind
-    of kList: K(k: x.k.kArr[i])
+    of kList: x.k.kArr[i].toK()
     of kVecInt: x.k.intArr[i].toK()
     of kVecLong: x.k.longArr[i].toK()
     of kVecSym: x.k.stringArr[i].toSym()
@@ -23,16 +23,12 @@ proc getM*[T](x: K0, i: int): var T =
 
 iterator items*(x: K): K =
   case x.k.kind
-  of kList:
-    var i = 0
-    while i < x.k.kLen:
-      yield x.k.kArr[i]  #TODO: not sure
-      inc(i)
+  of kDict:
+    for i in 0..<x.k.len:
+      yield x.k.keys[i]
   of kTable:
-    var i = 0
-    while i < x.k.dict.keys.len:
+    for i in 0..<x.k.dict.keys.len:
       yield x.k.dict.keys.stringArr[i].toSym()
-      inc(i)
   else:
     for i in 0..<x.len:
       yield x.get[:K](i)
