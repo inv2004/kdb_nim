@@ -50,6 +50,7 @@ proc fmtKTable(x: K): string {.gcsafe.} =
   for i in 0..<x.k.dict.values.kArr[0].len:
     var row: seq[string] = @[]
     for c in x.k.dict.values:
+      echo c[i].repr
       row.add $c[i]
     t.addRow(row)
 

@@ -37,6 +37,14 @@ macro fields(t: typedesc): untyped =
   result = quote do:
     `fields`
 
-proc newTTable*[T](): TTable[T] =
-  let kTable = newKTable(fields(T))
-  result = TTable[T](inner: kTable)
+proc newTTable*(T: typedesc): TTable[T] =
+  let fields = fields(T)
+  echo "newTTable: ", fields
+  let kTable = newKTable(fields)
+  TTable[T](inner: kTable)
+
+proc add*[T](t: var TTable[T], x: T) =
+  var vals = newSeq[K]()
+  for k, v in x.fieldPairs():
+    vals.add v.toK()
+  t.inner.addRow(vals)
