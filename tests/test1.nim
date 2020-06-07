@@ -18,6 +18,6 @@ import sequtils
 include basic
 include extended
 
-include mem
+# include mem
 
 include remote
