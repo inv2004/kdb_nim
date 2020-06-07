@@ -79,6 +79,9 @@ proc add*(x: var K0, v: int64) =
   else:
     add(x, v.toK())
 
+proc add*(x: var K, v: int64) =
+  add(x.k, v)
+
 proc add*(x: var K, v: int) =
   add(x.k, v.int64)
 

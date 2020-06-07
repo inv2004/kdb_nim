@@ -14,3 +14,11 @@ proc add*[T](v: var TVec[T], x: T) =
 iterator items*[T](v: TVec[T]): T =
   for x in v.inner.items(T):
     yield x
+
+iterator mitems*[T](v: var TVec[T]): var T =
+  for i in 0..<v.inner.len:
+    yield v.inner.k.getM[:T](i)
+
+iterator pairs*[T](v: TVec[T]): (int, T) =
+  for i, x in v.inner.pairs(T):
+    yield (i, x)

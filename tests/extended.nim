@@ -16,10 +16,10 @@ proc k*(t: TTable[T1]): TVec[int64] =
   TVec[int64](inner: t.inner.k.dict.values[0])
 
 test "vec":
-  var t = newTVec[int]()
+  var t = newTVec[int64]()
   t.add(10)
   t.add(20)
-  echo t
+  check toSeq(t) == @[10.int64, 20]
 
 test "table":
   var t = newTTable(T1)
@@ -29,10 +29,14 @@ test "table":
   check t.len == 2
   check compiles(t.add(T1(k: 11, v: "oneone"))) == true
   check compiles(t.add(T2(k: 10, v: 20))) == false
-  for x in t.k:
-    echo x
+  for i, x in t.k:
+    echo i, ": ", x
   echo t.k.mapIt(it + 10)
   check compiles(t.k.mapIt(it + "abc")) == false
+  var k = t.k
+  for x in k.mitems():
+    x += 100
+  echo t
   # echo t.v
   # echo "T1: ", t.inner["k"]
   # echo "T2: ", t.inner["v"]
