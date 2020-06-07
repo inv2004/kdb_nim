@@ -32,6 +32,7 @@ test "table":
   for x in t.k:
     echo x
   echo t.k.mapIt(it + 10)
+  check compiles(t.k.mapIt(it + "abc")) == false
   # echo t.v
   # echo "T1: ", t.inner["k"]
   # echo "T2: ", t.inner["v"]
