@@ -25,35 +25,35 @@ proc typeToKVecKind*[T](): KKind =
   elif T is typeof(nil): KKind.kList
   else: raise newException(KError, "cannot convert type " & $T)
 
-converter toK*(x: type(nil)): K =
+proc toK*(x: type(nil)): K =
   result = K(k: ka(101))
   result.k.idg = 0
 
-converter toK*(x: cstring): K =
+proc toK*(x: cstring): K =
   K(k: kpn(x, x.len))
 
-converter toK*(x: string): K =
+proc toK*(x: string): K =
   K(k: kpn(x.cstring, x.len))
 
-converter toK*(x: int16): K=
+proc toK*(x: int16): K=
   K(k: kh(x))
 
-converter toK*(x: int32): K=
+proc toK*(x: int32): K=
   K(k: ki(x))
 
-converter toK*(x: int): K =
+proc toK*(x: int): K =
   K(k: kj(x))
 
-converter toK*(x: int64): K =
+proc toK*(x: int64): K =
   K(k: kj(x))
 
-converter toK*(x: float32): K =
+proc toK*(x: float32): K =
   K(k: ke(x))
 
-converter toK*(x: float64): K =
+proc toK*(x: float64): K =
   K(k: kf(x))
 
-converter toK*(x: char): K =
+proc toK*(x: char): K =
   K(k: kc(x))
 
 proc toSym*(x: cstring): K =
@@ -69,7 +69,7 @@ proc toError*(x: string): K =
   let k0 = kerr(x.cstring)
   K(k: k0)
 
-converter toKMonth*(x: int32): K =
+proc toKMonth*(x: int32): K =
   K(k: km(x))
 
 proc toKMinute*(x: int32): K =
@@ -93,16 +93,16 @@ proc toKTimespan*(x: int64): K =
 proc toKTime*(x: int32): K =
   K(k: kt(x))
 
-converter toK*(x: byte): K =
+proc toK*(x: byte): K =
   K(k: kg(x.int32))
 
-converter toK*(x: bool): K =
+proc toK*(x: bool): K =
   K(k: kb(x))
 
-converter toK*(x: GUID): K =
+proc toK*(x: GUID): K =
   K(k: ku(x))
 
-converter toK*(uuid: UUID): K =
+proc toK*(uuid: UUID): K =
   let src1 = uuid.mostSigBits
   let src2 = uuid.leastSigBits
   var dst1: int64
@@ -117,7 +117,7 @@ proc toGUID*(x: string): K =
   let uuid = parseUUID(x)
   toK(uuid)
 
-converter toK*(x: array[16, byte]): K =
+proc toK*(x: array[16, byte]): K =
   let guid = GUID(g: x)
   toK(guid)
 
@@ -129,13 +129,13 @@ proc toMillis*(x: DateTime): float64 =
   let d = x - initDateTime(1, mJan, 2000, 0, 0, 0, utc())
   d.inMilliseconds().float64 / 86400000
 
-converter toKTimestamp*(x: Time): K =
+proc toKTimestamp*(x: Time): K =
   toKTimestamp(x.toNanos())
 
-converter toK*(x: Time): K =
+proc toK*(x: Time): K =
   toKTimestamp(x)
 
-converter toK*(x: DateTime): K =
+proc toK*(x: DateTime): K =
   toKDateTime(x.toMillis())
 
 proc toSymVec*(columns: openArray[string]): K =
@@ -144,7 +144,7 @@ proc toSymVec*(columns: openArray[string]): K =
     k0.stringArr[i] = ss(x.cstring)
   result = K(k: k0)
 
-converter toK*[T](v: openArray[T]): K =
+proc toK*[T](v: openArray[T]): K =
   when T is DateTime:
     result = K(k: ktn(typeToKVecKind[T]().int, v.len))
     for i, x in v:
@@ -158,7 +158,7 @@ converter toK*[T](v: openArray[T]): K =
     of kVecFloat:
       for i, x in v:
         result.k.floatArr[i] = x.float64
-    else: raise newException(KError, "openArray converter is not supported for " & $result.kind)
+    else: raise newException(KError, "openArray proc is not supported for " & $result.kind)
   elif T is string:
     result = K(k: ktn(typeToKVecKind[T]().int, v.len))
     for i, x in v:
@@ -169,15 +169,15 @@ converter toK*[T](v: openArray[T]): K =
     for i, x in v:
       result.k.kArr[i] = r1(x.k)
   else:
-    raise newException(KError, "openArray converter is not supported for " & $T)
+    raise newException(KError, "openArray proc is not supported for " & $T)
 
-converter toK*(x: K0): K =
+proc toK*(x: K0): K =
   K(k: r1(x))
 
 template `%`*(x: untyped): K =
   toK(x)
 
-# converter fromK(x: K): int =
+# proc fromK(x: K): int =
   # assert x.k.kind == KKind.kLong
   # x.k.jj.int
   

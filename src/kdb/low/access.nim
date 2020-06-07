@@ -82,11 +82,11 @@ proc getTime*(x: K): Time =
 template math1(op: untyped) =
   proc op*(a: K): K =
     case a.k.kind
-    of kByte: op(a.k.by)  # TODO: WHY ?
+    # of kByte: op(a.k.by)  # TODO: WHY ?
     of kShort: toK(op(a.k.sh))
     of kInt: toK(op(a.k.ii))
     of kLong: toK(op(a.k.jj))
-    of kReal: op(a.k.rr)  # TODO: WHY ?
+    of kReal: toK(op(a.k.rr))  # TODO: WHY ?
     of kFloat: toK(op(a.k.ff))
     else: raise newException(KError, "OP is not supported for " & $a.k.kind)
 

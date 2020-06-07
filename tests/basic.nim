@@ -31,8 +31,8 @@ test "vectors":
     check true
   v.add(10)
   v.add(20)
-  check v[0] == 10
-  check v[1] == 20
+  check v[0] == %10
+  check v[1] == %20
   check v.len == 2
 
 test "simple_lists":
@@ -40,8 +40,8 @@ test "simple_lists":
   l.add(false)
   l.add(10)
   check l.len == 2
-  check l[0] == false
-  check l[1] == 10
+  check l[0] == %false
+  check l[1] == %10
 
 test "list_of_vecs":
   var v1 = newKVec[bool]()
@@ -59,9 +59,9 @@ test "list_of_vecs":
 
 test "dicts_simple":
   var d = newKDict[int, string]()
-  d[1] = "one"
-  d[10] = "ten"
-  check d[10] == "ten"
+  d[1] = %"one"
+  d[10] = %"ten"
+  check d[10] == %"ten"
   try:
     discard d[11]
     check false
@@ -72,7 +72,7 @@ test "dicts_simple":
 
   var dd = newKDict[int, Ksym]()
   try:
-    dd[1] = "one"
+    dd[1] = %"one"
     check false
   except:
     check true
@@ -81,8 +81,8 @@ test "dicts_simple":
   check $dd == "{2: two; 10: ten}"
 
   var ddd = newKDict[int, nil]()
-  ddd[1] = 111
-  ddd[10] = "ten"
+  ddd[1] = %111
+  ddd[10] = %"ten"
   check $ddd == """{1: 111; 10: "ten"}"""
 
 test "dict_of_dict":
@@ -91,9 +91,9 @@ test "dict_of_dict":
   d1[1] = s"one"
   d1[2] = s"two"
   var d2 = newKDict[int, string]()
-  d2[11] = "eleven"
-  d[d1] = "11"
-  d[d2] = "22"
+  d2[11] = %"eleven"
+  d[d1] = %"11"
+  d[d2] = %"22"
   check $d == """{{1: one; 2: two}: "11"; {11: "eleven"}: "22"}"""
 
 test "tables_simple":
@@ -102,9 +102,9 @@ test "tables_simple":
   t.addColumn[:int]("aaa")
   t.addColumn[:string]("bbb")
   check t.len == 0
-  t.addRow(3, "30")
-  t.addRow(4, "40")
-  t.addRow(5, "50")
+  t.addRow(%3, %"30")
+  t.addRow(%4, %"40")
+  t.addRow(%5, %"50")
   check t.len == 3
   check t.flatTable() == """|aaa: [3, 4, 5], bbb: ("30"; "40"; "50")|"""
 
@@ -112,10 +112,10 @@ test "tables_simple":
   tt.addColumn[:GUID]("id")
   tt.addColumn[:KSym]("nick")
   tt.addColumn[:string]("name")
-  tt.addRow("0a000000-0000-0000-0000-000000000001".toGUID(), s"nick1", "name1")
-  tt.addRow("0a000000-0000-0000-0000-000000000002".toGUID(), s"nick2", "name2")
-  tt.addRow("0a000000-0000-0000-0000-000000000003".toGUID(), s"nick3", "name3")
-  tt.addRow("0a000000-0000-0000-0000-000000000004".toGUID(), s"nick4", "name4")
+  tt.addRow("0a000000-0000-0000-0000-000000000001".toGUID(), s"nick1", %"name1")
+  tt.addRow("0a000000-0000-0000-0000-000000000002".toGUID(), s"nick2", %"name2")
+  tt.addRow("0a000000-0000-0000-0000-000000000003".toGUID(), s"nick3", %"name3")
+  tt.addRow("0a000000-0000-0000-0000-000000000004".toGUID(), s"nick4", %"name4")
   let tStr = tt.flatTable()
   check tStr.startsWith "|id: [0a000000-0000-0000-0000-000000000001, 0a000000-"
   check tStr.contains "nick: [nick1, nick2, nick3, nick4]"
@@ -156,28 +156,28 @@ test "iterators":
 test "times":
   var v = newKVec[KTimestamp]()
   let ts = getTime()
-  v.add(ts)
-  v.add(ts)
+  v.add(%ts)
+  v.add(%ts)
   check v.len == 2
   check v[0].kind == KKind.kTimestamp
-  check v[0] == ts
-  check v[1] == ts
+  check v[0] == %ts
+  check v[1] == %ts
 
   var vv = newKVec[KDateTime]()
   let dt = now().utc()
-  vv.add(dt)
-  vv.add(dt)
+  vv.add(%dt)
+  vv.add(%dt)
   check vv[0].kind == KKind.kDateTime
-  check vv[0] == dt
-  check vv[1] == dt
+  check vv[0] == %dt
+  check vv[1] == %dt
 
 test "amend":
   var v = newKVec[float]()
   v.add(10.1)
   v.add(11.2)
   v.add(12.3)
-  v[0] = 110.1
-  v[2] = 112.3
+  v[0] = %110.1
+  v[2] = %112.3
   check $v == "[110.1, 11.2, 112.3]"
 
 test "seq":
@@ -204,7 +204,7 @@ test "tables_from":
   check tNil.len == 3
 
   var t = newKTable({"aaa": KKind.kLong, "bbb": KKind.kList})
-  t.addRow(1,
+  t.addRow(%1,
     %[
       %[1,2,3],
       %[4,5,6]
@@ -236,8 +236,8 @@ test "tables_idx":
   except:
     check true
 
-  check t["aaa"][0] == 1
-  check t["bbb"][2] == "ccc"
+  check t["aaa"][0] == %1
+  check t["bbb"][2] == %"ccc"
   check t["ccc"][1] == s"bbb"
 
 import tables
@@ -260,21 +260,21 @@ test "table_cols":
 
 test "basic_math":
   let a = %10
-  let b = a + 2
-  check b < 14
-  check b <= 14
-  check b > 10
-  check b >= 10
-  check b == 12
-  let c = b*2
-  check c == 24
-  check -c == -24
+  let b = a + %2
+  check b < %14
+  check b <= %14
+  check b > %10
+  check b >= %10
+  check b == %12
+  let c = b * %2
+  check c == %24
+  check -c == % -24
   var f = %2.5
-  check (f*(%2.0)) == 5.0
-  f += 10.0
-  check f == 12.5
-  f *= 2.0
-  check f == 25.0
+  check (f*(%2.0)) == %5.0
+  f += %10.0
+  check f == %12.5
+  f *= %2.0
+  check f == %25.0
 
 test "mitems":
   var a = %[10, 20, 30]

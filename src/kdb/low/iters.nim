@@ -35,7 +35,7 @@ iterator items*(x: K): K =
 
 iterator items*[T](x: K, _: typedesc[T]): T =
   for i in 0..<x.len:
-    yield x.k.get[:T](i)
+    yield x.get[:T](i)
 
 iterator mitems*[T](x: var K): var T =
   for i in 0..<x.len:
@@ -45,7 +45,7 @@ iterator pairs*(x: K): (K, K) =
   case x.k.kind
   of KKind.kDict:
     var i = 0
-    for k in x.k.keys:
+    for k in toK(x.k.keys):
       yield (k, x.k.values[i])
       inc(i)
   else:

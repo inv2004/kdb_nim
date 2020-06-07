@@ -4,21 +4,21 @@ test "testMem":
     var t = newKTable()
     t.addColumn[:int64]("aaa")
     t.addColumn[:nil]("bbb")
-    t.addRow(3, "30")
-    t.addRow(4, "40")
-    t.addRow(5, "50")
+    t.addRow(%3, %"30")
+    t.addRow(%4, %"40")
+    t.addRow(%5, %"50")
     echo t
-    var i = toK(1122)
+    var i = %1122
     var d = newKDict[int, nil]()
-    d[1] = "one"
-    d[2] = "two"
+    d[1] = %"one"
+    d[2] = %"two"
     echo d
     var dd = newKDict[int, int64]()
-    dd[1] = 11
-    dd[2] = 22
+    dd[1] = %11
+    dd[2] = %22
     echo dd
     var l = newKList()
-    l.add("aa".cstring)
+    l.add(%"aa".cstring)
     echo l
     var v1 = newKVec[int]()
     v1.add(10)
@@ -33,7 +33,7 @@ test "testMem":
     var vv = newKList()
     vv.add(v1)
     vv.add(v2)
-    for x in vv.k:
+    for x in vv:
       for y in x:
         echo y
     echo vv

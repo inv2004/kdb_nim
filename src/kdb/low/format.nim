@@ -27,7 +27,7 @@ proc fmtKList(x: K): string =
   for i in 0..<x.k.kLen:
     if i > 0:
       result.add "; "
-    result.add $x.k.kArr[i]
+    result.add $toK(x.k.kArr[i])
   result.add ")"
 
 proc flatTable*(x: K): string =
@@ -43,14 +43,13 @@ proc fmtKTable(x: K): string {.gcsafe.} =
   let t = newUnicodeTable()
   t.separateRows = false
   var header: seq[string] = @[]
-  for x in x.k.dict.keys: # TODO: strange r1
+  for x in toK(x.k.dict.keys): # TODO: strange r1
     header.add $x  # to remove quoted names
   t.setHeaders(header)
 
   for i in 0..<x.k.dict.values.kArr[0].len:
     var row: seq[string] = @[]
-    for c in x.k.dict.values:
-      echo c[i].repr
+    for c in toK(x.k.dict.values):
       row.add $c[i]
     t.addRow(row)
 

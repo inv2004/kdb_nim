@@ -1,5 +1,6 @@
 
 import kdb
+import kdb/high/vec
 import macros
 
 type
@@ -37,14 +38,45 @@ macro fields(t: typedesc): untyped =
   result = quote do:
     `fields`
 
+# macro getter(t: typedesc): untyped =
+#   result = quote do:
+#     proc k(): int =
+#       10
+
+# proc `k`*(t: TTable[T1]): seq[int] =
+  # t.inner.k.dict.values[0].k.longArr
+
 proc newTTable*(T: typedesc): TTable[T] =
   let fields = fields(T)
   echo "newTTable: ", fields
   let kTable = newKTable(fields)
   TTable[T](inner: kTable)
 
+proc len*(t: TTable): int =
+  t.inner.len
+
 proc add*[T](t: var TTable[T], x: T) =
   var vals = newSeq[K]()
-  for k, v in x.fieldPairs():
-    vals.add v.toK()
+  for kk, v in x.fieldPairs():
+    let vv = v.toK()
+    discard r1(vv.k)  # TODO: r1 fix
+    vals.add(vv)
   t.inner.addRow(vals)
+
+# macro mkTable*(T: typedesc): untyped =
+  # var result = newStmtList()
+  # for name in ["k"]:
+    # let f = quote do:
+      # proc k(t: TTable[T1]): int =
+
+    # echo f.treeRepr
+    # result.add(f)
+  # f = quote do:
+    # proc k*(t: TTable[T1]): int =
+      # 10
+    # proc v*(t: TTable[T1]): string =
+      # "10"
+
+# dumpTree:
+
+

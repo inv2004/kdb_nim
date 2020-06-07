@@ -135,6 +135,9 @@ proc add*(x: var K0, v: K) =
     of kSym: add(x, v.k.ss)
     # of kVecChar: add(x, cast[cstring](v.k.charArr)) # TODO: not sure
     else: raise newException(KError, "add[KVecSym] cannot add " & $v.k.kind)
+  of kVecDateTime:
+    assert v.k.kind == KKind.kDateTime
+    add(x, v.k.dt)
   of kVecTimestamp:
     assert v.k.kind == KKind.kTimestamp
     add(x, v.k.ts)
@@ -179,7 +182,7 @@ proc addColumn*[T](t: var K, name: string, col: K) =
     if t.len != col.len:
       raise newException(KError, "column.len is not equal to table.len")
     t.k.dict.keys.add(name.cstring)
-    t.k.dict.values.add(col.k)
+    t.k.dict.values.add(%col.k)
 
 proc addColumn*[T](t: var K, name: string) =
   if isNil(t.k):
@@ -193,7 +196,7 @@ proc addColumn*[T](t: var K, name: string) =
   else:
     t.k.dict.keys.add(name.cstring)
     var c1 = newKVec[T]()
-    t.k.dict.values.add(c1.k)
+    t.k.dict.values.add(%c1.k)
 
 # proc addRow*(t: var K, vals: openArray[K]) =
 #   assert t.k != nil
@@ -298,7 +301,7 @@ proc columns*(x: K): seq[string] =
 
 proc dictLookup(d: K0, k: K): K {.gcsafe.} =
   var i = 0
-  for x in d.keys:
+  for x in toK(d.keys):
     if x == k:
       return d.values[i]
     inc(i)
