@@ -11,7 +11,7 @@ import os
 test "test_ipc_sync":
   proc server() {.gcsafe.} =
     let client = waitOnPort(9999)
-    let d = kdb.read(client)
+    let d = low.read(client)
     check isCall(d)
     check d[0] == %"test"
     var t = d[1]
@@ -34,7 +34,7 @@ test "test_ipc_sync":
 test "test_ipc_async":
   proc server() {.gcsafe.} =
     let client = waitOnPort(9998)
-    var t = kdb.read(client)
+    var t = low.read(client)
     for x in t.mitems[:int64]:
       x *= 2
     client.sendASync(t)

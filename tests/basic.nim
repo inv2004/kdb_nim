@@ -1,3 +1,5 @@
+import kdb/low
+
 test "simple_atoms":
   check (%true).kind == KKind.kBool
   check (%10.byte).kind == KKind.kByte

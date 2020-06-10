@@ -8,7 +8,6 @@
 {.passC: "-Isrc".}
 
 import unittest
-import kdb
 
 import strutils
 import times

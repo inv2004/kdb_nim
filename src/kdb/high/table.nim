@@ -1,5 +1,5 @@
 
-import kdb
+import kdb/low
 import kdb/high/vec
 import macros
 

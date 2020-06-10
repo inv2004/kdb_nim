@@ -1,11 +1,11 @@
-import kdb
+import kdb/low
 
 type
   TVec*[T] = object
     inner*: K
 
-proc newTVec*[T](): TVec[T] =
-  let kVec = newKVec[T]()
+proc newKVec*[T](): TVec[T] =
+  let kVec = low.newKVec[T]()
   TVec[T](inner: kVec)
 
 proc add*[T](v: var TVec[T], x: T) =

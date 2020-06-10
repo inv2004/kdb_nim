@@ -20,17 +20,17 @@ test "testMem":
     var l = newKList()
     l.add(%"aa".cstring)
     echo l
-    var v1 = newKVec[int]()
+    var v1 = low.newKVec[int]()
     v1.add(10)
     v1.add(20)
-    var v2 = newKVec[KSym]()
+    var v2 = low.newKVec[KSym]()
     v2.add("100")
     v2.add("200")
-    var v3 = newKVec[nil]()
+    var v3 = low.newKVec[nil]()
     v3.add("100")
     v3.add("200")
     echo v3
-    var vv = newKList()
+    var vv = low.newKList()
     vv.add(v1)
     vv.add(v2)
     for x in vv:
