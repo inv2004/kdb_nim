@@ -39,8 +39,6 @@ proc len*(x: K0): int64 =
 proc len*(x: K): int =
   len(x.k).int
 
-proc `[]`*(x: K0, i: int64): K {.gcsafe.}
-
 proc add*(x: var K0, v: K)
 
 proc add*(x: var K0, v: bool) =
@@ -228,35 +226,7 @@ proc newKTable*(): K =
 
 proc dictLookup(d: K0, k: K): K {.gcsafe.}
 
-proc `[]`*(x: K0, i: int64): K {.gcsafe.} =
-  if x.kind != KKind.kDict:
-    if i >= x.len:
-      raise newException(KError, "index 10 not in 0 .. " & $(x.len - 1))
-  case x.kind
-  of kVecBool: x.boolArr[i].toK()
-  of kVecGUID: x.guidArr[i].toK()
-  of kVecByte: x.byteArr[i].toK()
-  of kVecShort: x.shortArr[i].toK()
-  of kVecInt: x.intArr[i].toK()
-  of kVecLong: x.longArr[i].toK()
-  of kVecReal: x.realArr[i].toK()
-  of kVecFloat: x.floatArr[i].toK()
-  of kVecSym: x.stringArr[i].toSym()
-  of kVecTimestamp: x.tsArr[i].toKTimestamp()
-  of kVecMonth: x.monthArr[i].toKMonth()
-  of kVecDate: x.dateArr[i].toKDate()
-  of kVecDateTime: x.dtArr[i].toKDateTime()
-  of kVecTimespan: x.tpArr[i].toKTimespan()
-  of kVecMinute: x.minuteArr[i].toKMinute()
-  of kVecSecond: x.secondArr[i].toKSecond()
-  of kVecTime: x.timeArr[i].toKTime()
-  of kDict: dictLookup(x, i.toK())
-  of kList: x.kArr[i].toK()
-  else: raise newException(KError, "`[]` is not supported for " & $x.kind)
-
-proc `[]`*(x: K, i: int64): K =
-  result = x.k[i]
-  # discard r1(result.k)  # TODO: not sure
+include iters
 
 proc `[]`*(x: K, c: string): K =
   assert x.kind == KKind.kTable
@@ -292,8 +262,6 @@ proc `[]=`*(x: var K, i: int64, v: K) =
 #     assert v.k.kind == kSym     # /-------\
 #     x.k.stringArr[i] = v.k.ss   # TODO: fix
 #   else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
-
-include iters
 
 proc columns*(x: K): seq[string] =
   assert x.kind == KKind.kTable
