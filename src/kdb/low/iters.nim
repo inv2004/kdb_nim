@@ -1,5 +1,8 @@
 
 proc `[]`*(x: K0, i: int64): K =
+  if x.kind != KKind.kDict:
+    if i >= x.len:
+      raise newException(KError, "index " & $i & " not in 0 .. " & $(x.len - 1))
   case x.kind
   of kVecBool: x.boolArr[i].toK()
   of kVecGUID: x.guidArr[i].toK()
@@ -23,9 +26,6 @@ proc `[]`*(x: K0, i: int64): K =
   else: raise newException(KError, "getFromK0 is not supported for " & $x.kind)
 
 proc get*[T](x: K, i: int): T =
-  if x.kind != KKind.kDict:
-    if i >= x.len:
-      raise newException(KError, "index " & $i & " not in 0 .. " & $(x.len - 1))
   when T is K: x.k[i]
   elif T is int64: x.k.longArr[i]
   elif T is float64: x.k.floatArr[i]
