@@ -38,14 +38,6 @@ macro fields(t: typedesc): untyped =
   result = quote do:
     `fields`
 
-# macro getter(t: typedesc): untyped =
-#   result = quote do:
-#     proc k(): int =
-#       10
-
-# proc `k`*(t: TTable[T1]): seq[int] =
-  # t.inner.k.dict.values[0].k.longArr
-
 proc newTTable*(T: typedesc): TTable[T] =
   let fields = fields(T)
   echo "newTTable: ", fields
@@ -63,20 +55,19 @@ proc add*[T](t: var TTable[T], x: T) =
     vals.add(vv)
   t.inner.addRow(vals)
 
-# macro mkTable*(T: typedesc): untyped =
-  # var result = newStmtList()
-  # for name in ["k"]:
-    # let f = quote do:
-      # proc k(t: TTable[T1]): int =
+macro defineTable*(T: typedesc): untyped =
+  var fields: seq[(string, string)] = @[]
+ 
+  let typeFields = getImpl(getType(T)[1])[2][2]
+  for f in typeFields.children:
+    fields.add ($f[0], f[1].strVal)
 
-    # echo f.treeRepr
-    # result.add(f)
-  # f = quote do:
-    # proc k*(t: TTable[T1]): int =
-      # 10
-    # proc v*(t: TTable[T1]): string =
-      # "10"
+  result = newStmtList()
 
-# dumpTree:
+  for i, (x, t) in fields:
+    let code = """
+proc """ & x & """*(t: TTable[T1]): TVec[""" & t & """] =
+  TVec[""" & t & """](inner: t.inner.k.dict.values[""" & $i & """])
+"""
 
-
+    result.add parseExpr(code)

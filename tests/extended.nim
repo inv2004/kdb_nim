@@ -11,13 +11,7 @@ type T2 =
   object
     k, v: int
 
-# proc `k`*(t: TTable[T1]): seq[int] =
-  # t.inner.k.dict.values[0].k.longArr
-
-# mkTable(T1)
-
-proc k*(t: TTable[T1]): TVec[int64] =
-  TVec[int64](inner: t.inner.k.dict.values[0])
+defineTable(T1)
 
 test "vec":
   var t = high.newKVec[int64]()
