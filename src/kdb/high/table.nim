@@ -34,14 +34,6 @@ proc len*(t: TTable): int =
 proc `$`*(t: TTable): string =
   $t.inner
 
-proc add*[T](t: var TTable[T], x: T) =
-  var vals = newSeq[K]()
-  for kk, v in x.fieldPairs():
-    let vv = v.toK()
-    discard r1(vv.k)  # TODO: r1 fix
-    vals.add(vv)
-  t.inner.addRow(vals)
-
 proc getFieldsRec(t: NimNode): seq[(string, string)] =
   let obj = getImpl(t)[2]
 
@@ -70,6 +62,20 @@ proc """ & x & """*(t: TTable[""" & $T & """]): TVec[""" & t & """] =
 
     result.add parseExpr(code)
 
+  var code = """
+proc genValues(t: TTable[""" & $T & """], x: """ & $T & """): seq[K] =
+"""
+  for i, (x, t) in fields:
+    let val = "v" & $i
+    code.add """
+  let """ & val & """ = x.""" & x & """.toK()
+  discard r1(""" & val & """.k)
+  result.add(""" & val & """)
+"""
+
+  result.add parseExpr(code)
+  
+
 macro fields(t: typed): untyped =
   let fields = getFieldsRec(getType(t)[1])
   var fieldsTyped: seq[(string, KKind)] = @[]
@@ -80,8 +86,19 @@ macro fields(t: typed): untyped =
     `fieldsTyped`
 
 proc newTTable*(T: typedesc): TTable[T] =
+  # when not declared(genValues):
+  #   echo "ERROR"
   let fields = fields(T)
   echo "newTTable: ", fields
   let kTable = newKTable(fields)
   TTable[T](inner: kTable)
 
+template add*[T](t: var TTable[T], x: T) =
+  let vals = t.genValues(x)
+  t.inner.addRow(vals)
+  # var vals = newSeq[K]()
+  # for kk, v in x.fieldPairs():
+  #   let vv = v.toK()
+  #   discard r1(vv.k)  # TODO: r1 fix
+  #   vals.add(vv)
+  # t.inner.addRow(vals)

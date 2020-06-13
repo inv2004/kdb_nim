@@ -50,4 +50,5 @@ test "table":
 
 test "table_inheritance":
   var t = newTTable(T111)
+  t.add(T111(k: 1, v: "one", vv: 1.1, vvv:"oneone"))
   echo t
