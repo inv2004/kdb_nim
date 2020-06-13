@@ -28,22 +28,6 @@ proc stringToKVecKind*(x: string): KKind =
   of "nil": KKind.kList
   else: raise newException(KError, "cannot convert type " & x)
 
-macro fields(t: typedesc): untyped =
-  var fields: seq[(string, KKind)] = @[]
- 
-  let typeFields = getImpl(getType(t)[1])[2][2]
-  for f in typeFields.children:
-    fields.add ($f[0], stringToKVecKind(f[1].strVal))
-
-  result = quote do:
-    `fields`
-
-proc newTTable*(T: typedesc): TTable[T] =
-  let fields = fields(T)
-  echo "newTTable: ", fields
-  let kTable = newKTable(fields)
-  TTable[T](inner: kTable)
-
 proc len*(t: TTable): int =
   t.inner.len
 
@@ -58,18 +42,23 @@ proc add*[T](t: var TTable[T], x: T) =
     vals.add(vv)
   t.inner.addRow(vals)
 
-macro defineTable*(T: typedesc): untyped =
-  var fields: seq[(string, string)] = @[]
+proc getFieldsRec(t: NimNode): seq[(string, string)] =
+  let obj = getImpl(t)[2]
 
-  let obj = getImpl(getType(T)[1])[2]
+  if obj[1].kind != nnkEmpty:
+    result.add getFieldsRec(obj[1][0])
 
   let typeFields = obj[2]
   for f in typeFields.children:
-    fields.add ($f[0], f[1].strVal)
+    result.add ($f[0], f[1].strVal)
 
-  if obj[1].kind != nnkEmpty:
-    echo obj[1].treeRepr
-    echo getType(obj[1][0]).treeRepr
+macro defineTable*(T: typedesc): untyped =
+  let fields = getFieldsRec(getType(T)[1])
+
+  #if obj[1].kind != nnkEmpty:
+  #  echo obj[1][0].treeRepr
+  #  echo getImpl(obj[1][0]).treeRepr
+    # echo getImpl(getType(obj[1][0])[1])
 
   result = newStmtList()
 
@@ -80,4 +69,19 @@ proc """ & x & """*(t: TTable[""" & $T & """]): TVec[""" & t & """] =
 """
 
     result.add parseExpr(code)
+
+macro fields(t: typed): untyped =
+  let fields = getFieldsRec(getType(t)[1])
+  var fieldsTyped: seq[(string, KKind)] = @[]
+  for (f, t) in fields:
+    fieldsTyped.add((f, stringToKVecKind(t)))
+ 
+  result = quote do:
+    `fieldsTyped`
+
+proc newTTable*(T: typedesc): TTable[T] =
+  let fields = fields(T)
+  echo "newTTable: ", fields
+  let kTable = newKTable(fields)
+  TTable[T](inner: kTable)
 

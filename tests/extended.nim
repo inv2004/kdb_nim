@@ -21,7 +21,7 @@ defineTable(T1)
 
 defineTable(T2)
 
-defineTable(T11)
+defineTable(T111)
 
 test "vec":
   var t = high.newKVec[int64]()
@@ -49,5 +49,5 @@ test "table":
   # echo "T2: ", t.inner["v"]
 
 test "table_inheritance":
-  var t = newTTable(T11)
+  var t = newTTable(T111)
   echo t
