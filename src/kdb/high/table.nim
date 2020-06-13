@@ -47,6 +47,9 @@ proc newTTable*(T: typedesc): TTable[T] =
 proc len*(t: TTable): int =
   t.inner.len
 
+proc `$`*(t: TTable): string =
+  $t.inner
+
 proc add*[T](t: var TTable[T], x: T) =
   var vals = newSeq[K]()
   for kk, v in x.fieldPairs():
@@ -66,8 +69,9 @@ macro defineTable*(T: typedesc): untyped =
 
   for i, (x, t) in fields:
     let code = """
-proc """ & x & """*(t: TTable[T1]): TVec[""" & t & """] =
+proc """ & x & """*(t: TTable[""" & $T & """]): TVec[""" & t & """] =
   TVec[""" & t & """](inner: t.inner.k.dict.values[""" & $i & """])
 """
 
     result.add parseExpr(code)
+

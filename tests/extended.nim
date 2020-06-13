@@ -2,16 +2,22 @@
 import kdb/high
 import kdb/low
 
-type T1 =
-  object
+type
+  T1 = object of RootObj
     k: int64
     v: string
 
-type T2 =
-  object
+  T2 = object
     k, v: int
 
+  T11 = object of T1
+    vv: float
+
 defineTable(T1)
+
+defineTable(T2)
+
+defineTable(T11)
 
 test "vec":
   var t = high.newKVec[int64]()
@@ -37,3 +43,7 @@ test "table":
   # echo t.v
   # echo "T1: ", t.inner["k"]
   # echo "T2: ", t.inner["v"]
+
+test "table_inheritance":
+  var t = newTTable(T11)
+  echo t
