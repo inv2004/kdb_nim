@@ -13,6 +13,10 @@ type
   T11 = object of T1
     vv: float
 
+  T111 = object of T11
+    vvv: string
+
+
 defineTable(T1)
 
 defineTable(T2)

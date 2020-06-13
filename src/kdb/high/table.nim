@@ -60,10 +60,16 @@ proc add*[T](t: var TTable[T], x: T) =
 
 macro defineTable*(T: typedesc): untyped =
   var fields: seq[(string, string)] = @[]
- 
-  let typeFields = getImpl(getType(T)[1])[2][2]
+
+  let obj = getImpl(getType(T)[1])[2]
+
+  let typeFields = obj[2]
   for f in typeFields.children:
     fields.add ($f[0], f[1].strVal)
+
+  if obj[1].kind != nnkEmpty:
+    echo obj[1].treeRepr
+    echo getType(obj[1][0]).treeRepr
 
   result = newStmtList()
 
