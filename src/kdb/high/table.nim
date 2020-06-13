@@ -74,7 +74,11 @@ proc genValues(t: TTable[""" & $T & """], x: """ & $T & """): seq[K] =
 """
 
   result.add parseExpr(code)
-  
+
+  result.add parseExpr("""
+proc checkDefinition(_: """ & $T & """) =
+  discard
+""")
 
 macro fields(t: typed): untyped =
   let fields = getFieldsRec(getType(t)[1])
@@ -86,8 +90,8 @@ macro fields(t: typed): untyped =
     `fieldsTyped`
 
 proc newTTable*(T: typedesc): TTable[T] =
-  # when not declared(genValues):
-  #   echo "ERROR"
+  when not compiles(checkDefinition(T())):
+    {.fatal: "defineTable".}
   let fields = fields(T)
   echo "newTTable: ", fields
   let kTable = newKTable(fields)
