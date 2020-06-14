@@ -41,8 +41,18 @@ proc getFieldsRec(t: NimNode): seq[(string, string)] =
     result.add getFieldsRec(obj[1][0])
 
   let typeFields = obj[2]
+
   for f in typeFields.children:
-    result.add ($f[0], f[1].strVal)
+    assert f.kind == nnkIdentDefs
+    var fieldNames = newSeq[string]()
+    for ff in f.children:
+      case ff.kind
+      of nnkIdent: fieldNames.add ff.strVal
+      of nnkSym:
+        for x in fieldNames:
+          result.add (x, ff.strVal)
+      of nnkEmpty: discard
+      else: raise newException(Exception, "unexpected construction: " & $ff.treeRepr)
 
 macro defineTable*(T: typedesc): untyped =
   let fields = getFieldsRec(getType(T)[1])
@@ -101,7 +111,7 @@ template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
-proc transform*[T, TT](t: TTable[T]): TTable[TT] =
+proc transform*[T](t: TTable[T], TT: typedesc): TTable[TT] =
   let fieldsT = fields(T)
   let fieldsTT = fields(TT)
   echo "from"
