@@ -21,6 +21,8 @@ defineTable(T1)
 
 defineTable(T2)
 
+defineTable(T11)
+
 defineTable(T111)
 
 test "vec":
@@ -49,9 +51,9 @@ test "table":
   # echo "T2: ", t.inner["v"]
 
 test "table_inheritance":
-  var t = newTTable(T1)
-  t.add(T1(k: 1, v: "one"))
+  var t = newTTable(T2)
+  # t.add(T1(k: 1, v: "one"))
   echo t
 
-  # let tt = t.convertInto[T1, T11]()
+  # let tt = t.transform[:T1, T2]()
   # echo tt

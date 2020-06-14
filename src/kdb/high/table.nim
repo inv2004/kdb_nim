@@ -101,11 +101,10 @@ template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
-proc convertInto*[T, TT](t: TTable[T]): TTable[TT] =
-  let fieldsT = getFieldsRec(getType(T)[1])
-  let fieldsTT = getFieldsRec(getType(TT)[1])
+proc transform*[T, TT](t: TTable[T]): TTable[TT] =
+  let fieldsT = fields(T)
+  let fieldsTT = fields(TT)
   echo "from"
   echo fieldsT
   echo fieldsTT
-  TTable[TT](inner: kTable)
-  
+  TTable[TT](inner: t.inner)
