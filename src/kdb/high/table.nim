@@ -100,9 +100,12 @@ proc newTTable*(T: typedesc): TTable[T] =
 template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
-  # var vals = newSeq[K]()
-  # for kk, v in x.fieldPairs():
-  #   let vv = v.toK()
-  #   discard r1(vv.k)  # TODO: r1 fix
-  #   vals.add(vv)
-  # t.inner.addRow(vals)
+
+proc convertInto*[T, TT](t: TTable[T]): TTable[TT] =
+  let fieldsT = getFieldsRec(getType(T)[1])
+  let fieldsTT = getFieldsRec(getType(TT)[1])
+  echo "from"
+  echo fieldsT
+  echo fieldsTT
+  TTable[TT](inner: kTable)
+  

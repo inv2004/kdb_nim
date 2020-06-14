@@ -49,6 +49,9 @@ test "table":
   # echo "T2: ", t.inner["v"]
 
 test "table_inheritance":
-  var t = newTTable(T111)
-  t.add(T111(k: 1, v: "one", vv: 1.1, vvv:"oneone"))
+  var t = newTTable(T1)
+  t.add(T1(k: 1, v: "one"))
   echo t
+
+  # let tt = t.convertInto[T1, T11]()
+  # echo tt
