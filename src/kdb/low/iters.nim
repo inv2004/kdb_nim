@@ -42,7 +42,7 @@ proc getM*[T](x: K0, i: int): var T =
   elif T is int64: x.longArr[i]
   elif T is float64: x.floatArr[i]
   elif T is cstring: x.stringArr[i]
-  elif T is string: $x.stringArr[i]
+  elif T is string: x.stringArr[i]
   else: raise newException(KError, "getM is not supported for " & $x.kind)
 
 iterator items*(x: K): K =

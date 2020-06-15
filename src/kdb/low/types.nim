@@ -7,8 +7,8 @@ import os
 {.compile: "k.c".}
 
 type
-  KError* = object of Exception
-  KErrorRemote* = object of Exception
+  KError* = object of ValueError
+  KErrorRemote* = object of ValueError
 
 type
   KSym* = object
@@ -278,4 +278,3 @@ proc `=sink`*(a: var K; b: K) =
   # echo "`=sink`"
   `=destroy`(a)
   a.k = b.k
-

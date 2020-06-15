@@ -45,15 +45,16 @@ test "table":
   var k = t.k
   for x in k.mitems():
     x += 100
-  echo t
-  # echo t.v
-  # echo "T1: ", t.inner["k"]
-  # echo "T2: ", t.inner["v"]
+  var v = t.v
+  check toSeq(t.k) == @[101.int64, 102]
 
 test "table_inheritance":
-  var t = newTTable(T2)
+  var t = newTTable(T1)
   # t.add(T1(k: 1, v: "one"))
   echo t
 
-  # let tt = t.transform[:T1, T2]()
+  let tt = t.transform(T11)
+  # var vv = tt.vv
+  # for x in vv.mitems():
+    # echo x
   # echo tt

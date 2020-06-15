@@ -7,7 +7,6 @@ import strutils
 import times
 import terminaltables
 import uuids
-import endians
 
 const monthFormat = initTimeFormat("yyyy-MM")
 const dateFormat = initTimeFormat("yyyy-MM-dd")

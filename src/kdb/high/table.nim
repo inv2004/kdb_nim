@@ -1,6 +1,7 @@
 
 import kdb/low
 import kdb/high/vec
+
 import macros
 
 type
@@ -97,7 +98,7 @@ macro fields(t: typed): untyped =
     fieldsTyped.add((f, stringToKVecKind(t)))
  
   result = quote do:
-    `fieldsTyped`
+    @`fieldsTyped`
 
 proc newTTable*(T: typedesc): TTable[T] =
   when not compiles(checkDefinition(T())):
@@ -111,10 +112,27 @@ template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
+import hashes
+
 proc transform*[T](t: TTable[T], TT: typedesc): TTable[TT] =
-  let fieldsT = fields(T)
-  let fieldsTT = fields(TT)
-  echo "from"
-  echo fieldsT
-  echo fieldsTT
+  when T is TT:
+    {.warning: "transform into itself".}
+  let fieldsT: seq[(string, KKind)] = fields(T)
+  let fieldsTT: seq[(string, KKind)] = fields(TT)
+  # echo "transform: ", union(tSet, ttSet)
+
+  for (x, k) in fieldsTT:  # TODO: something wrong with sets module
+    var found = false
+    for (xx, kk) in fieldsT:
+      if x == xx:
+        if k != kk:
+          raise newException(Exception, "transfer: type diff")
+        found = true
+        break
+    if not found:
+      echo "add: ", x
+      var k = t.inner
+      k.addColumn(x)
+  # echo "            to: ", fieldsTT
   TTable[TT](inner: t.inner)
+
