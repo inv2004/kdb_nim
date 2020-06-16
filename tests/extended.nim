@@ -50,11 +50,10 @@ test "table":
 
 test "table_inheritance":
   var t = newTTable(T1)
-  # t.add(T1(k: 1, v: "one"))
+  t.add(T1(k: 1, v: "one"))
   echo t
 
-  let tt = t.transform(T11)
-  # var vv = tt.vv
-  # for x in vv.mitems():
-    # echo x
-  # echo tt
+  var tt = t.transform(T11)
+  tt.add(T11(k: 2, v: "two", vv: 2.2))
+  echo tt
+  echo t

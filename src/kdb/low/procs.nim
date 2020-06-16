@@ -149,7 +149,7 @@ proc add*(x: var K, v: K) =
   add(x.k, v)
 
 proc newKVec*[T](): K =
-  let k0 = ktn(typeToKVecKind[T]().int, 0)
+  let k0 = ktn(typeToKKind[T]().toVecKKind().int, 0)
   result = K(k: k0)
 
 proc newKVecTyped(k: KKind): K =
@@ -179,7 +179,7 @@ proc addColumn*[T](t: var K, name: string, col: K) =
     let dict = newKDict(header, data)
     t.k = xT(r1(dict.k))
   else:
-    assert typeToKVecKind[T]().int == col.k.kind.int
+    assert typeToKKind[T]().toVecKKind().int == col.k.kind.int
     if t.len != col.len:
       raise newException(KError, "column.len is not equal to table.len")
     t.k.dict.keys.add(name.cstring)
@@ -198,6 +198,21 @@ proc addColumn*[T](t: var K, name: string) =
     t.k.dict.keys.add(name.cstring)
     var c1 = newKVec[T]()
     t.k.dict.values.add(%c1.k)
+
+proc addColumnWithKind*(t: var K, name: string, k: KKind, col: K) =
+  if isNil(t.k):
+    var header = newKVecTyped(k)
+    header.k.add(name.cstring)
+    var data = newKList()
+    data.add(col)
+    let dict = newKDict(header, data)
+    t.k = xT(r1(dict.k))
+  else:
+    assert k.int == col.k.kind.int
+    if t.len != col.len:
+      raise newException(KError, "column.len is not equal to table.len")
+    t.k.dict.keys.add(name.cstring)
+    t.k.dict.values.add(%col.k)
 
 # proc addRow*(t: var K, vals: openArray[K]) =
 #   assert t.k != nil

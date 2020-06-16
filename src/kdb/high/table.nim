@@ -7,6 +7,7 @@ import macros
 type
   TTable*[T] = object
     inner*: K
+    moved: bool
 
 proc stringToKVecKind*(x: string): KKind =
   case x
@@ -33,6 +34,7 @@ proc len*(t: TTable): int =
   t.inner.len
 
 proc `$`*(t: TTable): string =
+  if t.moved: raise newException(ValueError, "object moved")
   $t.inner
 
 proc getFieldsRec(t: NimNode): seq[(string, string)] =
@@ -106,15 +108,13 @@ proc newTTable*(T: typedesc): TTable[T] =
   let fields = fields(T)
   echo "newTTable: ", fields
   let kTable = newKTable(fields)
-  TTable[T](inner: kTable)
+  TTable[T](inner: kTable, moved: false)
 
 template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
-import hashes
-
-proc transform*[T](t: TTable[T], TT: typedesc): TTable[TT] =
+proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
   when T is TT:
     {.warning: "transform into itself".}
   let fieldsT: seq[(string, KKind)] = fields(T)
@@ -131,8 +131,11 @@ proc transform*[T](t: TTable[T], TT: typedesc): TTable[TT] =
         break
     if not found:
       echo "add: ", x
-      var k = t.inner
-      k.addColumn(x)
+      var kk = t.inner
+      echo kk.len
+      kk.addColumnWithKind(x, k, %[1.1])
+
+  result = TTable[TT](inner: t.inner, moved: false)
+  t.moved = true
   # echo "            to: ", fieldsTT
-  TTable[TT](inner: t.inner)
 

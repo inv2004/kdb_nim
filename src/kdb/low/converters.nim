@@ -5,25 +5,40 @@ import uuids
 import endians
 import times
 
-proc typeToKVecKind*[T](): KKind =
-  when T is bool: KKind.kVecBool
-  elif T is GUID: KKind.kVecGUID
-  elif T is byte: KKind.kVecByte
-  elif T is int16: KKind.kVecShort
-  elif T is int32: KKind.kVecInt
-  elif T is int: KKind.kVecLong
-  elif T is int64: KKind.kVecLong
-  elif T is float32: KKind.kVecReal
-  elif T is float64: KKind.kVecFloat
-  elif T is float: KKind.kVecFloat
-  elif T is KSym: KKind.kVecSym
-  elif T is KTimestamp: KKind.kVecTimestamp
-  elif T is KDateTime: KKind.kVecDateTime
-  elif T is DateTime: KKind.kVecDateTime
+proc typeToKKind*[T](): KKind =
+  when T is bool: KKind.kBool
+  elif T is GUID: KKind.kGUID
+  elif T is byte: KKind.kByte
+  elif T is int16: KKind.kShort
+  elif T is int32: KKind.kInt
+  elif T is int: KKind.kLong
+  elif T is int64: KKind.kLong
+  elif T is float32: KKind.kReal
+  elif T is float64: KKind.kFloat
+  elif T is float: KKind.kFloat
+  elif T is KSym: KKind.kSym
+  elif T is KTimestamp: KKind.kTimestamp
+  elif T is KDateTime: KKind.kDateTime
+  elif T is DateTime: KKind.kDateTime
   elif T is KList: KKind.kList
   elif T is string: KKind.kList
   elif T is typeof(nil): KKind.kList
   else: raise newException(KError, "cannot convert type " & $T)
+
+proc toVecKKind*(k: KKind): KKind =
+  case k:
+  of KKind.kBool: KKind.kVecBool
+  of KKind.kGUID: KKind.kVecGUID
+  of KKind.kByte: KKind.kVecByte
+  of KKind.kShort: KKind.kVecShort
+  of KKind.kInt: KKind.kVecInt
+  of KKind.kLong: KKind.kVecLong
+  of KKind.kReal: KKind.kVecReal
+  of KKind.kFloat: KKind.kVecFloat
+  of KKind.kSym: KKind.kVecSym
+  of KKind.kTimestamp: KKind.kVecTimestamp
+  of KKind.kDateTime: KKind.kVecDateTime
+  else: KKind.kList
 
 proc toK*(x: type(nil)): K =
   result = K(k: ka(101))
@@ -139,18 +154,18 @@ proc toK*(x: DateTime): K =
   toKDateTime(x.toMillis())
 
 proc toSymVec*(columns: openArray[string]): K =
-  let k0 = ktn(typeToKVecKind[KSym]().int, columns.len)
+  let k0 = ktn(typeToKKind[KSym]().toVecKKind().int, columns.len)
   for i, x in columns:
     k0.stringArr[i] = ss(x.cstring)
   result = K(k: k0)
 
 proc toK*[T](v: openArray[T]): K =
   when T is DateTime:
-    result = K(k: ktn(typeToKVecKind[T]().int, v.len))
+    result = K(k: ktn(typeToKKind[T]().toVecKKind().int, v.len))
     for i, x in v:
       result.k.dtArr[i] = x.toMillis()
   elif T is SomeNumber:
-    result = K(k: ktn(typeToKVecKind[T]().int, v.len))
+    result = K(k: ktn(typeToKKind[T]().toVecKKind().int, v.len))
     case result.k.kind
     of kVecLong:
       for i, x in v:
@@ -160,12 +175,12 @@ proc toK*[T](v: openArray[T]): K =
         result.k.floatArr[i] = x.float64
     else: raise newException(KError, "openArray proc is not supported for " & $result.kind)
   elif T is string:
-    result = K(k: ktn(typeToKVecKind[T]().int, v.len))
+    result = K(k: ktn(typeToKKind[T]().int, v.len))
     for i, x in v:
       let k = x.toK()
       result.k.kArr[i] = r1(k.k)
   elif T is K:
-    result = K(k: ktn(typeToKVecKind[nil]().int, v.len))
+    result = K(k: ktn(typeToKKind[nil]().int, v.len))
     for i, x in v:
       result.k.kArr[i] = r1(x.k)
   else:
