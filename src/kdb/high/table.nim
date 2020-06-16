@@ -30,11 +30,15 @@ proc stringToKVecKind*(x: string): KKind =
   of "nil": KKind.kList
   else: raise newException(KError, "cannot convert type " & x)
 
+proc checkMoved(t: TTable) =
+  if t.moved: raise newException(ValueError, "table was transformed")
+
 proc len*(t: TTable): int =
+  checkMoved(t)
   t.inner.len
 
 proc `$`*(t: TTable): string =
-  if t.moved: raise newException(ValueError, "object moved")
+  checkMoved(t)
   $t.inner
 
 proc getFieldsRec(t: NimNode): seq[(string, string)] =
@@ -111,10 +115,12 @@ proc newTTable*(T: typedesc): TTable[T] =
   TTable[T](inner: kTable, moved: false)
 
 template add*[T](t: var TTable[T], x: T) =
+  checkMoved(t)
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
 proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
+  checkMoved(t)
   when T is TT:
     {.warning: "transform into itself".}
   let fieldsT: seq[(string, KKind)] = fields(T)

@@ -56,4 +56,10 @@ test "table_inheritance":
   var tt = t.transform(T11)
   tt.add(T11(k: 2, v: "two", vv: 2.2))
   echo tt
-  echo t
+
+  try:
+    echo t
+    check false
+  except:
+    check true
+
