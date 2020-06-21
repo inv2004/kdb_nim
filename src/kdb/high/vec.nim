@@ -13,6 +13,9 @@ proc newKVec*[T](): TVec[T] =
 proc add*[T](v: var TVec[T], x: T) =
   v.inner.add(x)
 
+proc `[]`*[T](v: TVec[T], idx: int): T =
+  v.inner.get[:T](idx)
+
 iterator items*[T](v: TVec[T]): T =
   for x in v.inner.items(T):
     yield x

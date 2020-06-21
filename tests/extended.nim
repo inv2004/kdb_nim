@@ -50,14 +50,17 @@ test "table":
   var v = t.v
   check toSeq(t.k) == @[101.int64, 102]
 
-test "table_inheritance":
+test "table_transforms":
   var t = newTTable(T1)
   t.add(T1(k: 1, v: "one"))
-  echo t
+  check t.inner.cols() == @["k", "v"]
+  check compiles(t.vv) == false
 
   var tt = t.transform(T11)
   tt.add(T11(k: 2, v: "two", vv: 2.2))
-  echo tt
+  check t.inner.cols() == @["k", "v", "vv"]
+  check tt.vv[0] == 0.0
+  check tt.vv[1] == 2.2
 
   try:
     echo t
@@ -66,5 +69,6 @@ test "table_inheritance":
     check true
 
   var ttt = tt.transform(T3)
-  echo ttt
+  check t.inner.cols() == @["v"]
+
 

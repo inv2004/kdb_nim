@@ -199,22 +199,6 @@ proc addColumn*[T](t: var K, name: string) =
     var c1 = newKVec[T]()
     t.k.dict.values.add(%c1.k)
 
-# proc eval*(s: string, args: varargs[K]): K =
-#   let h = 0.SocketHandle
-
-#   let k0 = case args.len
-#               of 0: k(h, s.cstring, nil)
-#               of 1: k(h, s.cstring, args[0].k, nil)
-#               of 2: k(h, s.cstring, args[0].k, args[1].k, nil)
-#               of 3: k(h, s.cstring, args[0].k, args[1].k, args[2].k, nil)
-#               else: raise newException(KError, "Cannot exec with more than 3 arguments")
-
-#   if k0.kind == KKind.kError:
-#     echo $k0.msg
-#     raise newException(KError, $k0.msg)
-
-#   K(k: k0)
-
 proc dictLookup(d: K0, k: K): K {.gcsafe.}
 
 include iters
@@ -237,7 +221,6 @@ proc deleteColumn*(t: var K, name: string) =  ## TODO: optimize lookup with addi
     r0(d.values.kArr[i])
     moveMem(d.keys.stringArr[i].addr, d.keys.stringArr[i+1].addr, newLen * sizeof(cstring))
     moveMem(d.values.kArr[i].addr, d.values.kArr[i+1].addr, newLen * sizeof(K0))
-
   else:
     raise newException(KeyError, "key not found: " & name)
 
@@ -316,7 +299,7 @@ proc `[]=`*(x: var K, i: int64, v: K) =
 #     x.k.stringArr[i] = v.k.ss   # TODO: fix
 #   else: raise newException(KError, "[K;int;K]`[]=` is not supported for " & $x.k.kind)
 
-proc columns*(x: K): seq[string] =
+proc cols*(x: K): seq[string] =
   assert x.kind == KKind.kTable
   # result: seq[string]
   var cResult: seq[cstring]

@@ -268,7 +268,7 @@ test "table_cols":
   t.addColumn[:KSym]("zzz", c2.toSymVec())
 
   check t.toSeq() == @[s"a", s"z", s"zz", s"zzz"]
-  check t.columns() == @["a", "z", "zz", "zzz"]
+  check t.cols() == @["a", "z", "zz", "zzz"]
 
 test "basic_math":
   let a = %10
