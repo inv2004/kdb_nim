@@ -234,6 +234,7 @@ proc deleteColumn*(t: var K, name: string) =  ## TODO: optimize lookup with addi
     d.keys.stringLen.dec()
     d.values.kLen.dec()
     let newLen = d.keys.len() - i
+    r0(d.values.kArr[i])
     moveMem(d.keys.stringArr[i].addr, d.keys.stringArr[i+1].addr, newLen * sizeof(cstring))
     moveMem(d.values.kArr[i].addr, d.values.kArr[i+1].addr, newLen * sizeof(K0))
 
