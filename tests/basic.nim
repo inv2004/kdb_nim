@@ -123,6 +123,16 @@ test "tables_simple":
   check tStr.contains "nick: [nick1, nick2, nick3, nick4]"
   check tStr.contains """name: ("name1"; "name2"; "name3"; "name4")|"""
 
+test "table_del":
+  var t = newKTable()
+  t.addColumn[:int]("aaa")
+  t.addColumn[:string]("bbb")
+  t.addRow(%3, %"30")
+  t.addRow(%4, %"40")
+  t.addRow(%5, %"50")
+  t.deleteColumn("aaa")
+  check t.flatTable() == """|bbb: ("30"; "40"; "50")|"""
+
 test "iterators":
   var t = newKVec[KSym]()
   t.add(s"aa")

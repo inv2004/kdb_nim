@@ -8,6 +8,8 @@ proc newKVec*[T](): TVec[T] =
   let kVec = low.newKVec[T]()
   TVec[T](inner: kVec)
 
+# proc newKVecTyped(k: KKind, size: int): TVec
+
 proc add*[T](v: var TVec[T], x: T) =
   v.inner.add(x)
 
@@ -22,3 +24,4 @@ iterator mitems*[T](v: var TVec[T]): var T =
 iterator pairs*[T](v: TVec[T]): (int, T) =
   for i, x in v.inner.pairs(T):
     yield (i, x)
+

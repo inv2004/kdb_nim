@@ -152,7 +152,7 @@ proc newKVec*[T](): K =
   let k0 = ktn(typeToKKind[T]().toVecKKind().int, 0)
   result = K(k: k0)
 
-proc newKVecTyped(k: KKind): K =
+proc newKVecTyped*(k: KKind): K =
   let t = if 236 < k.int and k.int < 255: 256 - k.int else: k.int
   let k0 = ktn(t, 0)
   result = K(k: k0)
@@ -199,6 +199,47 @@ proc addColumn*[T](t: var K, name: string) =
     var c1 = newKVec[T]()
     t.k.dict.values.add(%c1.k)
 
+# proc eval*(s: string, args: varargs[K]): K =
+#   let h = 0.SocketHandle
+
+#   let k0 = case args.len
+#               of 0: k(h, s.cstring, nil)
+#               of 1: k(h, s.cstring, args[0].k, nil)
+#               of 2: k(h, s.cstring, args[0].k, args[1].k, nil)
+#               of 3: k(h, s.cstring, args[0].k, args[1].k, args[2].k, nil)
+#               else: raise newException(KError, "Cannot exec with more than 3 arguments")
+
+#   if k0.kind == KKind.kError:
+#     echo $k0.msg
+#     raise newException(KError, $k0.msg)
+
+#   K(k: k0)
+
+proc dictLookup(d: K0, k: K): K {.gcsafe.}
+
+include iters
+
+proc deleteColumn*(t: var K, name: string) =
+  assert not isNil(t.k)
+  let d = t.k.dict
+  let keyK = name.toSym()
+  var i = 0
+  var found = false
+  for x in toK(d.keys):
+    if x == keyK:
+      found = true
+      break
+    inc(i)
+  if found:
+    d.keys.stringLen.dec()
+    d.values.kLen.dec()
+    let newLen = d.keys.len()
+    moveMem(d.keys.stringArr[0].addr, d.keys.stringArr[1].addr, newLen * sizeof(cstring))
+    moveMem(d.values.kArr[0].addr, d.values.kArr[1].addr, newLen * sizeof(K0))
+
+  else:
+    raise newException(KeyError, "key not found: " & name)
+
 proc addColumnWithKind*(t: var K, name: string, k: KKind, col: K) =
   if isNil(t.k):
     var header = newKVecTyped(k)
@@ -238,10 +279,6 @@ proc newKTable*(cols: openArray[(string, KKind)]): K =
 proc newKTable*(): K =
   K(k: nil) # empty table is nil
 #  xT(fromDict)
-
-proc dictLookup(d: K0, k: K): K {.gcsafe.}
-
-include iters
 
 proc `[]`*(x: K, c: string): K =
   assert x.kind == KKind.kTable

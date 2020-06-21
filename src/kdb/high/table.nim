@@ -31,7 +31,7 @@ proc stringToKVecKind*(x: string): KKind =
   else: raise newException(KError, "cannot convert type " & x)
 
 proc checkMoved(t: TTable) =
-  if t.moved: raise newException(ValueError, "table was transformed")
+  if t.moved: raise newException(ValueError, "table has been transformed already")
 
 proc len*(t: TTable): int =
   checkMoved(t)
@@ -119,6 +119,12 @@ template add*[T](t: var TTable[T], x: T) =
   let vals = t.genValues(x)
   t.inner.addRow(vals)
 
+proc newTypedColumn(k: KKind, size: int): K =
+  case k
+  of KKind.kVecFloat: %newSeq[float](size)
+  of KKind.kLong: %newSeq[int](size)
+  else: raise newException(KError, "newKVecTyped: " & $k)
+
 proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
   checkMoved(t)
   when T is TT:
@@ -136,10 +142,20 @@ proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
         found = true
         break
     if not found:
-      echo "add: ", x
+      echo "add: ", x, ": ", k
       var kk = t.inner
-      echo kk.len
-      kk.addColumnWithKind(x, k, %[1.1])
+      kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
+  
+  for (x, k) in fieldsT:
+    var found = false
+    for (xx, kk) in fieldsTT:
+      if x == xx:
+        found = true
+        break
+    if not found:
+      echo "delete: ", x
+      var kk = t.inner
+      kk.deleteColumn(x)
 
   result = TTable[TT](inner: t.inner, moved: false)
   t.moved = true

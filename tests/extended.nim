@@ -15,7 +15,9 @@ type
 
   T111 = object of T11
     vvv: string
-
+  
+  T3 = object
+    v: string
 
 defineTable(T1)
 
@@ -62,4 +64,7 @@ test "table_inheritance":
     check false
   except:
     check true
+
+  var ttt = tt.transform(T3)
+  echo ttt
 
