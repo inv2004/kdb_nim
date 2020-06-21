@@ -219,7 +219,7 @@ proc dictLookup(d: K0, k: K): K {.gcsafe.}
 
 include iters
 
-proc deleteColumn*(t: var K, name: string) =
+proc deleteColumn*(t: var K, name: string) =  ## TODO: optimize lookup with additional table
   assert not isNil(t.k)
   let d = t.k.dict
   let keyK = name.toSym()
@@ -233,9 +233,9 @@ proc deleteColumn*(t: var K, name: string) =
   if found:
     d.keys.stringLen.dec()
     d.values.kLen.dec()
-    let newLen = d.keys.len()
-    moveMem(d.keys.stringArr[0].addr, d.keys.stringArr[1].addr, newLen * sizeof(cstring))
-    moveMem(d.values.kArr[0].addr, d.values.kArr[1].addr, newLen * sizeof(K0))
+    let newLen = d.keys.len() - i
+    moveMem(d.keys.stringArr[i].addr, d.keys.stringArr[i+1].addr, newLen * sizeof(cstring))
+    moveMem(d.values.kArr[i].addr, d.values.kArr[i+1].addr, newLen * sizeof(K0))
 
   else:
     raise newException(KeyError, "key not found: " & name)
@@ -322,7 +322,7 @@ proc columns*(x: K): seq[string] =
   cResult.add toOpenArray(x.k.dict.keys.stringArr.addr, 0, x.k.dict.keys.stringLen.int - 1)
   cResult.mapIt($it)
 
-proc dictLookup(d: K0, k: K): K {.gcsafe.} =
+proc dictLookup(d: K0, k: K): K {.gcsafe.} =  ## TODO: optimize lookup with additional table
   var i = 0
   for x in toK(d.keys):
     if x == k:
