@@ -110,7 +110,7 @@ proc newTTable*(T: typedesc): TTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   let fields = fields(T)
-  echo "newTTable: ", fields
+  # echo "newTTable: ", fields
   let kTable = newKTable(fields)
   TTable[T](inner: kTable, moved: false)
 
@@ -142,7 +142,7 @@ proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
         found = true
         break
     if not found:
-      echo "add: ", x, ": ", k
+      # echo "add: ", x, ": ", k
       var kk = t.inner
       kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
   
@@ -153,7 +153,7 @@ proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
         found = true
         break
     if not found:
-      echo "delete: ", x
+      # echo "delete: ", x
       var kk = t.inner
       kk.deleteColumn(x)
 
