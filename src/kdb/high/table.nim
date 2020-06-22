@@ -61,6 +61,31 @@ proc getFieldsRec(t: NimNode): seq[(string, string)] =
       of nnkEmpty: discard
       else: raise newException(Exception, "unexpected construction: " & $ff.treeRepr)
 
+proc calcToAdd[T: KKind | string](f: seq[(string, T)], t: seq[(string, T)]): seq[(string, T)] =
+  for (x, k) in t:  # TODO: something wrong with sets module
+    var found = false
+    for (xx, kk) in f:
+      if x == xx:
+        if k != kk:
+          raise newException(Exception, "transfer: type diff")
+        found = true
+        break
+    if not found:
+      # echo "add2: ", x, ": ", k
+      result.add((x, k))
+
+proc calcToDelete[T: KKind | string](f: seq[(string, T)], t: seq[(string, T)]): seq[string] =
+  for (x, k) in f:
+    var found = false
+    for (xx, kk) in t:
+      if x == xx:
+        found = true
+        break
+    if not found:
+      # echo "delete: ", x
+      result.add(x)
+
+
 macro defineTable*(T: typedesc): untyped =
   let fields = getFieldsRec(getType(T)[1])
 
@@ -125,93 +150,93 @@ proc newTypedColumn(k: KKind, size: int): K =
   of KKind.kVecLong: %newSeq[int](size)
   else: raise newException(KError, "newKVecTyped: " & $k)
 
-proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
-  checkMoved(t)
-  when T is TT:
-    {.warning: "transform into itself".}
-  let fieldsT: seq[(string, KKind)] = fields(T)
-  let fieldsTT: seq[(string, KKind)] = fields(TT)
-  # echo "transform: ", union(tSet, ttSet)
+macro transformCheck(t: typed, tt: typed, j: varargs[typed]): untyped =
+  if getType(t) == getType(tt):
+    warning("transform into itself")
 
-  for (x, k) in fieldsTT:  # TODO: something wrong with sets module
-    var found = false
-    for (xx, kk) in fieldsT:
-      if x == xx:
-        if k != kk:
-          raise newException(Exception, "transfer: type diff")
-        found = true
-        break
-    if not found:
-      # echo "add: ", x, ": ", k
-      var kk = t.inner
-      kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
-  
-  for (x, k) in fieldsT:
-    var found = false
-    for (xx, kk) in fieldsTT:
-      if x == xx:
-        found = true
-        break
-    if not found:
-      # echo "delete: ", x
-      var kk = t.inner
-      kk.deleteColumn(x)
-
-  result = TTable[TT](inner: t.inner, moved: false)
-  t.moved = true
-  # echo "            to: ", fieldsTT
-
-macro transformCheck(t: typed, tt: typed, cols: typed): untyped =
   let fieldsFrom = getFieldsRec(getType(t)[1])
   let fieldsTo = getFieldsRec(getType(tt)[1])
-  echo "fieldsCheck: "
-  echo "       from: ", fieldsFrom
-  echo "         to: ", fieldsTo
-  echo "       cols: ", cols.len
+#  echo "fieldsCheck: "
+#  echo "       from: ", fieldsFrom
+#  echo "         to: ", fieldsTo
 
-  let l = fieldsTo.len() - fieldsFrom.len() - cols.len()
+  let toAdd = calcToAdd(fieldsFrom, fieldsTo)
+  let toDel = calcToDelete(fieldsFrom, fieldsTo)
+
+  if j.len > 0:
+    var i = 0
+    for x in toAdd:
+      let jType = getType(j[0])[1].strVal
+#      echo "          j: ", jType
+#      echo x[1], "-", jType
+      if x[1] != jType:
+        error("transform error: expected: " & x[1] & ", provided: " & jType)
+      inc(i)
+    if i < j.len:
+      error("transform error: too many columns provided")
+
+  var toAddKind: seq[(string, KKind)] = @[]
+  for (f, t) in toAdd:
+    toAddKind.add((f, stringToKVecKind(t)))
+
   result = quote do:
-    `l`
+    checkMoved(t)
+    (@`toAddKind`, @`toDel`)
 
-template transform2*[T](t: var TTable[T], TT: typedesc, cols: varargs[TVec[typed]]): TTable[TT] =
-  checkMoved(t)
-  when T is TT:
-    {.warning: "transform into itself".}
-  when transformCheck(typeof(T), typeof(TT), cols) != 0:
-    # echo cols[0].treeRepr
-    {.fatal: "transform error".}
+proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
+  let toChange = transformCheck(T, TT)
 
-  let fieldsT: seq[(string, KKind)] = fields(typeof(T))
-  let fieldsTT: seq[(string, KKind)] = fields(TT)
-  # echo "transform: ", union(tSet, ttSet)
-  echo fieldsT, " => ", fieldsTT
+  var kk = t.inner
+  for (x, k) in toChange[0]:
+    kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
 
-  var toAddCount = 0
-  for (x, k) in fieldsTT:  # TODO: something wrong with sets module
-    var found = false
-    for (xx, kk) in fieldsT:
-      if x == xx:
-        if k != kk:
-          raise newException(Exception, "transfer: type diff")
-        found = true
-        break
-    if not found:
-      echo "add2: ", x, ": ", k
-      var kk = t.inner
-      toAddCount.inc()
-      kk.addColumnWithKind(x, k, cols[0].inner)
-  
-  for (x, k) in fieldsT:
-    var found = false
-    for (xx, kk) in fieldsTT:
-      if x == xx:
-        found = true
-        break
-    if not found:
-      # echo "delete: ", x
-      var kk = t.inner
-      kk.deleteColumn(x)
+  for x in toChange[1]:
+    kk.deleteColumn(x)
+
+  t.moved = true
+  result = TTable[TT](inner: t.inner, moved: false)
+
+proc transform*[T, J](t: var TTable[T], TT: typedesc, col1: openArray[J]): TTable[TT] =
+  let toChange = transformCheck(T, TT, J)
+
+  var kk = t.inner
+  let addCol1 = toChange[0][0]
+  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+
+  for x in toChange[1]:
+    kk.deleteColumn(x)
 
   t.moved = true
   TTable[TT](inner: t.inner, moved: false)
-  # echo "            to: ", fieldsTT
+
+proc transform*[T, J, JJ](t: var TTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ]): TTable[TT] =  # TODO: template? macros?
+  let toChange = transformCheck(T, TT, J, JJ)
+
+  var kk = t.inner
+  let addCol1 = toChange[0][0]
+  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  let addCol2 = toChange[0][1]
+  kk.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+
+  for x in toChange[1]:
+    kk.deleteColumn(x)
+
+  t.moved = true
+  TTable[TT](inner: t.inner, moved: false)
+
+proc transform*[T, J, JJ, JJJ](t: var TTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ], col3: openArray[JJJ]): TTable[TT] =
+  let toChange = transformCheck(T, TT, J, JJ, JJJ)
+
+  var kk = t.inner
+  let addCol1 = toChange[0][0]
+  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  let addCol2 = toChange[0][1]
+  kk.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+  let addCol3 = toChange[0][2]
+  kk.addColumnWithKind(addCol3[0], addCol3[1], toK(col3))
+
+  for x in toChange[1]:
+    kk.deleteColumn(x)
+
+  t.moved = true
+  TTable[TT](inner: t.inner, moved: false)

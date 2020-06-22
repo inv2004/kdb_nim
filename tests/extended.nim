@@ -78,13 +78,11 @@ test "table_transforms_with_vec":
   check t.inner.cols() == @["k", "v"]
   check compiles(t.vv) == false
 
-  var v = high.newKVec[int]()
-  v.add(1)
-  v.add(2)
-
-  var tt = t.transform2(T11, v)
-#   check t.inner.cols() == @["k", "v", "vv"]
-#   check tt.vv[0] == 1.1
-#   check tt.vv[1] == 2.2
+  # check compiles(t.transform(T11, v, vv)) = false
+  # check compiles(t.transform(T11, vv, v)) = false
+  let tt = t.transform(T11, @[1.1, 2.2])
+  check tt.inner.cols() == @["k", "v", "vv"]
+  check tt.vv[0] == 1.1
+  check tt.vv[1] == 2.2
 
 
