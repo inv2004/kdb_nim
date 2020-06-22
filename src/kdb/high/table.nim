@@ -122,7 +122,7 @@ template add*[T](t: var TTable[T], x: T) =
 proc newTypedColumn(k: KKind, size: int): K =
   case k
   of KKind.kVecFloat: %newSeq[float](size)
-  of KKind.kLong: %newSeq[int](size)
+  of KKind.kVecLong: %newSeq[int](size)
   else: raise newException(KError, "newKVecTyped: " & $k)
 
 proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
@@ -161,3 +161,57 @@ proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
   t.moved = true
   # echo "            to: ", fieldsTT
 
+macro transformCheck(t: typed, tt: typed, cols: typed): untyped =
+  let fieldsFrom = getFieldsRec(getType(t)[1])
+  let fieldsTo = getFieldsRec(getType(tt)[1])
+  echo "fieldsCheck: "
+  echo "       from: ", fieldsFrom
+  echo "         to: ", fieldsTo
+  echo "       cols: ", cols.len
+
+  let l = fieldsTo.len() - fieldsFrom.len() - cols.len()
+  result = quote do:
+    `l`
+
+template transform2*[T](t: var TTable[T], TT: typedesc, cols: varargs[typed]): TTable[TT] =
+  checkMoved(t)
+  when T is TT:
+    {.warning: "transform into itself".}
+  when transformCheck(typeof(T), typeof(TT), cols) != 0:
+    # echo cols[0].treeRepr
+    {.fatal: "transform error".}
+
+  let fieldsT: seq[(string, KKind)] = fields(typeof(T))
+  let fieldsTT: seq[(string, KKind)] = fields(TT)
+  # echo "transform: ", union(tSet, ttSet)
+  echo fieldsT, " => ", fieldsTT
+
+  var toAddCount = 0
+  for (x, k) in fieldsTT:  # TODO: something wrong with sets module
+    var found = false
+    for (xx, kk) in fieldsT:
+      if x == xx:
+        if k != kk:
+          raise newException(Exception, "transfer: type diff")
+        found = true
+        break
+    if not found:
+      echo "add2: ", x, ": ", k
+      var kk = t.inner
+      toAddCount.inc()
+      kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
+  
+  for (x, k) in fieldsT:
+    var found = false
+    for (xx, kk) in fieldsTT:
+      if x == xx:
+        found = true
+        break
+    if not found:
+      # echo "delete: ", x
+      var kk = t.inner
+      kk.deleteColumn(x)
+
+  t.moved = true
+  TTable[TT](inner: t.inner, moved: false)
+  # echo "            to: ", fieldsTT

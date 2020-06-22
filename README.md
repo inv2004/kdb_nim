@@ -17,3 +17,4 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [ ] Separate types for static garanties
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
+- [ ] Other languages except Nim if necessary 

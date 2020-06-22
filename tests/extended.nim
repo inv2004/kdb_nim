@@ -50,7 +50,7 @@ test "table":
   var v = t.v
   check toSeq(t.k) == @[101.int64, 102]
 
-test "table_transforms":
+test "table_transforms_with_default":
   var t = newTTable(T1)
   t.add(T1(k: 1, v: "one"))
   check t.inner.cols() == @["k", "v"]
@@ -59,7 +59,7 @@ test "table_transforms":
   var tt = t.transform(T11)
   tt.add(T11(k: 2, v: "two", vv: 2.2))
   check t.inner.cols() == @["k", "v", "vv"]
-  check tt.vv[0] == 0.0
+  check tt.vv[0] == 0.0  # default value
   check tt.vv[1] == 2.2
 
   try:
@@ -70,5 +70,20 @@ test "table_transforms":
 
   var ttt = tt.transform(T3)
   check t.inner.cols() == @["v"]
+
+test "table_transforms_with_vec":
+  var t = newTTable(T1)
+  t.add(T1(k: 1, v: "one"))
+  check t.inner.cols() == @["k", "v"]
+  check compiles(t.vv) == false
+
+  var v = high.newKVec[float]()
+  v.add(1.1)
+  v.add(2.2)
+
+  var tt = t.transform2(T11, v)
+#   check t.inner.cols() == @["k", "v", "vv"]
+#   check tt.vv[0] == 1.1
+#   check tt.vv[1] == 2.2
 
 
