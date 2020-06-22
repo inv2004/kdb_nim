@@ -58,7 +58,7 @@ test "table_transforms_with_default":
 
   var tt = t.transform(T11)
   tt.add(T11(k: 2, v: "two", vv: 2.2))
-  check t.inner.cols() == @["k", "v", "vv"]
+  check tt.inner.cols() == @["k", "v", "vv"]
   check tt.vv[0] == 0.0  # default value
   check tt.vv[1] == 2.2
 
@@ -69,7 +69,7 @@ test "table_transforms_with_default":
     check true
 
   var ttt = tt.transform(T3)
-  check t.inner.cols() == @["v"]
+  check ttt.inner.cols() == @["v"]
 
 test "table_transforms_with_vec":
   var t = newTTable(T1)
@@ -78,8 +78,6 @@ test "table_transforms_with_vec":
   check t.inner.cols() == @["k", "v"]
   check compiles(t.vv) == false
 
-  # check compiles(t.transform(T11, v, vv)) = false
-  # check compiles(t.transform(T11, vv, v)) = false
   let tt = t.transform(T11, @[1.1, 2.2])
   check tt.inner.cols() == @["k", "v", "vv"]
   check tt.vv[0] == 1.1
