@@ -173,7 +173,7 @@ macro transformCheck(t: typed, tt: typed, cols: typed): untyped =
   result = quote do:
     `l`
 
-template transform2*[T](t: var TTable[T], TT: typedesc, cols: varargs[typed]): TTable[TT] =
+template transform2*[T](t: var TTable[T], TT: typedesc, cols: varargs[TVec[typed]]): TTable[TT] =
   checkMoved(t)
   when T is TT:
     {.warning: "transform into itself".}
@@ -199,7 +199,7 @@ template transform2*[T](t: var TTable[T], TT: typedesc, cols: varargs[typed]): T
       echo "add2: ", x, ": ", k
       var kk = t.inner
       toAddCount.inc()
-      kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
+      kk.addColumnWithKind(x, k, cols[0].inner)
   
   for (x, k) in fieldsT:
     var found = false

@@ -74,12 +74,13 @@ test "table_transforms_with_default":
 test "table_transforms_with_vec":
   var t = newTTable(T1)
   t.add(T1(k: 1, v: "one"))
+  t.add(T1(k: 2, v: "two"))
   check t.inner.cols() == @["k", "v"]
   check compiles(t.vv) == false
 
-  var v = high.newKVec[float]()
-  v.add(1.1)
-  v.add(2.2)
+  var v = high.newKVec[int]()
+  v.add(1)
+  v.add(2)
 
   var tt = t.transform2(T11, v)
 #   check t.inner.cols() == @["k", "v", "vv"]
