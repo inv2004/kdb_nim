@@ -15,7 +15,7 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [x] Implicit casting between Nim and Kdb types
 - [x] Iterators and mutable iterators
 - [x] Separate types for static garanties
-- [x] Nested types
+- [x] Generic types
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
 - [ ] Translate the package into Java/Scala/Kotlin if necessary
