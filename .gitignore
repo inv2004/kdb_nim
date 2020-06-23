@@ -3,3 +3,4 @@ main
 tests/test1
 tests/test_1_low
 tests/test_2_high
+examples/enrich_mavg

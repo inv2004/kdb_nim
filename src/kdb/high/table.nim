@@ -101,7 +101,6 @@ macro defineTable*(T: typedesc): untyped =
 proc """ & x & """*(t: TTable[""" & $T & """]): TVec[""" & t & """] =
   TVec[""" & t & """](inner: t.inner.k.dict.values[""" & $i & """])
 """
-
     result.add parseExpr(code)
 
   var code = """
@@ -114,7 +113,6 @@ proc genValues(t: TTable[""" & $T & """], x: """ & $T & """): seq[K] =
   discard r1(""" & val & """.k)
   result.add(""" & val & """)
 """
-
   result.add parseExpr(code)
 
   result.add parseExpr("""
@@ -138,6 +136,11 @@ proc newTTable*(T: typedesc): TTable[T] =
   # echo "newTTable: ", fields
   let kTable = newKTable(fields)
   TTable[T](inner: kTable, moved: false)
+
+proc toTTable*(k: K, T: typedesc): TTable[T] =
+  when not compiles(checkDefinition(T())):
+    {.fatal: "defineTable".}
+  TTable[T](inner: k, moved: false)
 
 template add*[T](t: var TTable[T], x: T) =
   checkMoved(t)

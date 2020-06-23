@@ -1,5 +1,5 @@
 
-import kdb/high
+import kdb
 import kdb/low
 
 type
@@ -34,13 +34,13 @@ defineTable(T111)
 # defineTable(T4)
 
 test "vec":
-  var t = high.newKVec[int64]()
+  var t = kdb.newKVec[int64]()
   t.add(10)
   t.add(20)
   check toSeq(t) == @[10.int64, 20]
 
 test "vec_of_vec":
-  var v = high.newKVec[seq[int64]]()
+  var v = kdb.newKVec[seq[int64]]()
   v.add(@[10.int64, 20])
   v.add(@[30.int64, 40, 50])
   check v.len() == 2
@@ -52,24 +52,24 @@ test "vec_of_vec":
   check v[1].len() == 4
 
 test "vec_of_vec_of_vec":
-  var v = high.newKVec[seq[seq[int64]]]()
+  var v = kdb.newKVec[seq[seq[int64]]]()
   v.add(@[@[10.int64], @[20.int64, 30]])
   v.add(@[@[40.int64, 50], @[60.int64]])
 
 test "dict":
-  var d = high.newKDict[int, float]()
+  var d = kdb.newKDict[int, float]()
   d[1] = 1.1
   d[2] = 2.2
   d[1] = 3.3
   echo d
-  var dd = high.newKDict[int, string]()
+  var dd = kdb.newKDict[int, string]()
   dd[1] = "onn"
   dd[2] = "two"
   dd[1] = "one"
   echo dd
 
 test "dict_of_vec":
-  var d = high.newKDict[int, seq[float]]()
+  var d = kdb.newKDict[int, seq[float]]()
   d[1] = @[1.1, 11.1]
   d[2] = @[2.2, 22.2]
 
