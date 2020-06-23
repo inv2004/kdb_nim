@@ -14,7 +14,10 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [x] IPC + Sync Replay
 - [x] Implicit casting between Nim and Kdb types
 - [x] Iterators and mutable iterators
-- [ ] Separate types for static garanties
+- [x] Separate types for static garanties
+- [x] Nested types
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
-- [ ] Translate to Java/Scala/Kotlin if necessary 
+- [ ] Translate the package into Java/Scala/Kotlin if necessary
+
+### Advantages
