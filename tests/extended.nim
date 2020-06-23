@@ -19,6 +19,10 @@ type
   T3 = object
     v: string
 
+  # T4 = object
+  #   k: int64
+  #   v: seq[int64]
+
 defineTable(T1)
 
 defineTable(T2)
@@ -27,11 +31,47 @@ defineTable(T11)
 
 defineTable(T111)
 
+# defineTable(T4)
+
 test "vec":
   var t = high.newKVec[int64]()
   t.add(10)
   t.add(20)
   check toSeq(t) == @[10.int64, 20]
+
+test "vec_of_vec":
+  var v = high.newKVec[seq[int64]]()
+  v.add(@[10.int64, 20])
+  v.add(@[30.int64, 40, 50])
+  check v.len() == 2
+  check v[0].len() == 2
+  check v[1].len() == 3
+  var v1 = v[1]
+  check compiles(v1.add(60.6)) == false
+  v1.add(60)
+  check v[1].len() == 4
+
+test "vec_of_vec_of_vec":
+  var v = high.newKVec[seq[seq[int64]]]()
+  v.add(@[@[10.int64], @[20.int64, 30]])
+  v.add(@[@[40.int64, 50], @[60.int64]])
+
+test "dict":
+  var d = high.newKDict[int, float]()
+  d[1] = 1.1
+  d[2] = 2.2
+  d[1] = 3.3
+  echo d
+  var dd = high.newKDict[int, string]()
+  dd[1] = "onn"
+  dd[2] = "two"
+  dd[1] = "one"
+  echo dd
+
+test "dict_of_vec":
+  var d = high.newKDict[int, seq[float]]()
+  d[1] = @[1.1, 11.1]
+  d[2] = @[2.2, 22.2]
 
 test "table":
   var t = newTTable(T1)
@@ -83,4 +123,5 @@ test "table_transforms_with_vec":
   check tt.vv[0] == 1.1
   check tt.vv[1] == 2.2
 
-
+# test "table_of_vec":
+#   var t = newTTable(T4)

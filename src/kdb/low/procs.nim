@@ -123,6 +123,7 @@ proc checkAdd(x: var K0, v: K): bool =
   case x.kind
   of kList: result = true
   of kVecLong: result = v.k.kind == KKind.kLong
+  of kVecFloat: result = v.k.kind == KKind.kFloat
   of kVecSym: result = v.k.kind == KKind.kSym
   else: raise newException(KError, "checkAdd[K] is not supported for " & $x.kind)
 

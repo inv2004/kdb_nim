@@ -25,13 +25,23 @@ proc `[]`*(x: K0, i: int64): K =
   of kList: x.kArr[i].toK()
   else: raise newException(KError, "getFromK0 is not supported for " & $x.kind)
 
+proc get*[T](x: K0, i: int): T =
+  when T is K: x[i]
+  elif T is int64: x.longArr[i]
+  elif T is int: x.longArr[i].int
+  elif T is float64: x.floatArr[i]
+  elif T is cstring: x.stringArr[i]
+  elif T is string: $x.stringArr[i]
+  else: raise newException(KError, "getK0[" & $T & "] is not supported for " & $x.kind)
+
+proc getDict*[T, U](x: K, k: T): U =
+  for i in 0..<x.k.keys.len():
+    if x.k.keys.get[:T](i.int) == k:
+      return x.k.values.get[:U](i.int)
+  raise newException(KError, "key not found " & $k)
+
 proc get*[T](x: K, i: int): T =
-  when T is K: x.k[i]
-  elif T is int64: x.k.longArr[i]
-  elif T is float64: x.k.floatArr[i]
-  elif T is cstring: x.k.stringArr[i]
-  elif T is string: $x.k.stringArr[i]
-  else: raise newException(KError, "get is not supported for " & $x.kind)
+  x.k.get[:T](i)
 
 proc `[]`*(x: K, i: int64): K =
   result = x.get[:K](i.int)

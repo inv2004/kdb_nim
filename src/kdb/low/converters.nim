@@ -23,7 +23,7 @@ proc typeToKKind*[T](): KKind =
   elif T is KList: KKind.kList
   elif T is string: KKind.kList
   elif T is typeof(nil): KKind.kList
-  else: raise newException(KError, "cannot convert type " & $T)
+  else: KKind.kList # raise newException(KError, "cannot convert type " & $T)
 
 proc toVecKKind*(k: KKind): KKind =
   case k:
@@ -159,6 +159,10 @@ proc toSymVec*(columns: openArray[string]): K =
     k0.stringArr[i] = ss(x.cstring)
   result = K(k: k0)
 
+proc toK*[T](v: openArray[seq[T]]): K =
+  result = K(k: ktn(KKind.kList.int, v.len))
+  # TODO: unimplemented
+
 proc toK*[T](v: openArray[T]): K =
   when T is DateTime:
     result = K(k: ktn(typeToKKind[T]().toVecKKind().int, v.len))
@@ -189,7 +193,7 @@ proc toK*[T](v: openArray[T]): K =
 proc toK*(x: K0): K =
   K(k: r1(x))
 
-template `%`*(x: untyped): K =
+template `%`*(x: typed): K =
   toK(x)
 
 # proc fromK(x: K): int =
