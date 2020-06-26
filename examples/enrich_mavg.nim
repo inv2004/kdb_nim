@@ -17,8 +17,8 @@ let client = connect("your-server", 9999)
 var sum = 0.0
 
 while true:
-  var (cmd, data) = client.read(RequestT)               # var - because transform wants mutable
-  var resp = data.transform(ReplyT, toSeq(data.price))  
+  let (cmd, data) = client.read(RequestT)               # var - because transform wants mutable
+  let resp = data.transform(ReplyT, toSeq(data.price))  
   var mAvg = resp.movingSum
   for x in mAvg.mitems():
     sum += x

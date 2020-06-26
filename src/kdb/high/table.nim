@@ -5,7 +5,7 @@ import kdb/high/vec
 import macros
 
 type
-  KTable*[T] = object
+  KTable*[T] = ref object
     inner*: K
     moved: bool
 
@@ -212,37 +212,34 @@ macro transformCheck(t: typed, tt: typed, j: varargs[typed]): untyped =
 proc transform*[T](t: var KTable[T], TT: typedesc): KTable[TT] =
   let toChange = transformCheck(T, TT)
 
-  var kk = t.inner
   for (x, k) in toChange[0]:
-    kk.addColumnWithKind(x, k, newTypedColumn(k, kk.len))
+    t.inner.addColumnWithKind(x, k, newTypedColumn(k, t.inner.len))
 
   for x in toChange[1]:
-    kk.deleteColumn(x)
+    t.inner.deleteColumn(x)
 
   t.moved = true
   result = KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J](t: var KTable[T], TT: typedesc, col1: openArray[J]): KTable[TT] =
+proc transform*[T, J](t: KTable[T], TT: typedesc, col1: openArray[J]): KTable[TT] =
   let toChange = transformCheck(T, TT, J)
 
-  var kk = t.inner
   let addCol1 = toChange[0][0]
-  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
 
   for x in toChange[1]:
-    kk.deleteColumn(x)
+    t.inner.deleteColumn(x)
 
   t.moved = true
   KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J, JJ](t: var KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ]): KTable[TT] =  # TODO: template? macros?
+proc transform*[T, J, JJ](t: KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ]): KTable[TT] =  # TODO: template? macros?
   let toChange = transformCheck(T, TT, J, JJ)
 
-  var kk = t.inner
   let addCol1 = toChange[0][0]
-  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
   let addCol2 = toChange[0][1]
-  kk.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
 
   for x in toChange[1]:
     kk.deleteColumn(x)
@@ -250,16 +247,15 @@ proc transform*[T, J, JJ](t: var KTable[T], TT: typedesc, col1: openArray[J], co
   t.moved = true
   KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J, JJ, JJJ](t: var KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ], col3: openArray[JJJ]): KTable[TT] =
+proc transform*[T, J, JJ, JJJ](t: KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ], col3: openArray[JJJ]): KTable[TT] =
   let toChange = transformCheck(T, TT, J, JJ, JJJ)
 
-  var kk = t.inner
   let addCol1 = toChange[0][0]
-  kk.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
   let addCol2 = toChange[0][1]
-  kk.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
   let addCol3 = toChange[0][2]
-  kk.addColumnWithKind(addCol3[0], addCol3[1], toK(col3))
+  t.inner.addColumnWithKind(addCol3[0], addCol3[1], toK(col3))
 
   for x in toChange[1]:
     kk.deleteColumn(x)
