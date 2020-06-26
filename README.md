@@ -18,6 +18,6 @@ The one of reasons of the package is not only to provide bindings between the tw
 - [x] Generic types
 - [ ] Historical files access
 - [ ] Async-await IO dispatching
-- [ ] Translate the package into Java/Scala/Kotlin if necessary
+- [ ] Translate the package into Java/Scala/Kotlin (by request)
 
 ### Advantages
