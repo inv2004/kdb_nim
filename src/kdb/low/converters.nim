@@ -177,7 +177,7 @@ proc toK*[T](v: openArray[T]): K =
     of kVecFloat:
       for i, x in v:
         result.k.floatArr[i] = x.float64
-    else: raise newException(KError, "openArray proc is not supported for " & $result.kind)
+    else: raise newException(KError, "openArray proc is not supported for " & $result.k.kind)
   elif T is string:
     result = K(k: ktn(typeToKKind[T]().int, v.len))
     for i, x in v:

@@ -31,6 +31,7 @@ while true:
     x = sum
   echo resp
   client.reply(resp)
+
 # check isCall(d)
 # check d[0] == %"test"
 # var t = d[1]

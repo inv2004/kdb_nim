@@ -5,7 +5,7 @@ import kdb/high/vec
 import macros
 
 type
-  TTable*[T] = object
+  KTable*[T] = object
     inner*: K
     moved: bool
 
@@ -30,14 +30,17 @@ proc stringToKVecKind*(x: string): KKind =
   of "nil": KKind.kList
   else: raise newException(KError, "cannot convert type " & x)
 
-proc checkMoved(t: TTable) =
+proc checkMoved(t: KTable) =
   if t.moved: raise newException(ValueError, "table has been transformed already")
 
-proc len*(t: TTable): int =
+proc len*(t: KTable): int =
   checkMoved(t)
   t.inner.len
 
-proc `$`*(t: TTable): string =
+proc cols*(t: KTable): seq[string] =
+  t.inner.cols
+
+proc `$`*(t: KTable): string =
   checkMoved(t)
   $t.inner
 
@@ -85,40 +88,59 @@ proc calcToDelete[T: KKind | string](f: seq[(string, T)], t: seq[(string, T)]): 
       # echo "delete: ", x
       result.add(x)
 
+proc newBracketExpr(a, b: NimNode): NimNode =
+  result = newNimNode(nnkBracketExpr)
+  result.add a
+  result.add b
+
+proc newDiscardStmt(x: NimNode): NimNode =
+  result = newNimNode(nnkDiscardStmt)
+  result.add x
+
+proc newCommand(a, b: NimNode): NimNode =
+  result = newNimNode(nnkCommand)
+  result.add a
+  result.add b
 
 macro defineTable*(T: typedesc): untyped =
   let fields = getFieldsRec(getType(T)[1])
 
-  #if obj[1].kind != nnkEmpty:
-  #  echo obj[1][0].treeRepr
-  #  echo getImpl(obj[1][0]).treeRepr
-    # echo getImpl(getType(obj[1][0])[1])
-
   result = newStmtList()
 
-  for i, (x, t) in fields:
-    let code = """
-proc """ & x & """*(t: TTable[""" & $T & """]): TVec[""" & t & """] =
-  TVec[""" & t & """](inner: t.inner.k.dict.values[""" & $i & """])
-"""
-    result.add parseExpr(code)
+  let getFunc = bindSym("get")
+  let r1Func = bindSym("r1")
+  let toKFunc = bindSym("toK")
+  let kType = bindSym("K")
 
-  var code = """
-proc genValues(t: TTable[""" & $T & """], x: """ & $T & """): seq[K] =
-"""
-  for i, (x, t) in fields:
-    let val = "v" & $i
-    code.add """
-  let """ & val & """ = x.""" & x & """.toK()
-  discard r1(""" & val & """.k)
-  result.add(""" & val & """)
-"""
-  result.add parseExpr(code)
+  let typeDefId = ident($T)
 
-  result.add parseExpr("""
-proc checkDefinition(_: """ & $T & """) =
-  discard
-""")
+  for i, (x, t) in fields:
+    let xId = ident(x)
+    let tId = ident(t)
+    let iId = newIntLitNode(i)
+
+    result.add quote do:
+      proc `xId`*(t: KTable[`typeDefId`]): KVec[`tId`] =
+        KVec[`tId`](inner: `getFunc`[`kType`](t.inner.k.dict.values, `iId`))
+
+  var params = newSeq[NimNode]()
+  params.add newBracketExpr(ident "seq", kType)
+  params.add newIdentDefs(ident "t", newBracketExpr(ident "KTable", typeDefId))
+  params.add newIdentDefs(ident "x", typeDefId)
+
+  var body = newStmtList()
+  for i, (x, _) in fields:
+    let val = ident("v" & $i)
+    body.add newLetStmt(val, newCall(newDotExpr(newDotExpr(ident"x", ident x), toKFunc)))
+    body.add newDiscardStmt(newCall(r1Func, newDotExpr(val, ident"k")))
+    body.add newCommand(newDotExpr(ident"result", ident"add"), val)
+
+  let g = newProc(ident("genValues"), params, body)
+  result.add g
+
+  result.add quote do:
+    proc checkDefinition(_: `typeDefId`) =
+      discard
 
 macro fields(t: typed): untyped =
   let fields = getFieldsRec(getType(t)[1])
@@ -129,23 +151,24 @@ macro fields(t: typed): untyped =
   result = quote do:
     @`fieldsTyped`
 
-proc newTTable*(T: typedesc): TTable[T] =
+proc newTTable*(T: typedesc): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   let fields = fields(T)
   # echo "newTTable: ", fields
   let kTable = newKTable(fields)
-  TTable[T](inner: kTable, moved: false)
+  KTable[T](inner: kTable, moved: false)
 
-proc toTTable*(k: K, T: typedesc): TTable[T] =
+proc toTTable*(k: K, T: typedesc): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
-  TTable[T](inner: k, moved: false)
+  KTable[T](inner: k, moved: false)
 
-template add*[T](t: var TTable[T], x: T) =
+template add*[T](t: var KTable[T], x: T) =
   checkMoved(t)
   let vals = t.genValues(x)
-  t.inner.addRow(vals)
+  # t.inner.addRow(vals)
+  addRow(t.inner, vals)
 
 proc newTypedColumn(k: KKind, size: int): K =
   case k
@@ -186,7 +209,7 @@ macro transformCheck(t: typed, tt: typed, j: varargs[typed]): untyped =
     checkMoved(t)
     (@`toAddKind`, @`toDel`)
 
-proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
+proc transform*[T](t: var KTable[T], TT: typedesc): KTable[TT] =
   let toChange = transformCheck(T, TT)
 
   var kk = t.inner
@@ -197,9 +220,9 @@ proc transform*[T](t: var TTable[T], TT: typedesc): TTable[TT] =
     kk.deleteColumn(x)
 
   t.moved = true
-  result = TTable[TT](inner: t.inner, moved: false)
+  result = KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J](t: var TTable[T], TT: typedesc, col1: openArray[J]): TTable[TT] =
+proc transform*[T, J](t: var KTable[T], TT: typedesc, col1: openArray[J]): KTable[TT] =
   let toChange = transformCheck(T, TT, J)
 
   var kk = t.inner
@@ -210,9 +233,9 @@ proc transform*[T, J](t: var TTable[T], TT: typedesc, col1: openArray[J]): TTabl
     kk.deleteColumn(x)
 
   t.moved = true
-  TTable[TT](inner: t.inner, moved: false)
+  KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J, JJ](t: var TTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ]): TTable[TT] =  # TODO: template? macros?
+proc transform*[T, J, JJ](t: var KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ]): KTable[TT] =  # TODO: template? macros?
   let toChange = transformCheck(T, TT, J, JJ)
 
   var kk = t.inner
@@ -225,9 +248,9 @@ proc transform*[T, J, JJ](t: var TTable[T], TT: typedesc, col1: openArray[J], co
     kk.deleteColumn(x)
 
   t.moved = true
-  TTable[TT](inner: t.inner, moved: false)
+  KTable[TT](inner: t.inner, moved: false)
 
-proc transform*[T, J, JJ, JJJ](t: var TTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ], col3: openArray[JJJ]): TTable[TT] =
+proc transform*[T, J, JJ, JJJ](t: var KTable[T], TT: typedesc, col1: openArray[J], col2: openArray[JJ], col3: openArray[JJJ]): KTable[TT] =
   let toChange = transformCheck(T, TT, J, JJ, JJJ)
 
   var kk = t.inner
@@ -242,4 +265,14 @@ proc transform*[T, J, JJ, JJJ](t: var TTable[T], TT: typedesc, col1: openArray[J
     kk.deleteColumn(x)
 
   t.moved = true
-  TTable[TT](inner: t.inner, moved: false)
+  KTable[TT](inner: t.inner, moved: false)
+
+# dumpTree:
+#   proc genValues(t: KTable[T1], x: T1): seq[K] =
+#     let v1 = x.price.toK()
+#     discard r1(v1.k)
+#     result.add(v1)
+#     let v2 = x.name.toK()
+#     discard r1(v2.k)
+#     result.add(v2)
+

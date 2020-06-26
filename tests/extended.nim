@@ -1,6 +1,4 @@
-
 import kdb
-import kdb/low
 
 type
   T1 = object of RootObj
@@ -93,12 +91,12 @@ test "table":
 test "table_transforms_with_default":
   var t = newTTable(T1)
   t.add(T1(k: 1, v: "one"))
-  check t.inner.cols() == @["k", "v"]
+  check t.cols() == @["k", "v"]
   check compiles(t.vv) == false
 
   var tt = t.transform(T11)
   tt.add(T11(k: 2, v: "two", vv: 2.2))
-  check tt.inner.cols() == @["k", "v", "vv"]
+  check tt.cols() == @["k", "v", "vv"]
   check tt.vv[0] == 0.0  # default value
   check tt.vv[1] == 2.2
 
@@ -109,17 +107,17 @@ test "table_transforms_with_default":
     check true
 
   var ttt = tt.transform(T3)
-  check ttt.inner.cols() == @["v"]
+  check ttt.cols() == @["v"]
 
 test "table_transforms_with_vec":
   var t = newTTable(T1)
   t.add(T1(k: 1, v: "one"))
   t.add(T1(k: 2, v: "two"))
-  check t.inner.cols() == @["k", "v"]
+  check t.cols() == @["k", "v"]
   check compiles(t.vv) == false
 
   let tt = t.transform(T11, @[1.1, 2.2])
-  check tt.inner.cols() == @["k", "v", "vv"]
+  check tt.cols() == @["k", "v", "vv"]
   check tt.vv[0] == 1.1
   check tt.vv[1] == 2.2
 
