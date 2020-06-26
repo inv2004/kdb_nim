@@ -1,15 +1,12 @@
 import kdb
-
 import sequtils
 
 type
-  RequestT = object
+  RequestT = object of RootObj
     ts: int
     price: float
 
-  ReplyT = object
-    ts: int
-    price: float
+  ReplyT = object of RequestT
     movingSum: float
 
 defineTable(RequestT)
