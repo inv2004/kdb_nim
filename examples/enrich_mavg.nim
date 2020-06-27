@@ -12,7 +12,6 @@ type
 defineTable(RequestT)
 defineTable(ReplyT)
 
-# let client = connect("your-server", 9999)
 let client = connect("your-server", 9999)
 
 let d = {1: s"one", 2: s"two", 3: s"three"}.toTable
