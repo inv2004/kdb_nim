@@ -5,6 +5,10 @@ import uuids
 import endians
 import times
 
+type
+  Sym* = object  # it is for high module, but it is here to support toK
+    inner*: K
+
 proc typeToKKind*[T](): KKind =
   when T is bool: KKind.kBool
   elif T is GUID: KKind.kGUID
@@ -17,6 +21,7 @@ proc typeToKKind*[T](): KKind =
   elif T is float64: KKind.kFloat
   elif T is float: KKind.kFloat
   elif T is KSym: KKind.kSym
+  elif T is Sym: KKind.kSym
   elif T is KTimestamp: KKind.kTimestamp
   elif T is KDateTime: KKind.kDateTime
   elif T is DateTime: KKind.kDateTime
@@ -39,6 +44,9 @@ proc toVecKKind*(k: KKind): KKind =
   of KKind.kTimestamp: KKind.kVecTimestamp
   of KKind.kDateTime: KKind.kVecDateTime
   else: KKind.kList
+
+proc toK*(x: Sym): K =
+  x.inner
 
 proc toK*(x: type(nil)): K =
   result = K(k: ka(101))
@@ -183,6 +191,11 @@ proc toK*[T](v: openArray[T]): K =
     for i, x in v:
       let k = x.toK()
       result.k.kArr[i] = r1(k.k)
+  elif T is Sym:
+    result = K(k: ktn(typeToKKind[T]().toVecKKind().int, v.len))
+    discard r1(result.k)
+    for i, x in v:
+      result.k.stringArr[i] = x.inner.k.ss
   elif T is K:
     result = K(k: ktn(typeToKKind[nil]().int, v.len))
     for i, x in v:

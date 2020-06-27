@@ -1,27 +1,32 @@
 import kdb
 import sequtils
+import tables
 
 type
   RequestT = object of RootObj
-    ts: int
-    price: float
+    n: int
 
   ReplyT = object of RequestT
-    movingSum: float
+    s: Sym
 
 defineTable(RequestT)
 defineTable(ReplyT)
 
+# let client = connect("your-server", 9999)
 let client = connect("your-server", 9999)
 
-var sum = 0.0
+let d = {1: s"one", 2: s"two", 3: s"three"}.toTable
 
 while true:
-  let (cmd, data) = client.read(RequestT)               # var - because transform wants mutable
-  let resp = data.transform(ReplyT, toSeq(data.price))  
-  var mAvg = resp.movingSum
-  for x in mAvg.mitems():
-    sum += x
-    x = sum
-  echo resp
-  client.reply(resp)
+  let (cmd, data) = client.read(RequestT)
+  for x in data.n:
+    echo x
+    echo d.getOrDefault(x)
+  # let resp = data.transform(ReplyT, data.n.mapIt(d.getOrDefault(it)))
+  # let resp = data.transform(ReplyT, v)
+  # var mAvg = resp.movingSum
+  # for x in mAvg.mitems():
+    # sum += x
+    # x = sum
+  # echo resp
+  client.reply(data)

@@ -17,6 +17,9 @@ type
   T3 = object
     v: string
 
+  T4 = object of T1
+    s: Sym
+
   # T4 = object
   #   k: int64
   #   v: seq[int64]
@@ -29,7 +32,7 @@ defineTable(T11)
 
 defineTable(T111)
 
-# defineTable(T4)
+defineTable(T4)
 
 test "vec":
   var t = kdb.newKVec[int64]()
@@ -123,3 +126,11 @@ test "table_transforms_with_vec":
 
 # test "table_of_vec":
 #   var t = newTTable(T4)
+
+test "sym":
+  var t = newTTable(T1)
+  t.add(T1(k: 1, v: "one"))
+  t.add(T1(k: 2, v: "two"))
+  let tt = t.transform(T4, [s"one", s"two"])
+  check tt.s[0] == s"one"
+  check tt.s[1] == s"two"

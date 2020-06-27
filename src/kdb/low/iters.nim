@@ -32,6 +32,7 @@ proc get*[T](x: K0, i: int): T =
   elif T is float64: x.floatArr[i]
   elif T is cstring: x.stringArr[i]
   elif T is string: $x.stringArr[i]
+  elif T is Sym: Sym(inner: toSym($x.stringArr[i]))  # TODO: not sure
   else: raise newException(KError, "getK0[" & $T & "] is not supported for " & $x.kind)
 
 proc getDict*[T, U](x: K, k: T): U =

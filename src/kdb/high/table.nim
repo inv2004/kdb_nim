@@ -21,7 +21,7 @@ proc stringToKVecKind*(x: string): KKind =
   of "float32": KKind.kVecReal
   of "float64": KKind.kVecFloat
   of "float": KKind.kVecFloat
-  of "KSym": KKind.kVecSym
+  of "Sym": KKind.kVecSym
   of "KTimestamp": KKind.kVecTimestamp
   of "KDateTime": KKind.kVecDateTime
   of "DateTime": KKind.kVecDateTime
