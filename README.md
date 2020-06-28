@@ -64,7 +64,7 @@ There is also a ``Sym`` type with an ``s`` constructor to easily distinguish sym
 while true:
   let (cmd, data) = client.read(RequestT, check = true)
 ```
-The *read* function returns the called function's name and *KTable* of type provided in the first parameter. Also, the function can check that the data received from kdb-side matches the scheme for the table we defined and throw an exception otherwise.
+The ``read`` function returns the called function's name and ``KTable`` of type provided in the first parameter. Also, the function can check that the data received from kdb-side matches the scheme for the table we defined and throw an exception otherwise.
 
 ```nim
   let symCol = data.n.mapIt(d.getOrDefault(it))
@@ -74,7 +74,7 @@ Here we generate a new column for our reply, see how we can access table's field
 ```nim
   var resp = data.transform(ReplyT, symCol)
 ```
-*transform* function was made to transform tables from one schema to another. By default it makes in-place transformation, so we do not copy the data, but internally enrich low-level kdb data with the new columns or delete some if necessary. We do not need old ``data`` anymore, ``data`` is not available after this transformation. So, to transform ``RequestT`` into ``ReplyT`` we have to add one more column and we provide it in the argument to the function. If ``transform`` does not have arguments except the type, then the column is created with default values for the column's type.
+``transform`` function was made to transform tables from one schema to another. By default it makes in-place transformation, so we do not copy the data, but internally enrich low-level kdb data with the new columns or delete some if necessary. We do not need old ``data`` anymore, ``data`` is not available after this transformation. So, to transform ``RequestT`` into ``ReplyT`` we have to add one more column and we provide it in the argument to the function. If ``transform`` does not have arguments except the type, then the column is created with default values for the column's type.
 
 It's important point out that we also do type checking here. If, for example, we want to put floats into the Sym column, we will get a compilation error: ``Error: transform error: expected: Sym, provided: float``
 
