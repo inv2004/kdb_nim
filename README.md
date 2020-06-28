@@ -83,7 +83,7 @@ It's important point out that we also do type checking here. If, for example, we
   echo resp
   client.reply(resp)
 ```
-Nim distincts between mutable and immutable data, that is why we defined ``var resp`` as mutable in the previous example because we are modifying it. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
+Nim distinguishes between mutable and immutable data, that is why we defined ``var resp`` as mutable in the previous example because we are modifying it. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
 
 All types implement the output interface, so you will see a reply after ``echo``
 ```nim
