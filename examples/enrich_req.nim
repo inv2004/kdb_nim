@@ -14,9 +14,10 @@ defineTable(ReplyT)
 
 let client = connect("your-server", 9999)
 
-let d = {1: "one", 2: "two", 3: "three"}.toTable
+const d = {1: "one", 2: "two", 3: "three"}.toTable
 
 while true:
   let (cmd, data) = client.read(RequestT)
   let resp = data.transform(ReplyT, data.n.mapIt(d.getOrDefault(it)))
+  echo resp
   client.reply(resp)
