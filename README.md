@@ -1,7 +1,7 @@
 # Nim to Kdb bindings
 [![](https://github.com/inv2004/kdb_nim/workflows/Tests/badge.svg)](https://github.com/inv2004/kdb_nim/actions?query=workflow%3ATests)
 
-**Kdb** is column-oriented database https://kx.com with build-in Q and K languages. It quite popular for financial and time-series analytics.
+**Kdb** is column-oriented database https://kx.com with built-in Q and K languages. It is quite popular for financial and time-series analytics.
 
 **Nim** is statically typed compiled programming language with optional GC https://nim-lang.org. It generates very effective intermediate C code, that is why it's speed often is near or equals vanilla-C implementation. In addition Nim shares a lot of Python's aspects like syntax and simplicity of usage.
 
@@ -98,4 +98,3 @@ All types implements output interface, so you will see reply after *echo*
 └─────┴─────────┘
 ````
 And the last one - just sending reply back to client. Also, please find that it is reply to *sync request*, which is not possible in standart Kdb-C-binding without additional hacks.
-
