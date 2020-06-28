@@ -6,7 +6,7 @@
 **Nim** is a statically typed compiled programming language with an optional GC https://nim-lang.org. It compiles to very efficient C code, that is why its' speed is often near or equals the vanilla-C implementation. In addition Nim shares a lot of Python-like aspects like syntax and simplicity of usage.
 
 ### Reason
-The goal of this package is not only to provide bindings between the two languages, but to build statically-checked code and structures on top of Kdb, which, due to it's duck-typed nature leads to a lot of exceptions and errors in Kdb projects.
+The goal of this package is not only to provide bindings between the two languages, but to build statically-checked code and structures on top of Kdb, which, due to it's duck-typed nature leads to a lot of exceptions and runtime errors in Kdb projects.
 
 ### Features / TODO:
 - [x] Support all Kdb types in low-level binding
