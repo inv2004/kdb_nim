@@ -41,11 +41,11 @@ type
 defineTable(RequestT)
 defineTable(ReplyT)
 ```
-One of the main ideas of the library is to help to catch all type-related errors during compile time. That's why the first thing we want is to define schema for the tables we use. We generate the schema by *defineTable* declaration from basic language structures which represent a row of our table.
+One of the main ideas of the library is to help to catch all type-related errors during compile time. That's why the first thing we want is to define schema for the tables we use. We generate the schema by ``defineTable`` declaration from basic language structures which represent a row of our table.
 
-Another point is that Nim has inheritance for structures, and we can use it, so the table *ReplyT* actually has two fields: *n* and *s*.
+Another point is that Nim has inheritance for structures, and we can use it, so the table ``ReplyT`` actually has two fields: ``n`` and ``s``.
 
-*defineTable* automatically generates a function which depends on the struct's fields and types during compiletime, not runtime.
+``defineTable`` automatically generates a function which depends on the struct's fields and types during compiletime, not runtime.
 
 ```nim
 const d = {1: "one", 2: "two", 3: "three"}.toTable
