@@ -12,9 +12,10 @@ type
 defineTable(RequestT)
 defineTable(ReplyT)
 
-let client = connect("your-server", 9999)
-
 const d = {1: "one", 2: "two", 3: "three"}.toTable
+
+let client = connect("your-server", 9999)
+let rep = client.call[:bool](".u.sub", 123.456, "str", s"sym")
 
 while true:
   let (cmd, data) = client.read(RequestT)

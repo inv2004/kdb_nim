@@ -13,3 +13,36 @@ proc read*(client: SocketHandle, T: typedesc, checkSchema = false): (string, KTa
 
 proc reply*(client: SocketHandle, x: KTable) =
   low.sendSyncReply(client, x.inner)
+
+proc get[T](x: K): T =
+  # assert x.kind == typeToKKind[T]()
+  when T is bool:
+    x.k.bb
+  elif T is int64:
+    x.k.ii
+  elif T is int:
+    x.k.ii
+  elif T is float:
+    x.k.ff
+  elif T is seq[bool]:
+    result.add toOpenArray(x.k.boolArr.addr, 0, x.k.boolLen.int - 1)
+  elif T is seq[int64]:
+    result.add toOpenArray(x.k.longArr.addr, 0, x.k.longLen.int - 1)
+  elif T is seq[int]:
+    result.add toOpenArray(x.k.longArr.addr, 0, x.k.longLen.int - 1)
+  elif T is seq[float]:
+    result.add toOpenArray(x.k.floatArr.addr, 0, x.k.floatLen.int - 1)
+  # when T is float: x.k.ff
+  else: raise newException(KError, "get[T] is not supported for " & $T)
+
+proc call*[T](client: SocketHandle, x: string, args: varargs[K, toK]): T =
+  get[T](low.exec(client, x, args))
+
+proc callAsync*(client: SocketHandle, x: string, args: varargs[K, toK]) =
+  low.execAsync(client, x, args)
+
+template toK*(x: typed): K =
+  when x is Sym:
+    x.inner
+  else:
+    low.toK(x)
