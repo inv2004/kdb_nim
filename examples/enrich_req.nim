@@ -14,7 +14,7 @@ defineTable(ReplyT)
 
 let client = connect("your-server", 9999)
 
-let d = {1: s"one", 2: s"two", 3: s"three"}.toTable
+let d = {1: "one", 2: "two", 3: "three"}.toTable
 
 while true:
   let (cmd, data) = client.read(RequestT)
