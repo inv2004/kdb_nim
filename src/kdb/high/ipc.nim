@@ -5,7 +5,7 @@ import table
 
 import net
 
-proc read*(client: SocketHandle, T: typedesc, checkSchema = false): (string, KTable[T]) =
+proc read*(client: SocketHandle, T: typedesc, check = false): (string, KTable[T]) =
   let d = low.read(client)
   if not isCall(d):
     raise newException(KErrorRemote, "not a ipc call")

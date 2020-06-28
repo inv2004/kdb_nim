@@ -11,9 +11,6 @@ proc newSym*(x: string): Sym =
 proc `s`*(x: string): Sym =
   newSym(x)
 
-proc default*(Sym: typedesc): Sym =
-  newSym("")
-
 proc `$`*(x: Sym): string =
   $x.inner
 
