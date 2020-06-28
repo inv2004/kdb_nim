@@ -1,7 +1,9 @@
-
 import kdb/low
 import kdb/high/vec
 
+import kdb/high/sym
+
+import sequtils
 import macros
 
 type
@@ -193,10 +195,11 @@ macro transformCheck(t: typed, tt: typed, j: varargs[typed]): untyped =
     var i = 0
     for x in toAdd:
       let jType = getType(j[0])[1].strVal
-#      echo "          j: ", jType
-#      echo x[1], "-", jType
+      echo "          j: ", jType
+      echo x[1], " - ", jType
       if x[1] != jType:
-        error("transform error: expected: " & x[1] & ", provided: " & jType)
+        if not (x[1] == "Sym" and jType == "string"):
+          error("transform error: expected: " & x[1] & ", provided: " & jType)
       inc(i)
     if i < j.len:
       error("transform error: too many columns provided")
@@ -221,11 +224,20 @@ proc transform*[T](t: var KTable[T], TT: typedesc): KTable[TT] =
   t.moved = true
   result = KTable[TT](inner: t.inner, moved: false)
 
+proc toKOrSym[T](k: KKind, x: openArray[T]): K =
+  when T is string:
+    if k == KKind.kVecSym:
+      toK(x.mapIt(newSym(it)))
+    else:
+      toK(x)
+  else:
+    toK(x)
+
 proc transform*[T, J](t: KTable[T], TT: typedesc, col1: openArray[J]): KTable[TT] =
   let toChange = transformCheck(T, TT, J)
 
   let addCol1 = toChange[0][0]
-  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toKOrSym(addCol1[1], col1))
 
   for x in toChange[1]:
     t.inner.deleteColumn(x)
@@ -237,9 +249,9 @@ proc transform*[T, J, JJ](t: KTable[T], TT: typedesc, col1: openArray[J], col2: 
   let toChange = transformCheck(T, TT, J, JJ)
 
   let addCol1 = toChange[0][0]
-  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toKOrSym(addCol1[1], col1))
   let addCol2 = toChange[0][1]
-  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toKOrSym(addCol2[1], col2))
 
   for x in toChange[1]:
     kk.deleteColumn(x)
@@ -251,11 +263,11 @@ proc transform*[T, J, JJ, JJJ](t: KTable[T], TT: typedesc, col1: openArray[J], c
   let toChange = transformCheck(T, TT, J, JJ, JJJ)
 
   let addCol1 = toChange[0][0]
-  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toK(col1))
+  t.inner.addColumnWithKind(addCol1[0], addCol1[1], toKOrSym(addCol1[1], col1))
   let addCol2 = toChange[0][1]
-  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toK(col2))
+  t.inner.addColumnWithKind(addCol2[0], addCol2[1], toKOrSym(addCol2[1], col3))
   let addCol3 = toChange[0][2]
-  t.inner.addColumnWithKind(addCol3[0], addCol3[1], toK(col3))
+  t.inner.addColumnWithKind(addCol3[0], addCol3[1], toKOrSym(addCol3[1], col3))
 
   for x in toChange[1]:
     kk.deleteColumn(x)

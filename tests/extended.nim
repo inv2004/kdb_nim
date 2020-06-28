@@ -134,3 +134,14 @@ test "sym":
   let tt = t.transform(T4, [s"one", s"two"])
   check tt.s[0] == s"one"
   check tt.s[1] == s"two"
+
+test "sym_string":
+  var t = newTTable(T1)
+  t.add(T1(k: 1, v: "one"))
+  t.add(T1(k: 2, v: "two"))
+  var tt = t.transform(T4, ["one", "two"])
+  check tt.s[0] == "one"
+  check tt.s[1] == "two"
+  tt.add(T4(k: 3, v: "three", s: "three"))
+  check tt.s[2] == s"three"
+

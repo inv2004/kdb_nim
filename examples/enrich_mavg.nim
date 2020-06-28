@@ -18,5 +18,5 @@ let d = {1: s"one", 2: s"two", 3: s"three"}.toTable
 
 while true:
   let (cmd, data) = client.read(RequestT)
-  let resp = data.transform(ReplyT, data.n.mapIt(d.getOrDefault(it, s"")))
+  let resp = data.transform(ReplyT, data.n.mapIt(d.getOrDefault(it)))
   client.reply(resp)
