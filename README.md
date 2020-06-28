@@ -1,7 +1,7 @@
 # Nim to Kdb bindings
 [![](https://github.com/inv2004/kdb_nim/workflows/Tests/badge.svg)](https://github.com/inv2004/kdb_nim/actions?query=workflow%3ATests)
 
-**Kdb** is a column-oriented database https://kx.com with build-in Q and K languages. It quite popular for financial and time-series analytics.
+**Kdb** is a column-oriented database https://kx.com with built-in Q and K languages. It's quite popular for financial and time-series analytics.
 
 **Nim** is a statically typed compiled programming language with an optional GC https://nim-lang.org. It compiles to very efficient C code, that is why its' speed is often near or equals the vanilla-C implementation. In addition Nim shares a lot of Python-like aspects like syntax and simplicity of usage.
 
