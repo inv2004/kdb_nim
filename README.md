@@ -21,6 +21,7 @@ The goal of this package is not only to provide bindings between the two languag
 - [ ] Translate the package into Java/Scala/Kotlin (by request)
 
 ### Advantages
+Except low-level binding from ``kdb/low``, the main goal the library to interact via high-level interface.
 The best way to understand the advantages of this package is by going through an example:
 
 #### Init part
@@ -45,7 +46,7 @@ One of the main ideas of the library is to help to catch all type-related errors
 
 Another point is that Nim has inheritance for structures, and we can use it, so the table ``ReplyT`` actually has two fields: ``n`` and ``s``.
 
-``defineTable`` automatically generates a function which depends on the struct's fields and types during compiletime, not runtime.
+``defineTable`` automatically generates a functions to interact with the table according to the struct's fields and types during compiletime, not runtime.
 
 ```nim
 const d = {1: "one", 2: "two", 3: "three"}.toTable
