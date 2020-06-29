@@ -1,4 +1,4 @@
-# Nim to Kdb bindings
+# Nim to Kdb type-safe bindings
 [![](https://github.com/inv2004/kdb_nim/workflows/Tests/badge.svg)](https://github.com/inv2004/kdb_nim/actions?query=workflow%3ATests)
 
 **Kdb** is a column-oriented database https://kx.com with built-in Q and K languages. It is quite popular for financial and time-series analytics.
