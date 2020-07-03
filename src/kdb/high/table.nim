@@ -161,7 +161,7 @@ proc newTTable*(T: typedesc): KTable[T] =
   let kTable = newKTable(fields)
   KTable[T](inner: kTable, moved: false)
 
-proc toTTable*(k: K, T: typedesc): KTable[T] =
+proc toTTable*(k: K, T: typedesc, check = false): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   let fields = fields(T)

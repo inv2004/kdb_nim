@@ -5,7 +5,12 @@ import table
 
 import net
 
-proc read*(client: SocketHandle, T: typedesc, check = false): (string, KTable[T]) =
+var defaultCheck = false
+
+proc setCheck*(check: bool) =
+  defaultCheck = check
+
+proc read*(client: SocketHandle, T: typedesc, check = defaultCheck): (string, KTable[T]) =
   let d = low.read(client)
   if not isCall(d):
     raise newException(KErrorRemote, "not a ipc call")
@@ -15,7 +20,7 @@ proc read*(client: SocketHandle, T: typedesc, check = false): (string, KTable[T]
   if str.len > 0:
     copyMem(str[0].addr, call.k.charArr.addr, call.k.charLen)
 
-  (str, d[1].toTTable(T))
+  (str, d[1].toTTable(T, check = check))
 
 proc reply*(client: SocketHandle, x: KTable) =
   low.sendSyncReply(client, x.inner)
@@ -47,9 +52,9 @@ proc get[T](x: K): T =
 proc call*[T](client: SocketHandle, x: string, t: KTable): T =
   get[T](low.exec(client, x, t.inner))
 
-proc callTable*[T](client: SocketHandle, x: string, args: varargs[K, toK]): KTable[T] =
+proc callTable*[T](client: SocketHandle, x: string, args: varargs[K, toK], check = defaultCheck): KTable[T] =
   let res = low.exec(client, x, args)
-  res.toTTable(T)
+  res.toTTable(T, check)
 
 proc call*[T](client: SocketHandle, x: string, args: varargs[K, toK]): T =
   get[T](low.exec(client, x, args))
