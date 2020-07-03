@@ -77,14 +77,14 @@ Here we generate a new column for our reply, see how we can access table's field
 ```
 ``transform`` function was made to transform tables from one schema to another. By default it makes in-place transformation, so we do not copy the data, but internally enrich low-level kdb data with the new columns or delete some if necessary. We do not need old ``data`` anymore, ``data`` is not available after this transformation. So, to transform ``RequestT`` into ``ReplyT`` we have to add one more column and we provide it in the argument to the function. If ``transform`` does not have arguments except the type, then the column is created with default values for the column's type.
 
-It's important point out that we also do type checking here. If, for example, we want to put floats into the Sym column, we will get a compilation error: ``Error: transform error: expected: Sym, provided: float``
+It's important point out that we also do type checking here. If we try to put floats into the Sym column for some reasons, we will get a compilation error: ``Error: transform error: expected: Sym, provided: float``
 
 ```nim
   resp.add(ReplyT(n: 100, s: "hundred"))
   echo resp
   client.reply(resp)
 ```
-Nim distinguishes between mutable and immutable data, that is why we defined ``var resp`` as mutable in the previous example because we are modifying it. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
+Nim distinguishes between mutable and immutable data, that is why we defined ``var resp`` as mutable in the previous lines because we are going to modify it by adding row. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
 
 All types implement the output interface, so you will see a reply after ``echo``
 ```nim
