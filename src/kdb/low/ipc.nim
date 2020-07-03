@@ -80,7 +80,7 @@ proc sendSyncReply*(h: SocketHandle, v: K) =
 proc isCall*(x: K): bool =
   (x.kind == KKind.kList or x.kind == kVecSym) and x.len >= 2
 
-proc waitOnPort*(port: int, timeout = 1000): SocketHandle =
+proc listen*(port: int, timeout = 1000): SocketHandle =
   var server = newSocket()
   server.setSockOpt(OptReuseAddr, true)
   server.bindAddr(Port(port))

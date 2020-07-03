@@ -54,7 +54,7 @@ proc getM*[T](x: K0, i: int): var T =
   elif T is float64: x.floatArr[i]
   elif T is cstring: x.stringArr[i]
   elif T is string: x.stringArr[i]
-  else: raise newException(KError, "getM is not supported for " & $x.kind)
+  else: raise newException(KError, "getM is not supported for " & $T)
 
 iterator items*(x: K): K =
   case x.k.kind

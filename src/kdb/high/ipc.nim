@@ -1,5 +1,5 @@
 import kdb/low
-export low.waitOnPort
+export low.listen
 export low.connect
 import table
 
@@ -9,7 +9,13 @@ proc read*(client: SocketHandle, T: typedesc, check = false): (string, KTable[T]
   let d = low.read(client)
   if not isCall(d):
     raise newException(KErrorRemote, "not a ipc call")
-  ($d[0], d[1].toTTable(T))
+
+  let call = d[0]
+  var str = newString(call.k.charLen)  # copy from format, but without quotes
+  if str.len > 0:
+    copyMem(str[0].addr, call.k.charArr.addr, call.k.charLen)
+
+  (str, d[1].toTTable(T))
 
 proc reply*(client: SocketHandle, x: KTable) =
   low.sendSyncReply(client, x.inner)
@@ -37,6 +43,13 @@ proc get[T](x: K): T =
   elif T is (bool, string):  # TODO: remake to support tuple
     (x.k.kArr[0].bb, $x.k.kArr[1].ss)
   else: raise newException(KError, "get[T] is not supported for " & $T)
+
+proc call*[T](client: SocketHandle, x: string, t: KTable): T =
+  get[T](low.exec(client, x, t.inner))
+
+proc callTable*[T](client: SocketHandle, x: string, args: varargs[K, toK]): KTable[T] =
+  let res = low.exec(client, x, args)
+  res.toTTable(T)
 
 proc call*[T](client: SocketHandle, x: string, args: varargs[K, toK]): T =
   get[T](low.exec(client, x, args))

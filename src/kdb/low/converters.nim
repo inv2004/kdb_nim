@@ -206,6 +206,9 @@ proc toK*[T](v: openArray[T]): K =
 proc toK*(x: K0): K =
   K(k: r1(x))
 
+proc toK*(x: K): K =
+  x
+
 template `%`*(x: typed): K =
   toK(x)
 

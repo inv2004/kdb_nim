@@ -164,6 +164,7 @@ proc newTTable*(T: typedesc): KTable[T] =
 proc toTTable*(k: K, T: typedesc): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
+  let fields = fields(T)
   KTable[T](inner: k, moved: false)
 
 template add*[T](t: var KTable[T], x: T) =
