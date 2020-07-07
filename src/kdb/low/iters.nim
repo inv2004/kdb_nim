@@ -83,6 +83,11 @@ iterator pairs*(x: K): (K, K) =
     for k in toK(x.k.keys):
       yield (k, x.k.values[i])
       inc(i)
+  of KKind.kTable:
+    var i = 0
+    for k in toK(x.k.dict.keys):
+      yield (k, x.k.dict.values[i])
+      inc(i)
   else:
     var i = 0
     for v in x:

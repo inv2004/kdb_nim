@@ -161,10 +161,24 @@ proc newTTable*(T: typedesc): KTable[T] =
   let kTable = newKTable(fields)
   KTable[T](inner: kTable, moved: false)
 
+proc checkK[T](k: K) =
+  let fields = fields(T)
+  for k, v in k.pairs():
+    var found = false
+    for kk in fields:
+      if kk[0] == $k:
+        if kk[1] != v.kind:
+          raise newException(Exception, "check failed: fields `" & $k & "` expected " & $kk[1] & " but received " & $v.kind)
+        found = true
+        break
+    
+    if not found:
+      raise newException(Exception, "check failed: fields `" & $k & "` is not found in schema definition")
+
 proc toTTable*(k: K, T: typedesc, check = false): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
-  let fields = fields(T)
+  checkK[T](k)
   KTable[T](inner: k, moved: false)
 
 template add*[T](t: var KTable[T], x: T) =
@@ -196,8 +210,8 @@ macro transformCheck(t: typed, tt: typed, j: varargs[typed]): untyped =
     var i = 0
     for x in toAdd:
       let jType = getType(j[0])[1].strVal
-      echo "          j: ", jType
-      echo x[1], " - ", jType
+      # echo "          j: ", jType
+      # echo x[1], " - ", jType
       if x[1] != jType:
         if not (x[1] == "Sym" and jType == "string"):
           error("transform error: expected: " & x[1] & ", provided: " & jType)
