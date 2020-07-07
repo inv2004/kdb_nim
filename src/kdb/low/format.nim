@@ -29,7 +29,7 @@ proc fmtKList(x: K): string =
     result.add $toK(x.k.kArr[i])
   result.add ")"
 
-proc flatTable*(x: K): string =
+proc flatoKTable*(x: K): string =
   result.add "|"
   for i in 0..<x.k.dict.keys.len:
     if i > 0:

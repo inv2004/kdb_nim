@@ -30,7 +30,7 @@ test "test_ipc":
 
   let h = connect("localhost", 9999)
   check true
-  var t = newTTable(ReqT)
+  var t = newKTable(ReqT)
   t.add(ReqT(x: 1))
   t.add(ReqT(x: 2))
   t.add(ReqT(x: 3))
@@ -48,7 +48,7 @@ test "test_ipc_high_check":
     except:
       check true
   
-    var t = newTTable(ReqTErr1)
+    var t = newKTable(ReqTErr1)
     client.reply(t)
 
   var worker1: Thread[void]
@@ -58,7 +58,7 @@ test "test_ipc_high_check":
 
   let h = connect("localhost", 9997)
   check true
-  var t = newTTable(ReqT)
+  var t = newKTable(ReqT)
   try:
     let response = h.callTable[:ReqTErr2]("test", t.inner, check = true)
     check false

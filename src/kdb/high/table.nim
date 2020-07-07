@@ -153,11 +153,11 @@ macro fields(t: typed): untyped =
   result = quote do:
     @`fieldsTyped`
 
-proc newTTable*(T: typedesc): KTable[T] =
+proc newKTable*(T: typedesc): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   let fields = fields(T)
-  # echo "newTTable: ", fields
+  # echo "newKTable: ", fields
   let kTable = newKTable(fields)
   KTable[T](inner: kTable, moved: false)
 
@@ -175,7 +175,7 @@ proc checkK[T](k: K) =
     if not found:
       raise newException(Exception, "check failed: fields `" & $k & "` is not found in schema definition")
 
-proc toTTable*(k: K, T: typedesc, check = false): KTable[T] =
+proc totoKTable*(k: K, T: typedesc, check = false): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   checkK[T](k)

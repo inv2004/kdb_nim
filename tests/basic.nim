@@ -108,7 +108,7 @@ test "tables_simple":
   t.addRow(%4, %"40")
   t.addRow(%5, %"50")
   check t.len == 3
-  check t.flatTable() == """|aaa: [3, 4, 5], bbb: ("30"; "40"; "50")|"""
+  check t.flatoKTable() == """|aaa: [3, 4, 5], bbb: ("30"; "40"; "50")|"""
 
   var tt = newKTable()
   tt.addColumn[:GUID]("id")
@@ -118,7 +118,7 @@ test "tables_simple":
   tt.addRow("0a000000-0000-0000-0000-000000000002".toGUID(), s"nick2", %"name2")
   tt.addRow("0a000000-0000-0000-0000-000000000003".toGUID(), s"nick3", %"name3")
   tt.addRow("0a000000-0000-0000-0000-000000000004".toGUID(), s"nick4", %"name4")
-  let tStr = tt.flatTable()
+  let tStr = tt.flatoKTable()
   check tStr.startsWith "|id: [0a000000-0000-0000-0000-000000000001, 0a000000-"
   check tStr.contains "nick: [nick1, nick2, nick3, nick4]"
   check tStr.contains """name: ("name1"; "name2"; "name3"; "name4")|"""
@@ -131,7 +131,7 @@ test "table_del":
   t.addRow(%4, %"40")
   t.addRow(%5, %"50")
   t.deleteColumn("aaa")
-  check t.flatTable() == """|bbb: ("30"; "40"; "50")|"""
+  check t.flatoKTable() == """|bbb: ("30"; "40"; "50")|"""
 
 test "iterators":
   var t = newKVec[KSym]()

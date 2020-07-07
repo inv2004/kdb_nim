@@ -75,7 +75,7 @@ test "dict_of_vec":
   d[2] = @[2.2, 22.2]
 
 test "table":
-  var t = newTTable(T1)
+  var t = newKTable(T1)
   t.add(T1(k: 1, v: "one"))
   t.add(T1(k: 2, v: "two"))
   # discard r1(t.inner.k.dict.values.kArr)
@@ -92,7 +92,7 @@ test "table":
   check toSeq(t.k) == @[101.int64, 102]
 
 test "table_transforms_with_default":
-  var t = newTTable(T1)
+  var t = newKTable(T1)
   t.add(T1(k: 1, v: "one"))
   check t.cols() == @["k", "v"]
   check compiles(t.vv) == false
@@ -113,7 +113,7 @@ test "table_transforms_with_default":
   check ttt.cols() == @["v"]
 
 test "table_transforms_with_vec":
-  var t = newTTable(T1)
+  var t = newKTable(T1)
   t.add(T1(k: 1, v: "one"))
   t.add(T1(k: 2, v: "two"))
   check t.cols() == @["k", "v"]
@@ -125,10 +125,10 @@ test "table_transforms_with_vec":
   check tt.vv[1] == 2.2
 
 # test "table_of_vec":
-#   var t = newTTable(T4)
+#   var t = newKTable(T4)
 
 test "sym":
-  var t = newTTable(T1)
+  var t = newKTable(T1)
   t.add(T1(k: 1, v: "one"))
   t.add(T1(k: 2, v: "two"))
   let tt = t.transform(T4, [s"one", s"two"])
@@ -136,7 +136,7 @@ test "sym":
   check tt.s[1] == s"two"
 
 test "sym_string":
-  var t = newTTable(T1)
+  var t = newKTable(T1)
   t.add(T1(k: 1, v: "one"))
   t.add(T1(k: 2, v: "two"))
   var tt = t.transform(T4, ["one", "two"])
