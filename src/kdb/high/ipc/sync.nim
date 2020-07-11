@@ -1,7 +1,7 @@
 import kdb/low
 export low.listen
 export low.connect
-import table
+import kdb/high/table
 
 import net
 

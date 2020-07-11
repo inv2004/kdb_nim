@@ -132,6 +132,9 @@ proc kerr*(x: cstring): K0 {.
 proc b9*(t: cint, v: K0): K0 {.
   importc: "b9", header: "k.h".}
 
+proc d9*(x: K0): K0 {.
+  importc: "d9", header: "k.h".}
+
 proc checkCStructOffset*() {.
   importc: "check_c_struct_offset".}
 

@@ -149,8 +149,8 @@ proc add*(x: var K0, v: K) =
 proc add*(x: var K, v: K) =
   add(x.k, v)
 
-proc newKVec*[T](): K =
-  let k0 = ktn(typeToKKind[T]().toVecKKind().int, 0)
+proc newKVec*[T](cap = 0): K =
+  let k0 = ktn(typeToKKind[T]().toVecKKind().int, cap)
   result = K(k: k0)
 
 proc newKVecTyped*(k: KKind): K =

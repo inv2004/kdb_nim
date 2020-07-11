@@ -7,6 +7,7 @@
 import tables
 import sequtils
 import os
+import asyncdispatch
 
 test "test_ipc_sync":
   proc server() {.gcsafe.} =
@@ -31,7 +32,7 @@ test "test_ipc_sync":
 
   worker1.joinThread()
 
-test "test_ipc_async":
+test "test_ipc_sendasync":
   proc server() {.gcsafe.} =
     let client = listen(9998)
     var t = low.read(client)
@@ -52,23 +53,25 @@ test "test_ipc_async":
 
   worker1.joinThread()
 
+test "test_ipc_async":
+  proc server() {.gcsafe.} =
+    proc f(x: K): K =
+      var y = x
+      for x in y.mitems[:int64]:
+        x *= 2
+      y
 
-# test "testRemoteRead":
-#   let h = connect("test-kdb", 9999)
-#   let r = h.read()
-#   if not r.isCall():
-#     h.sendSyncReply("not_call".toError())
-#   else:
-#     const map = {1: "one", 2: "two", 3:"three"}.toTable
+    waitFor asyncServe1(9997, f)
 
-#     var t = r[1]
-#     case t.kind
-#     of kTable:
-#       var c1 = (0..<t.len).toSeq()
-#       let c2 = t["a"].mapIt(map.getOrDefault(it.k.jj.int))
-#       t.addColumn[:int]("z", %c1)
-#       t.addColumn[:string]("zz", %c2)
-#       t.addColumn[:KSym]("zzz", c2.toSymVec())
-#       h.sendSyncReply(t)
-#     else:
-#       h.sendSyncReply("not_table".toError())
+  var worker1: Thread[void]
+  createThread(worker1, server)
+
+  sleep(20)
+
+  let h = connect("localhost", 9997)
+  check true
+  h.sendASync(%[10, 20, 30])
+  let response = h.read()
+  check response == %[20, 40, 60]
+
+  worker1.joinThread()

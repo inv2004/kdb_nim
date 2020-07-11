@@ -6,5 +6,7 @@ import kdb/high/table
 export table
 import kdb/high/sym
 export sym
-import kdb/high/ipc
-export ipc
+import kdb/high/ipc/sync
+export sync
+import kdb/high/ipc/async
+export async

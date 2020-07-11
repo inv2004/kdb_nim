@@ -41,7 +41,7 @@ test "test_ipc":
 
 test "test_ipc_high_check":
   proc server() {.gcsafe.} =
-    let client = listen(9997)
+    let client = listen(9998)
     try:
       var (call, data) = client.read(ReqTErr1)
       check false
@@ -56,7 +56,7 @@ test "test_ipc_high_check":
 
   sleep(20)
 
-  let h = connect("localhost", 9997)
+  let h = connect("localhost", 9998)
   check true
   var t = newKTable(ReqT)
   try:
