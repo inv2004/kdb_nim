@@ -34,7 +34,7 @@ proc initializeClient(client: AsyncSocket) {.async} =
   bufSend[0] = version.char
   await client.send(bufSend)
 
-proc sendSyncReplyHere*(client: AsyncSocket, v: K) {.async.} =
+proc sendSyncReplyAsync(client: AsyncSocket, v: K) {.async.} =
   case v.kind
   of kError:  # kError does not work via b9
     let strLen = v.k.msg.len()
@@ -53,7 +53,7 @@ proc sendSyncReplyHere*(client: AsyncSocket, v: K) {.async.} =
     await client.send(data.byteArr.addr, data.byteLen.int)
     r0(data)
 
-proc sendAsyncHere*(client: AsyncSocket, v: K) {.async.} =
+proc sendAsyncAsync(client: AsyncSocket, v: K) {.async.} =
   let data = b9(3, v.k)
   data.byteArr[1] = 0  # async type
   await client.send(data.byteArr.addr, data.byteLen.int)
@@ -73,8 +73,8 @@ proc processClient1(client: AsyncSocket, callback: proc (request: K): K {.closur
   assert not isNil(k)
   let reply = callback(k.toK())
   case buf[1].byte
-  of 0: await client.sendSyncReplyHere(reply)
-  of 1: await client.sendASyncHere(reply)
+  of 0: await client.sendASyncAsync(reply)      # initial request was async
+  of 1: await client.sendSyncReplyAsync(reply)  # initial request was sync
   else: raise newException(KError, "unsupported msg type")
 
 proc asyncServe1*(port: uint32, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
