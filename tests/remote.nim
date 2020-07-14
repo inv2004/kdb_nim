@@ -56,10 +56,9 @@ test "test_ipc_sendasync":
 test "test_ipc_async":
   proc server() {.gcsafe.} =
     proc f(x: K): K =
-      var y = x
-      for x in y.mitems[:int64]:
+      result = x
+      for x in result.mitems[:int64]:
         x *= 2
-      y
 
     waitFor asyncServe(9997, f)
 
