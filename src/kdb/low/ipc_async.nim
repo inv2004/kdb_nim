@@ -7,26 +7,6 @@ import endians
 
 # var clients {.threadvar.}: seq[AsyncSocket]
 
-proc processClient(client: AsyncSocket, callback: proc (request: string): string {.closure,gcsafe.}) {.async.} =
-  while true:
-    let header = await client.recv(4)
-
-    # if line.len == 0: break
-    # await client.send(callback(line))
-
-proc asyncServe*(port: uint32, callback: proc (request: string): string {.closure,gcsafe.}) {.async.} =
-  # clients = @[]
-
-  var server = newAsyncSocket()
-  server.setSockOpt(OptReuseAddr, true)
-  server.bindAddr(Port(port))
-  server.listen()
-
-  while true:
-    let client = await server.accept()
-    # clients.add client
-    asyncCheck processClient(client, callback)
-
 proc initializeClient(client: AsyncSocket) {.async} =
   let buf = await client.recv(3)
   let version = if buf.len() > 1: max(3.byte, buf[^2].byte) else: 0.byte
@@ -59,8 +39,7 @@ proc sendAsyncAsync(client: AsyncSocket, v: K) {.async.} =
   await client.send(data.byteArr.addr, data.byteLen.int)
   r0(data)
 
-proc processClient1(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
-  await initializeClient(client)
+proc processMessage(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
   var buf = await client.recv(8)
   var len = 0
   littleEndian64(len.addr, buf[4].unsafeAddr)
@@ -77,12 +56,18 @@ proc processClient1(client: AsyncSocket, callback: proc (request: K): K {.closur
   of 1: await client.sendSyncReplyAsync(reply)  # initial request was sync
   else: raise newException(KError, "unsupported msg type")
 
-proc asyncServe1*(port: uint32, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
+proc processClient(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
+  await initializeClient(client)
+  while true:
+    await processMessage(client, callback)
+
+proc asyncServe*(port: uint32, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
   var server = newAsyncSocket()
   server.setSockOpt(OptReuseAddr, true)
   server.bindAddr(Port(port))
   server.listen()
 
-  let client = await server.accept()
-  echo "connected"
-  await processClient1(client, callback)
+  while true:
+    let client = await server.accept()
+    echo "connected"
+    await processClient(client, callback)

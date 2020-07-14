@@ -61,7 +61,7 @@ test "test_ipc_async":
         x *= 2
       y
 
-    waitFor asyncServe1(9997, f)
+    waitFor asyncServe(9997, f)
 
   var worker1: Thread[void]
   createThread(worker1, server)
@@ -74,4 +74,4 @@ test "test_ipc_async":
   let response = h.read()
   check response == %[20, 40, 60]
 
-  worker1.joinThread()
+  # worker1.joinThread()
