@@ -67,3 +67,24 @@ test "test_ipc_high_check":
 
   worker1.joinThread()
 
+# test "test_ipc_high_async":
+#   proc server() {.gcsafe.} =
+#     proc f(x: K): K =
+#       result = x
+#       for x in result.mitems[:int64]:
+#         x *= 2
+
+#     waitFor asyncServe(9997, f)
+
+#   var worker1: Thread[void]
+#   createThread(worker1, server)
+
+#   sleep(20)
+
+#   let h = connect("localhost", 9997)
+#   check true
+#   h.sendASync(%[10, 20, 30])
+#   let response = h.read()
+#   check response == %[20, 40, 60]
+
+#   # worker1.joinThread()

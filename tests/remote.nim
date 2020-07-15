@@ -67,10 +67,10 @@ test "test_ipc_async":
 
   sleep(20)
 
-  let h = connect("localhost", 9997)
+  let h = waitFor asyncConnect("localhost", 9997)
   check true
-  h.sendASync(%[10, 20, 30])
-  let response = h.read()
+  waitFor h.sendASync(%[10, 20, 30])
+  let response = waitFor h.read()
   check response == %[20, 40, 60]
 
   # worker1.joinThread()
