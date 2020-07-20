@@ -20,7 +20,7 @@ proc read*(client: SocketHandle, T: typedesc, check = defaultCheck): (string, KT
   if str.len > 0:
     copyMem(str[0].addr, call.k.charArr.addr, call.k.charLen)
 
-  (str, d[1].totoKTable(T, check = check))
+  (str, d[1].toKTable(T, check = check))
 
 proc reply*(client: SocketHandle, x: KTable) =
   low.sendSyncReply(client, x.inner)
@@ -54,7 +54,7 @@ proc call*[T](client: SocketHandle, x: string, t: KTable): T =
 
 proc callTable*[T](client: SocketHandle, x: string, args: varargs[K, toK], check = defaultCheck): KTable[T] =
   let res = low.exec(client, x, args)
-  res.totoKTable(T, check)
+  res.toKTable(T, check)
 
 proc call*[T](client: SocketHandle, x: string, args: varargs[K, toK]): T =
   get[T](low.exec(client, x, args))

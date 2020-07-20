@@ -175,7 +175,7 @@ proc checkK[T](k: K) =
     if not found:
       raise newException(Exception, "check failed: fields `" & $k & "` is not found in schema definition")
 
-proc totoKTable*(k: K, T: typedesc, check = false): KTable[T] =
+proc toKTable*(k: K, T: typedesc, check = false): KTable[T] =
   when not compiles(checkDefinition(T())):
     {.fatal: "defineTable".}
   checkK[T](k)
