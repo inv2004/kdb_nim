@@ -7,6 +7,10 @@ import endians
 
 # var clients {.threadvar.}: seq[AsyncSocket]
 
+type
+  MessageType* = enum
+    Async = 0, Sync = 1, Response = 2
+
 proc handshake*(client: AsyncSocket) {.async} =
   let buf = await client.recv(3)
   let version = if buf.len() > 1: min(3.byte, buf[^2].byte) else: 0.byte
@@ -39,22 +43,26 @@ proc sendAsyncAsync*(client: AsyncSocket, v: K) {.async.} =
   await client.send(data.byteArr.addr, data.byteLen.int)
   r0(data)
 
-proc processMessage(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
-  var buf = await client.recv(8)
+proc readMessage*(socket: AsyncSocket): Future[(MessageType, K)] {.async.} =
+  var buf = await socket.recv(8)
   var len = 0
   littleEndian32(len.addr, buf[4].addr)
   buf.add(newString(len - 8))
-  let size = await client.recvInto(buf[8].addr, len - 8)  # TODO: add logic to add into buffer
+  let size = await socket.recvInto(buf[8].addr, len - 8)  # TODO: add logic to add into buffer
   var kBytes = newKVec[byte](len)
   copyMem(kBytes.k.byteArr.addr, buf[0].addr, len)
   
   let k = d9(kBytes.k)
   assert not isNil(k)
+  result = (MessageType(buf[1].byte), k.toK())
 
-  let reply = callback(k.toK())
-  case buf[1].byte
-  of 0: await client.sendASyncAsync(reply)      # initial request was async
-  of 1: await client.sendSyncReplyAsync(reply)  # initial request was sync
+proc processMessage(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
+  let x = await client.readMessage()
+
+  let reply = callback(x[1].toK())
+  case x[0]
+  of Async: await client.sendASyncAsync(reply)      # initial request was async
+  of Sync: await client.sendSyncReplyAsync(reply)   # initial request was sync
   else: raise newException(KError, "unsupported msg type")
 
 proc processClient(client: AsyncSocket,
@@ -90,15 +98,14 @@ proc sendAsync*(socket: AsyncSocket, v: K) {.async.} =
   await socket.send(data.byteArr.addr, data.byteLen.int)
   r0(data)
 
+proc callAsync*(socket: AsyncSocket, x: string, v: K) {.async.} =
+  var l = newKList()
+  l.add(x.toK())
+  l.add(v)
+  let data = b9(3, l.k)
+  data.byteArr[1] = 1  # sync type
+  await socket.send(data.byteArr.addr, data.byteLen.int)
+  r0(data)
+
 proc read*(socket: AsyncSocket): Future[K] {.async.} =
-  var buf = await socket.recv(8)
-  var len = 0
-  littleEndian32(len.addr, buf[4].addr)
-  buf.add(newString(len - 8))
-  let size = await socket.recvInto(buf[8].addr, len - 8)  # TODO: add logic to add into buffer
-  var kBytes = newKVec[byte](len)
-  copyMem(kBytes.k.byteArr.addr, buf[0].addr, len)
-  
-  let k = d9(kBytes.k)
-  assert not isNil(k)
-  result = k.toK()
+  result = (await socket.readMessage())[1]

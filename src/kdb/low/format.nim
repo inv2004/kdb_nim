@@ -101,9 +101,7 @@ proc `$`*(x: K): string {.gcsafe.} =
   of kChar:
     result.add "'" & $x.k.ch & "'"
   of kSym:
-    # var str = newString(4)
-    # copyMem(str[0].addr, x.k.ss.addr, 4)
-    result.add $x.k.ss
+    result.add getStr(x)
   of kBool:
     result.add $x.k.bb.bool
   of kId:
@@ -136,10 +134,7 @@ proc `$`*(x: K): string {.gcsafe.} =
     let d = initTime(0, 0) + initDuration(milliseconds = x.k.tt)
     result.add d.format(timeFormat, zone = utc())
   of kVecChar:
-    var str = newString(x.k.charLen)
-    if str.len > 0:
-      copyMem(str[0].addr, x.k.charArr.addr, x.k.charLen)
-    result.add '"' & str & '"'
+    result.add '"' & x.getStr() & '"'
   of kVecInt, kVecSym, kVecBool, kVecByte, kVecShort,
         kVecLong, kVecReal, kVecFloat,
         kVecMonth, kVecMinute, kVecSecond,

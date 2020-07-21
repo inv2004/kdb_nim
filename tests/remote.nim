@@ -56,7 +56,9 @@ test "test_ipc_sendasync":
 test "test_ipc_async":
   proc server() {.gcsafe.} =
     proc f(x: K): K =
-      result = x
+      check isCall(x)
+      check x[0] == %"test"
+      result = x[1]
       for x in result.mitems[:int64]:
         x *= 2
 
@@ -69,7 +71,7 @@ test "test_ipc_async":
 
   let h = waitFor asyncConnect("localhost", 9997)
   check true
-  waitFor h.sendASync(%[10, 20, 30])
+  waitFor h.callASync("test", %[10, 20, 30])
   let response = waitFor h.read()
   check response == %[20, 40, 60]
 

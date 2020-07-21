@@ -70,7 +70,8 @@ test "test_ipc_high_check":
 
 test "test_ipc_async":
   proc server() {.gcsafe.} =
-    proc f(x: KTable[ReqT]): KTable[ReqT] =
+    proc f(c: string, x: KTable[ReqT]): KTable[ReqT] =
+      check c == "test"
       var c = x.x
       for x in c.mitems[:int64]:
         x *= 10

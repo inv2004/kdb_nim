@@ -77,8 +77,11 @@ proc sendSyncReply*(h: SocketHandle, v: K) =
     assert sent == data.byteLen
     r0(data)
 
-proc isCall*(x: K): bool =
+proc isCall*(x: K0): bool =
   (x.kind == KKind.kList or x.kind == kVecSym) and x.len >= 2
+
+proc isCall*(x: K): bool =
+  isCall(x.k)
 
 proc listen*(port: int, timeout = 1000): SocketHandle =
   var server = newSocket()

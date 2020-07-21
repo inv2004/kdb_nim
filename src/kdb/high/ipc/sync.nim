@@ -15,12 +15,7 @@ proc read*(client: SocketHandle, T: typedesc, check = defaultCheck): (string, KT
   if not isCall(d):
     raise newException(KErrorRemote, "not a ipc call")
 
-  let call = d[0]
-  var str = newString(call.k.charLen)  # copy from format, but without quotes
-  if str.len > 0:
-    copyMem(str[0].addr, call.k.charArr.addr, call.k.charLen)
-
-  (str, d[1].toKTable(T, check = check))
+  (d[0].getStr(), d[1].toKTable(T, check = check))
 
 proc reply*(client: SocketHandle, x: KTable) =
   low.sendSyncReply(client, x.inner)
