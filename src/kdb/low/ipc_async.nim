@@ -7,7 +7,7 @@ import endians
 
 # var clients {.threadvar.}: seq[AsyncSocket]
 
-proc handshake(client: AsyncSocket) {.async} =
+proc handshake*(client: AsyncSocket) {.async} =
   let buf = await client.recv(3)
   let version = if buf.len() > 1: min(3.byte, buf[^2].byte) else: 0.byte
   var bufSend = "_"

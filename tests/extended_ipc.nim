@@ -73,7 +73,8 @@ test "test_ipc_async":
     proc f(x: KTable[ReqT]): KTable[ReqT] =
       var c = x.x
       for x in c.mitems[:int64]:
-        x *= 2
+        x *= 10
+      result = x
 
     waitFor asyncServe(9997, f)
 
@@ -84,8 +85,12 @@ test "test_ipc_async":
 
   let h = waitFor asyncConnect("localhost", 9997)
   check true
-  waitFor h.sendASync(%[10, 20, 30])
-  let response = waitFor h.read()
-  check response == %[20, 40, 60]
+
+  var t = newKTable(ReqT)
+  t.add(ReqT(x: 1))
+  t.add(ReqT(x: 2))
+  t.add(ReqT(x: 3))
+  let response = waitFor h.callTable[:ReqT,ReqT]("test", t, check = true)
+  check toSeq(response.x) == @[10.int64, 20, 30]
 
   # worker1.joinThread()
