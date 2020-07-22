@@ -16,12 +16,12 @@ The goal of this package is not only to provide bindings between the two languag
 - [x] Iterators and mutable iterators
 - [x] Separate types for static garanties
 - [x] Generic types for K-structures
-- [ ] Async-await IO dispatching
+- [x] Async-await IO/IPC dispatching
 - [ ] Historical files access
 - [ ] Translate the package into Java/Scala/Kotlin (by request)
 
 ### Advantages
-Except low-level binding from ``kdb/low``, the main goal the library to interact via high-level interface.
+Except low-level binding from ``kdb/low``, the main goal the library to interact via high-level type-checked interface.
 The best way to understand the advantages of this package is by going through an example:
 
 #### Init part
