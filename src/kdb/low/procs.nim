@@ -39,7 +39,7 @@ proc len*(x: K0): int64 =
 proc len*(x: K): int =
   len(x.k).int
 
-proc add*(x: var K0, v: K)
+proc add*(x: var K0, v: K) {.gcsafe.}
 
 proc add*(x: var K0, v: bool) =
   if x.kind == KKind.kVecBool:
@@ -127,7 +127,7 @@ proc checkAdd(x: var K0, v: K): bool =
   of kVecSym: result = v.k.kind == KKind.kSym
   else: raise newException(KError, "checkAdd[K] is not supported for " & $x.kind)
 
-proc add*(x: var K0, v: K) =
+proc add*(x: var K0, v: K) {.gcsafe.} =
   case x.kind
   of kList: jk(x.addr, r1(v.k))
   of kVecLong: add(x, v.k.jj)
@@ -246,7 +246,7 @@ proc addColumnWithKind*(t: var K, name: string, k: KKind, col: K) =
 #   for i in 0..<t.k.dict.values.len:
 #     t.k.dict.values.kArr[i].add(vals[i])
 
-proc addRow*(t: var K, vals: varargs[K]) =
+proc addRow*(t: var K, vals: varargs[K]) {.gcsafe.} =
   assert not isNil(t.k)
   assert t.k.dict.values.len == vals.len
   for i in 0..<t.k.dict.values.len:

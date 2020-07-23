@@ -5,12 +5,15 @@ import asyncdispatch
 type
   ReqT = object
     x: int64
+  ResT = object
+    x: float64
   ReqTErr1 = object
     x: float
   ReqTErr2 = object
     y: float
 
 defineTable(ReqT)
+defineTable(ResT)
 defineTable(ReqTErr1)
 defineTable(ReqTErr2)
 
@@ -70,12 +73,11 @@ test "test_ipc_high_check":
 
 test "test_ipc_async":
   proc server() {.gcsafe.} =
-    proc f(c: string, x: KTable[ReqT]): KTable[ReqT] =
+    proc f(c: string, x: KTable[ReqT]): KTable[ResT] {.gcsafe.} =
       check c == "test"
-      var c = x.x
-      for x in c.mitems[:int64]:
-        x *= 10
-      result = x
+      result = newKTable(ResT)
+      for x in x.x:
+        result.add(ResT(x: 11 * x.float + x.float / 10.0))
 
     waitFor asyncServe(9997, f)
 
@@ -91,7 +93,7 @@ test "test_ipc_async":
   t.add(ReqT(x: 1))
   t.add(ReqT(x: 2))
   t.add(ReqT(x: 3))
-  let response = waitFor h.callTable[:ReqT,ReqT]("test", t, check = true)
-  check toSeq(response.x) == @[10.int64, 20, 30]
+  let response = waitFor h.callTable[:ReqT, ResT]("test", t, check = true)
+  check toSeq(response.x) == @[11.1.float, 22.2, 33.3]
 
   # worker1.joinThread()
