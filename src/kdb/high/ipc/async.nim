@@ -26,7 +26,7 @@ proc processMessage[T,U](client: AsyncSocket, callback: proc (c: string, request
   case x[0]
   of Async: await client.sendASyncAsync(reply.inner)      # initial request was async
   of Sync: await client.sendSyncReplyAsync(reply.inner)   # initial request was sync
-  else: raise newException(KError, "unsupported msg type")
+  else: raise newException(KError, "unsupported msg type: " & $x[0])
 
 proc processClient[T,U](client: AsyncSocket,
     process: proc (client: AsyncSocket, callback: proc (x: string, request: KTable[T]): KTable[U] {.closure,gcsafe.}): Future[system.void],
