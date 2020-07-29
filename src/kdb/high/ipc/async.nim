@@ -18,35 +18,6 @@ proc callTable*[T,U](client: AsyncSocket, x: string, t: KTable[T], check = defau
   let k = await client.read()
   result = k.toKTable(U, check)
 
-proc processMessage[T,U](client: AsyncSocket, callback: proc (c: string, request: KTable[T]): KTable[U] {.closure,gcsafe.}) {.async.} =
-  let x = await client.readMessage()
-
-  let k = x[1]
-  assert isCall(k)
-
-  let reply = callback(k[0].getStr(), k[1].toK().toKTable(T))
-  case x[0]
-  of Async: await client.sendASyncAsync(reply.inner)      # initial request was async
-  of Sync: await client.sendSyncReplyAsync(reply.inner)   # initial request was sync
-  else: raise newException(KError, "unsupported msg type: " & $x[0])
-
-proc processClient[T,U](client: AsyncSocket,
-    process: proc (client: AsyncSocket, callback: proc (x: string, request: KTable[T]): KTable[U] {.closure,gcsafe.}): Future[system.void],
-    callback: proc (x: string, request: KTable[T]): KTable[U] {.closure,gcsafe.}) {.async.} =
-  await handshake(client)
-  while true:
-    await process(client, callback)
-
-proc asyncServe*[T,U](port: uint32, callback: proc (x: string, request: KTable[T]): KTable[U] {.closure,gcsafe.}) {.async.} =
-  var server = newAsyncSocket()
-  server.setSockOpt(OptReuseAddr, true)
-  server.bindAddr(Port(port))
-  server.listen()
-  while true:
-    let client = await server.accept()
-    echo "connected"
-    asyncCheck processClient[T,U](client, processMessage, callback)
-
 proc processMessage1(client: AsyncSocket, process: proc (n: string, k: K): K {.gcsafe,closure.} ) {.async, gcsafe.} =
   let x = await client.readMessage()
 
@@ -62,12 +33,12 @@ proc processMessage1(client: AsyncSocket, process: proc (n: string, k: K): K {.g
   of Sync: await client.sendSyncReplyAsync(reply)   # initial request was sync
   else: raise newException(KError, "unsupported msg type: " & $x[0])
 
-proc processClient1(client: AsyncSocket, process: proc (n: string, k: K): K {.gcsafe,closure.}) {.async, gcsafe.} =
+proc processClient(client: AsyncSocket, process: proc (n: string, k: K): K {.gcsafe,closure.}) {.async, gcsafe.} =
   await handshake(client)
   while true:
     await processMessage1(client, process)
 
-proc asyncServe1*(port: uint32, process: proc (n: string, k: K): K {.gcsafe,closure.}) {.async, gcsafe.} =
+proc asyncServe*(port: uint32, process: proc (n: string, k: K): K {.gcsafe,closure.}) {.async, gcsafe.} =
   var server = newAsyncSocket()
   server.setSockOpt(OptReuseAddr, true)
   server.bindAddr(Port(port))
@@ -75,7 +46,7 @@ proc asyncServe1*(port: uint32, process: proc (n: string, k: K): K {.gcsafe,clos
   echo "serve ", port
   while true:
     let client = await server.accept()
-    asyncCheck processClient1(client, process)
+    asyncCheck processClient(client, process)
 
 proc getDefs(t: NimNode): seq[(string, NimNode)] =
   if t.kind == nnkStmtList:
@@ -154,4 +125,4 @@ macro serve*(port: typed, body: typed): untyped =
   result.add newProc(ident("process1"), params, newStmtList(ccase), pragmas = newPragma(ident"gcsafe"))
 
   result.add quote do:
-    asyncCheck asyncServe1(`port`, process1)
+    asyncCheck asyncServe(`port`, process1)
