@@ -155,14 +155,3 @@ macro serve*(port: typed, body: typed): untyped =
 
   result.add quote do:
     asyncCheck asyncServe1(`port`, process1)
-
-#  echo result.treeRepr
-
-# dumpTree:
-# proc process1(n: string, k: K): K {.gcsafe,closure.} =
-#   case n
-#   of "f1": f1(k.toTable(ReqT)).inner
-#   of "f2": f2(k.toTable(ResT)).inner
-#   else: raise newException(KError, "aaa" & n)
-
-# asyncServe1(9999, process2)
