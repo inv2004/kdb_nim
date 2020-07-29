@@ -72,19 +72,15 @@ test "test_ipc_high_check":
   worker1.joinThread()
 
 test "test_ipc_async":
-  proc server() {.gcsafe.} =
-    proc f(c: string, x: KTable[ReqT]): KTable[ResT] {.gcsafe.} =
-      check c == "test"
+  serve(9997):
+    proc test1(x: KTable[ReqT]): KTable[ResT] {.gcsafe.} =
       result = newKTable(ResT)
       for x in x.x:
         result.add(ResT(x: 11 * x.float + x.float / 10.0))
-
-    waitFor asyncServe(9997, f)
-
-  var worker1: Thread[void]
-  createThread(worker1, server)
-
-  sleep(20)
+    proc test2(x: KTable[ResT]): KTable[ReqT] {.gcsafe.} =
+      result = newKTable(ReqT)
+      for x in x.x:
+        result.add(ReqT(x: 10 * x.int))
 
   let h = waitFor asyncConnect("localhost", 9997)
   check true
@@ -93,7 +89,13 @@ test "test_ipc_async":
   t.add(ReqT(x: 1))
   t.add(ReqT(x: 2))
   t.add(ReqT(x: 3))
-  let response = waitFor h.callTable[:ReqT, ResT]("test", t, check = true)
+  let response = waitFor h.callTable[:ReqT, ResT]("test1", t, check = true)
   check toSeq(response.x) == @[11.1.float, 22.2, 33.3]
 
-  # worker1.joinThread()
+  var t2 = newKTable(ResT)
+  t2.add(ResT(x: 1.1))
+  t2.add(ResT(x: 2.2))
+  t2.add(ResT(x: 3.3))
+  let response2 = waitFor h.callTable[:ResT, ReqT]("test2", t2, check = true)
+  check toSeq(response2.x) == @[10.int64, 20, 30]
+
