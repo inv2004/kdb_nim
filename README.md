@@ -30,6 +30,15 @@ Code to run on q-server side to simulate stream data after some-kind of subscrip
 .u.sub:{[x;y;z] system"t 1000"; .z.ts:{[x;y] -1 .Q.s2 x(`enrich;([] n:10?5))}[.z.w]; (1b; `ok)}
 ```
 
+<details>
+  <summary>Click to expant full code</summary>
+
+### Nim-client:
+  ```nim
+lets try
+  ```
+</details>
+
 Nim-client:
 ```nim
 type

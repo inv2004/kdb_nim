@@ -290,6 +290,9 @@ proc transform*[T, J, JJ, JJJ](t: KTable[T], TT: typedesc, col1: openArray[J], c
   t.moved = true
   KTable[TT](inner: t.inner, moved: false)
 
+proc toK*(t: KTable):K =
+  t.inner
+
 # dumpTree:
 #   proc genValues(t: KTable[T1], x: T1): seq[K] =
 #     let v1 = x.price.toK()
@@ -298,4 +301,3 @@ proc transform*[T, J, JJ, JJJ](t: KTable[T], TT: typedesc, col1: openArray[J], c
 #     let v2 = x.name.toK()
 #     discard r1(v2.k)
 #     result.add(v2)
-

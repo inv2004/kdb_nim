@@ -1,7 +1,10 @@
 import kdb/low
+# export asyncServe
 export low.asyncServe
 export low.asyncConnect
 import kdb/high/table
+
+import shared
 
 import asyncnet, asyncdispatch
 import endians
@@ -13,9 +16,8 @@ var defaultCheck = false
 proc setCheck*(check: bool) =
   defaultCheck = check
 
-proc callTable*[T,U](client: AsyncSocket, x: string, t: KTable[T], check = defaultCheck): Future[KTable[U]] {.async.} =
-  await client.callASync(x, t.inner)
-  let k = await client.read()
+proc asyncCallTable*[T,U](client: AsyncSocket, x: string, t: KTable[T], check = defaultCheck): Future[KTable[U]] {.async.} =
+  let k = await client.asyncCall(x, t.inner)
   result = k.toKTable(U, check)
 
 proc processMessage1(client: AsyncSocket, process: proc (n: string, k: K): K {.gcsafe,closure.} ) {.async, gcsafe.} =
@@ -126,3 +128,28 @@ macro serve*(port: typed, body: typed): untyped =
 
   result.add quote do:
     asyncCheck asyncServe(`port`, process1)
+
+proc asyncCall*[T](socket: AsyncSocket, x: string, a, b, c: K): Future[T] {.async.} =
+  var l = newKList()
+  l.add(x.toK())
+  # for x in args:
+  #   l.add(x)
+  l.add(a)
+  l.add(b)
+  l.add(c)
+
+  let data = b9(3, l.k)
+  data.byteArr[1] = 1  # sync type
+  await socket.send(data.byteArr.addr, data.byteLen.int)
+  r0(data)
+  let k = await socket.asyncRead()
+  result = get[T](k)
+
+converter toKK*(x: float64): K =
+  low.toK(x)
+
+converter toKK*(x: string): K =
+  low.toK(x)
+
+converter toKK*(x: Sym): K =
+  x.inner

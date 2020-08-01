@@ -38,7 +38,7 @@ test "test_ipc":
   t.add(ReqT(x: 1))
   t.add(ReqT(x: 2))
   t.add(ReqT(x: 3))
-  let response = h.callTable[:ReqT]("test", t.inner, check = true)
+  let response = h.callTable[:ReqT]("test", t, check = true)
   check toSeq(response.x) == @[10.int64, 20, 30]
 
   worker1.joinThread()
@@ -64,7 +64,7 @@ test "test_ipc_high_check":
   check true
   var t = newKTable(ReqT)
   try:
-    let response = h.callTable[:ReqTErr2]("test", t.inner, check = true)
+    let response = h.callTable[:ReqTErr2]("test", t, check = true)
     check false
   except:
     check true
@@ -89,13 +89,13 @@ test "test_ipc_async":
   t.add(ReqT(x: 1))
   t.add(ReqT(x: 2))
   t.add(ReqT(x: 3))
-  let response = waitFor h.callTable[:ReqT, ResT]("test1", t, check = true)
+  let response = waitFor h.asyncCallTable[:ReqT, ResT]("test1", t, check = true)
   check toSeq(response.x) == @[11.1.float, 22.2, 33.3]
 
   var t2 = newKTable(ResT)
   t2.add(ResT(x: 1.1))
   t2.add(ResT(x: 2.2))
   t2.add(ResT(x: 3.3))
-  let response2 = waitFor h.callTable[:ResT, ReqT]("test2", t2, check = true)
+  let response2 = waitFor h.asyncCallTable[:ResT, ReqT]("test2", t2, check = true)
   check toSeq(response2.x) == @[10.int64, 20, 30]
 

@@ -89,7 +89,7 @@ createAsyncServe(processMessage)
 proc asyncConnect*(hostname: string, port: int): Future[AsyncSocket] {.async.} =
   result = newAsyncSocket()
   await result.connect(hostname, Port(port))
-  await result.send("\0\3\0")
+  await result.send("k\3\0")
   discard await result.recv(1)
 
 proc sendAsync*(socket: AsyncSocket, v: K) {.async.} =
@@ -98,14 +98,17 @@ proc sendAsync*(socket: AsyncSocket, v: K) {.async.} =
   await socket.send(data.byteArr.addr, data.byteLen.int)
   r0(data)
 
-proc callAsync*(socket: AsyncSocket, x: string, v: K) {.async.} =
+proc asyncRead*(socket: AsyncSocket): Future[K] {.async.} =
+  result = (await socket.readMessage())[1]
+
+proc asyncCall*(socket: AsyncSocket, x: string, a: K): Future[K] {.async.} =
   var l = newKList()
   l.add(x.toK())
-  l.add(v)
+  l.add(a)
+
   let data = b9(3, l.k)
   data.byteArr[1] = 1  # sync type
   await socket.send(data.byteArr.addr, data.byteLen.int)
   r0(data)
+  result = await asyncRead(socket)
 
-proc read*(socket: AsyncSocket): Future[K] {.async.} =
-  result = (await socket.readMessage())[1]
