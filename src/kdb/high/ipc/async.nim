@@ -1,6 +1,4 @@
 import kdb/low
-# export asyncServe
-export low.asyncServe
 export low.asyncConnect
 import kdb/high/table
 
