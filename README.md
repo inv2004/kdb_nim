@@ -11,7 +11,7 @@ The goal of this package is not only to provide bindings between the two languag
 ### Features / TODO:
 - [x] Support all Kdb types in low-level binding
 - [x] Automatic memory management
-- [x] IPC + Sync Replay
+- [x] IPC + Sync Reply
 - [x] Implicit casting between Nim and Kdb types
 - [x] Iterators and mutable iterators
 - [x] Separate types for static garanties
