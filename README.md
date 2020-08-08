@@ -128,7 +128,7 @@ It's important point out that we also do type checking here. If we try to put fl
     result.add(ReplyT(n: 100, s: "hundred"))
     echo result
 ```
-Nim distinguishes between mutable and immutable data, that is why we defined ``var resp`` as mutable in the previous lines because we are going to modify it by adding row. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
+Nim distinguishes between mutable and immutable data, by default result of the procedure is mutable, and it helps us because we are going to modify it by adding row. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
 
 ```nim
 runForever()
