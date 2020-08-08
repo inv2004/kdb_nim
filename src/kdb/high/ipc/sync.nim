@@ -34,3 +34,6 @@ proc call*[T](client: SocketHandle, x: string, args: varargs[K, toK]): T =
 
 proc callAsync*(client: SocketHandle, x: string, args: varargs[K, toK]) =
   low.execAsync(client, x, args)
+
+template toK*(x: typed): K =  # TODO: not sure, but varargs wants it
+  low.toK(x)

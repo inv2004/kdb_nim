@@ -18,6 +18,8 @@ proc handshake*(client: AsyncSocket) {.async} =
   bufSend[0] = version.char
   await client.send(bufSend)
 
+import strutils
+
 proc sendSyncReplyAsync*(client: AsyncSocket, v: K) {.async.} =
   case v.kind
   of kError:  # kError does not work via b9
@@ -53,7 +55,7 @@ proc readMessage*(socket: AsyncSocket): Future[(MessageType, K)] {.async.} =
   copyMem(kBytes.k.byteArr.addr, buf[0].addr, len)
   
   let k = d9(kBytes.k)
-  assert not isNil(k)
+  assert not isNil(k)  # TODO: check error
   result = (MessageType(buf[1].byte), k.toK())
 
 proc processMessage(client: AsyncSocket, callback: proc (request: K): K {.closure,gcsafe.}) {.async.} =
@@ -89,7 +91,7 @@ createAsyncServe(processMessage)
 proc asyncConnect*(hostname: string, port: int): Future[AsyncSocket] {.async.} =
   result = newAsyncSocket()
   await result.connect(hostname, Port(port))
-  await result.send("k\3\0")
+  await result.send("c\3\0")
   discard await result.recv(1)
 
 proc sendAsync*(socket: AsyncSocket, v: K) {.async.} =
