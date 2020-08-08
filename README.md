@@ -64,7 +64,7 @@ let rep = waitFor client.asyncCall[:(bool, Sym)](".u.sub", 123.456, "str", s"sym
 echo rep
 
 serve(client):
-  proc enrich(data: KTable[RequestT]): KTable[ReplyT] {.gcsafe.} =
+  proc enrich(data: KTable[RequestT]): KTable[ReplyT] =
     let newCol = data.n.mapIt(d.getOrDefault(it))
     result = data.transform(ReplyT, newCol)
     result.add(ReplyT(n: 100, s: "hundred"))
