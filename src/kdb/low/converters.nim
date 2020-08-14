@@ -88,7 +88,7 @@ proc toSym*(x: string): K =
 proc `s`*(x: string): K =
   K(k: ks(x.cstring))
 
-proc toError*(x: string): K =
+proc toKError*(x: string): K =
   let k0 = kerr(x.cstring)
   K(k: k0)
 

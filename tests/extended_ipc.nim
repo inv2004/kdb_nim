@@ -125,3 +125,33 @@ test "test_ipc_async_client":
       result = newKTable(ResT)
       for x in x.x:
         result.add(ResT(x: x.float))
+
+test "test_ipc_async_error":
+  proc server() {.gcsafe.} =
+    let client = listen(9995)
+
+    var t = newKTable(ReqT)
+    t.add(ReqT(x: 1))
+    t.add(ReqT(x: 2))
+    t.add(ReqT(x: 3))
+
+    try:
+      let resp = client.callTable[:ResT]("test2", t.inner)
+      check false
+    except KErrorRemote:
+      check "test2" == getCurrentExceptionMsg()
+
+  var worker1: Thread[void]
+  createThread(worker1, server)
+
+  sleep(20)
+
+  let client = waitFor asyncConnect("localhost", 9995)
+  check true
+
+  serveOne(client):
+    proc test1(x: KTable[ReqT]): KTable[ResT] {.gcsafe.} =
+      check toSeq(x.x) == @[1.int64, 2, 3]
+      result = newKTable(ResT)
+      for x in x.x:
+        result.add(ResT(x: x.float))

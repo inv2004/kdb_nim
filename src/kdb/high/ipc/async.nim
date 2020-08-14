@@ -1,5 +1,6 @@
 import kdb/low
 export low.asyncConnect
+export low.KErrorRemote
 import kdb/high/table
 
 import shared
@@ -146,6 +147,7 @@ macro serveOne*(port: uint32 | AsyncSocket, body: typed): untyped =
 
   let kType = bindSym("K")
   let kError = bindSym("KError")
+  let toKError = bindSym("toKError")
 
   var params = newSeq[NimNode]()
   params.add kType
@@ -156,7 +158,7 @@ macro serveOne*(port: uint32 | AsyncSocket, body: typed): untyped =
 
   for (n, t) in defs:
     ccase.add newOfBranch(newStrLitNode(n), newStmtList(newDotExpr(newCall(ident n, newCall(newDotExpr(ident"k", ident"toKTable"), t)), ident"inner")))
-  ccase.add newElse(newStmtList(newRaiseStmt(newCall(ident"newException", ident"ValueError", newInfix(ident"&", newStrLitNode"function call not found", ident "n")))))
+  ccase.add newElse(newStmtList(newCall(toKError, ident"n")))
 
   result.add newProc(ident("process123"), params, newStmtList(ccase), pragmas = newPragma(ident"gcsafe"))
 
