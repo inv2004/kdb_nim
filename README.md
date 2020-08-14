@@ -33,7 +33,7 @@ Code to run on q-server side to simulate stream data after some-kind of subscrip
 .u.sub:{[x;y;z] system"t 1000"; .z.ts:{[x;y] -1 .Q.s2 x(`enrich;([] n:10?5))}[.z.w]; (1b; `ok)}
 ```
 
-Full code is here [enrich_req.nim](/inv2004/kdb_nim/blob/master/examples/enrich_req.nim)
+Full code is here [enrich_req.nim](/examples/enrich_req.nim)
 
 Nim-client:
 ```nim
