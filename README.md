@@ -19,7 +19,7 @@ The goal of this package is not only to provide bindings between the two languag
 - [x] Async-await IO/IPC dispatching
 - [x] IPC Routing macro
 - [ ] Historical files access
-- [ ] Translate the package into Java/Scala/Kotlin (by request)
+- [ ] Translate the package into Java/Scala/Kotlin/Rust (by request)
 
 ### Advantages
 Except low-level binding from ``kdb/low``, the main goal the library to interact via high-level type-checked interface.
