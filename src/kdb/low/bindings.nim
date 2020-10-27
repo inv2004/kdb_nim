@@ -3,10 +3,10 @@ export types
 
 
 when defined(windows):
-  import winlean
+  from winlean import SocketHandle
   export winlean.SocketHandle
 else:
-  import posix
+  from posix import SocketHandle
   export posix.SocketHandle
 
 proc kb*(x: bool): K0 {.

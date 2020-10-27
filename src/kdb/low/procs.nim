@@ -4,7 +4,8 @@
 import sequtils
 
 proc initMemory*() = 
-  echo "Init KDB Memory"
+  when not defined(release):
+    echo "Init KDB Memory"
   discard khp("", -1)
 
 proc kind*(x: K): KKind {.inline.} =
