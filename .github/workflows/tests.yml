@@ -37,6 +37,7 @@ jobs:
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ matrix.nim }}
+        if: runner.os != 'Windows'
       - uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ matrix.nim }}
