@@ -93,7 +93,7 @@ proc `$`*(x: K): string {.gcsafe.} =
   of kInt:
     result.add $x.k.ii
   of kLong:
-    result.add $x.k.jj
+    result.add if x.k.jj == 0x8000000000000000: "NaN" else: $x.k.jj
   of kReal:
     result.add $x.k.rr
   of kFloat:
