@@ -18,6 +18,7 @@ The goal of this package is not only to provide bindings between the two languag
 - [x] Generic types for K-structures
 - [x] Async-await IO/IPC dispatching
 - [x] IPC Routing macro
+- [ ] Native implementation without k bindings
 - [ ] Historical files access
 - [ ] Translate the package into Java/Scala/Kotlin/Rust (by request)
 
