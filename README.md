@@ -50,7 +50,7 @@ defineTable(ReplyT)
 ```
 One of the main ideas of the library is to help to catch all type-related errors during compile time. That's why the first thing we want is to define schema for the tables we use. We generate the schema by ``defineTable`` declaration from basic language structures which represent a row of our table.
 
-Another point is that Nim has inheritance for structures, and we can use it, so the table ``ReplyT`` actually has two fields: ``n`` and ``s`` from ``RequestT``.
+Another point is that Nim has inheritance for structures, and we can use it, so the table ``ReplyT`` actually has two fields: ``s`` and ``n`` from ``RequestT``.
 
 ``defineTable`` automatically generates a functions to interact with the table according to the struct's fields and types during compiletime, not runtime.
 
