@@ -92,7 +92,7 @@ It's important point out that we also do type checking here. If we try to put fl
 ```
 Nim distinguishes between mutable and immutable data, by default result of the procedure is mutable, and it helps us because we are going to modify it by adding row. If we provided a wrong struct or types into the ``add`` function then we would get compilation error, I specifically mentioned this because in kdb the problem can only be found at runtime or even in production.
 
-Additional point that the library automatically detects is it sync or async call and sends reply back according to the requested message type, but it did not block thread, because all logic is implemented in Nim's asynchronous IO.
+Additional point that the library automatically detects is it sync or async call and sends reply back according to the requested message type, but it does not block thread, because all logic is implemented in Nim's asynchronous IO.
 
 All types implement the output interface, so you will see a reply after ``echo``
 ```nim
