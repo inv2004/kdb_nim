@@ -13,8 +13,6 @@ type
 defineTable(RequestT)
 defineTable(ReplyT)
 
-const d = {1: "one", 2: "two", 3: "three"}.toTable
-
 # q-server:
 # .u.sub:{[x;y;z] system"t 1000"; .z.ts:{[x;y] -1 .Q.s2 x(`enrich;([] n:10?5))}[.z.w]; (1b; `ok)}
 
