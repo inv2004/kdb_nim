@@ -55,8 +55,6 @@ Another point is that Nim has inheritance for structures, and we can use it, so 
 ``defineTable`` automatically generates a functions to interact with the table according to the struct's fields and types during compiletime, not runtime.
 
 ```nim
-const d = {1: "one", 2: "two", 3: "three"}.toTable
-
 let client = waitFor asyncConnect("your-server", 9999)
 
 let rep = waitFor client.asyncCall[:(bool, Sym)](".u.sub", 123.456, "str", s"sym")
